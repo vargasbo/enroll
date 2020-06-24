@@ -169,6 +169,13 @@ end
 Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |named_person, legal_name, legal_name2|
   person = people[named_person]
   sponsorship =  employer(legal_name).benefit_sponsorships.first
+  person_record = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first || FactoryBot.create(
+    :person,
+    :with_family,
+    first_name: person[:first_name],
+    last_name: person[:last_name]
+  )
+  employee_role = FactoryBot.create(:employee_role, person: person_record, employer_profile: employer(legal_name).employer_profile)
   census_employees 1,
                    benefit_sponsorship: sponsorship, employer_profile: sponsorship.profile,
                    first_name: person[:first_name],
@@ -176,6 +183,9 @@ Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |nam
                    ssn: person[:ssn],
                    dob: person[:dob],
                    email: FactoryBot.build(:email, address: person[:email])
+  census_employee = CensusEmployee.where(:first_name => /#{person[:first_name]}/i,
+                       :last_name => /#{person[:last_name]}/i).first
+  employee_role.update_attributes!(census_employee_id: census_employee.id)
   if legal_name2.present?
     sponsorship2 = employer(legal_name2).benefit_sponsorships.first
     FactoryBot.create_list(:census_employee, 1,
@@ -246,6 +256,32 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   end
   login_as user
   visit "/families/home"
+end
+
+And(/(.*) has active coverage in coverage enrolled state/) do |named_person|
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  raise("Census Employee record not present #{person[:first_name]} #{person[:last_name]}") if ce.blank?
+  person_rec = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
+  raise("Person record not present #{person[:first_name]} #{person[:last_name]}") if person_rec.blank?
+  benefit_package = ce.active_benefit_group_assignment.benefit_package
+  active_enrollment = FactoryBot.create(:hbx_enrollment,
+                                         family: person_rec.primary_family,
+                                         household: person_rec.primary_family.active_household,
+                                         coverage_kind: "health",
+                                         effective_on: TimeKeeper.date_of_record - 1.month,
+                                         enrollment_kind: "open_enrollment",
+                                         kind: "employer_sponsored",
+                                         submitted_at: benefit_package.start_on - 1.month,
+                                         employee_role_id: person_rec.active_employee_roles.first.id,
+                                         benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                                         benefit_sponsorship_id: ce.benefit_sponsorship.id,
+                                         sponsored_benefit_package_id: benefit_package.id,
+                                         sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
+                                         rating_area_id: benefit_package.rating_area.id,
+                                         product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
+                                         issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id)
+  active_enrollment.update_attributes!(aasm_state: 'coverage_enrolled')
 end
 
 And(/(.*) has active coverage and passive renewal/) do |named_person|
