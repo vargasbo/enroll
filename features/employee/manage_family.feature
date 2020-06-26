@@ -16,9 +16,7 @@ Feature: Employees can update their password or security questions
     And hbx_read_only admin clicks family home page link for Patrick Doe
     And hbx_read_only admin Soren Smith clicks Manage Family link
     Then hbx_read_only admin should click on the Personal Tab link
-    And the user clicks submit button
-    Then Soren White should see a message saying that they do not have the necessary permissions to perform that action
-
+    Then Soren White should see a disabled Save button
 
 #  Scenario: An employee can update their password with the correct original password
 #    Given Employer exists and logs in
