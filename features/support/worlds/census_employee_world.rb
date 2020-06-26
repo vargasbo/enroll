@@ -87,9 +87,11 @@ module CensusEmployeeWorld
 
   def census_employee(named_person = nil)
     @census_employee ||= {}
-
-    if named_person.present?
+    person = people[named_person]
+    if named_person.present? && @census_employee[named_person].present?
       @census_employee[named_person]
+    elsif CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).present?
+      CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).last
     else
       @census_employee.values.first
     end
@@ -153,17 +155,25 @@ end
 And(/^there is a census employee record and employee role for (.*?) for employer (.*?)$/) do |named_person, legal_name|
   create_census_employee_from_person(named_person, legal_name)
   person = people[named_person]
-  organization = employer(legal_name)
-  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  ce = census_employee(named_person)
+  sponsorship = employer(legal_name).benefit_sponsorships.first
+  profile = sponsorship.profile
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
   employer_profile = employer_profile(legal_name)
-  employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)
-  person_record.employee_roles <<  employer_staff_role
-  person_record.save!
+  create_list(:employee_role, 1,
+                    person: person_record,
+                    census_employee_id: ce.id,
+                    benefit_sponsors_employer_profile_id: profile.id,
+                    employer_profile_id: employer(legal_name).employer_profile.id,
+                    hired_on: ce.hired_on,
+                    ssn: person_record.ssn || person[:ssn],
+                    dob: person_record.dob || person[:dob])
+  expect(person_record.employee_roles.count).to eq(1)
 end
 
 And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|
   person = people[named_person]
-  census_employee.update(aasm_state: state)
+  census_employee(named_person).update(aasm_state: state)
 end
 
 Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |named_person, legal_name, legal_name2|
@@ -231,7 +241,7 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
     person_record = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).last
     person_record.update_attributes!(ssn: person[:ssn]) if person_record.ssn.blank?
     person_record.update_attributes!(gender: person[:gender]) if person_record.gender.blank?
-    if person_record.employee_roles.last.present?
+    if person_record.employee_roles.present?
       employee_role = person_record.employee_roles.last
     else
       create_list(:employee_role, 1,
@@ -242,6 +252,7 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                     hired_on: ce.hired_on,
                     ssn: person_record.ssn || person[:ssn],
                     dob: person_record.dob || person[:dob])
+      employee_role = person_record.employee_roles.last
     end
   else
     person_record = FactoryBot.create(:person_with_employee_role,
@@ -252,12 +263,13 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                                        census_employee_id: ce.id,
                                        benefit_sponsors_employer_profile_id: profile.id,
                                        hired_on: ce.hired_on)
+    employee_role = person_record.employee_roles.last
   end
 
   sponsorship.benefit_applications.each do |benefit_application|
     benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
   end
-  ce.update_attributes(employee_role_id: person_record.employee_roles.last.id)
+  ce.update_attributes(employee_role_id: employee_role.id)
   if person_record.primary_family.blank?
     FactoryBot.create :family, :with_primary_family_member, person: person_record
   end
