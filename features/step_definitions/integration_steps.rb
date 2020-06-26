@@ -155,6 +155,9 @@ def people
       first_name: "Ricky",
       last_name: "Martin",
       dob_date: '10/10/1984',
+      dob: '10/10/1984',
+      gender: 'male',
+      email: 'ricky.martin@example.com',
       broker_census_employee: true,
       password: 'aA1!aA1!aA1!',
       ssn: "222335220"
