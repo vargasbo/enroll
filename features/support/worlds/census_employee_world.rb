@@ -140,7 +140,7 @@ World(CensusEmployeeWorld)
 And(/^census employee (.*?) new_hire_enrollment_period is greater than date of record$/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
-  ce.update_attributes(hired_on: TimeKeeper.date_of_record + 1.month)
+  ce.update_attributes!(hired_on: TimeKeeper.date_of_record + 1.month)
 end
 
 And(/^there (are|is) (\d+) (employee|employees) for (.*?)$/) do |_, roster_count, _, legal_name|
@@ -213,7 +213,7 @@ And(/employee (.*?) has (.*?) hired on date/) do |named_person, ee_hire_date|
   date = ee_hire_date == "current" ? TimeKeeper.date_of_record : TimeKeeper.date_of_record - 1.year
   person = people[named_person]
   CensusEmployee.where(:first_name => /#{person[:first_name]}/i,
-                       :last_name => /#{person[:last_name]}/i).first.update_attributes(:hired_on => date, :created_at => date)
+                       :last_name => /#{person[:last_name]}/i).first.update_attributes!(:hired_on => date, :created_at => date)
 end
 
 And(/employee (.*) has earliest eligible date under current active plan year/) do |named_person|
@@ -264,6 +264,12 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                                        benefit_sponsors_employer_profile_id: profile.id,
                                        hired_on: ce.hired_on)
     employee_role = person_record.employee_roles.last
+  end
+
+  if ce.employee_role.blank?
+    ce.employee_role = employee_role
+    ce.save!
+    employee_role.update_attributes!(hired_on: ce.hired_on)
   end
 
   sponsorship.benefit_applications.each do |benefit_application|
