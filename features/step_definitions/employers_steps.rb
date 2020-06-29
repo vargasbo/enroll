@@ -1034,6 +1034,7 @@ When(/^employer selects (.*) employee on Employee Roster$/) do |named_person|
 end
 
 Then(/^employer should see enrollment tile$/) do
+  sleep 5
   expect(page).to have_content('Coverage Selected')
 end
 
