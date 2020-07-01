@@ -306,7 +306,6 @@ And(/(.*) has active coverage and passive renewal/) do |named_person|
                                          rating_area_id: benefit_package.rating_area.id,
                                          product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
                                          issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id)
-  active_enrollment.update_attributes!(aasm_state: 'coverage_enrolled')
   new_benefit_package = benefit_sponsorship.renewal_benefit_application.benefit_packages.first
   active_enrollment.renew_benefit(new_benefit_package)
 end
