@@ -87,9 +87,12 @@ module CensusEmployeeWorld
 
   def census_employee(named_person = nil)
     @census_employee ||= {}
+    person = people[named_person]
 
-    if named_person.present?
+    if named_person.present? && @census_employee[named_person]
       @census_employee[named_person]
+    elsif CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).present?
+      CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
     else
       @census_employee.values.first
     end
@@ -179,11 +182,18 @@ Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |nam
   if census_employee.blank?
     census_employee = create_census_employee_from_person(named_person, legal_name)
   end
-  employee_role = census_employee.employee_role
-  if employee_role.blank?
-      employee_role = FactoryBot.create(:employee_role, person: person_record, employer_profile: employer(legal_name).employer_profile)
+  if census_employee.employee_role.blank?
+    employee_role = FactoryBot.create(
+      :employee_role,
+      person: person_record,
+      benefit_sponsors_employer_profile_id: sponsorship.profile.id,
+      census_employee_id: census_employee.id,
+      hired_on: census_employee.hired_on
+    )
+    census_employee.update_attributes!(employee_role_id: employee_role.id)
+  else
+    census_employee.employee_role.update_attributes!(census_employee_id: census_employee.id)
   end
-  employee_role.update_attributes!(census_employee_id: census_employee.id)
   if legal_name2.present?
     sponsorship2 = employer(legal_name2).benefit_sponsorships.first
     FactoryBot.create_list(:census_employee, 1,
@@ -200,8 +210,9 @@ end
 And(/employee (.*?) has (.*?) hired on date/) do |named_person, ee_hire_date|
   date = ee_hire_date == "current" ? TimeKeeper.date_of_record : TimeKeeper.date_of_record - 1.year
   person = people[named_person]
-  CensusEmployee.where(:first_name => /#{person[:first_name]}/i,
-                       :last_name => /#{person[:last_name]}/i).first.update_attributes(:hired_on => date, :created_at => date)
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i,
+                       :last_name => /#{person[:last_name]}/i).last
+  ce.update_attributes!(:hired_on => date, :created_at => date)
 end
 
 And(/employee (.*) has earliest eligible date under current active plan year/) do |named_person|
@@ -238,7 +249,8 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   sponsorship.benefit_applications.each do |benefit_application|
     benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
   end
-  ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
+  ce.update_attributes!(employee_role_id: person_record.employee_roles.first.id)
+  ce.employee_role.update_attributes!(hired_on: ce.hired_on)
   if person_record.primary_family.blank?
     FactoryBot.create :family, :with_primary_family_member, person: person_record
   end
@@ -329,8 +341,7 @@ And(/^Assign benefit group assignments to (.*?) employee$/) do |legal_name|
   benefit_package = fetch_benefit_group(legal_name)
   @census_employees.each do |employee|
     employee.add_benefit_group_assignment(benefit_package)
-  end
-end
+  end end
 
 And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
 
