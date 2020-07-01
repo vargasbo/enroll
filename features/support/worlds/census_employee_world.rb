@@ -165,8 +165,7 @@ And(/^there is a census employee record and employee role for (.*?) for employer
 end
 
 And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|
-  person = people[named_person]
-  census_employee.update(aasm_state: state)
+  census_employee(named_person).update(aasm_state: state)
 end
 
 Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |named_person, legal_name, legal_name2|
