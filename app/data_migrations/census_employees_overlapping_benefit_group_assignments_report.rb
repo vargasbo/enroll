@@ -9,7 +9,11 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
     overlapping_bgas = []
     census_employee.benefit_group_assignments.each do |target_bga|
       census_employee.benefit_group_assignments.each do |bga|
-        if (bga.start_on..bga.end_on).cover?(target_bga.start_on) || (bga.start_on..bga.end_on).cover?(target_bga.start_on)
+        next if [target_bga.start_on, target_bga.end_on].any? { |date| date.blank? }
+        # TODO: Need to figure out what to do if no end on date
+        bga_end_on = bga.end_on || bga.start_on + 1.year
+        if (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.start_on&.to_datetime) ||
+          (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.end_on&.to_datetime)
           overlapping_bgas << bga
         end
       end
@@ -20,8 +24,9 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
     }
   end
   def migrate
+    puts("Beginning census employee with overlapping Benefit Group Assignments report generation.")
     Dir.mkdir("census_employees_overlapping_bgas_report") unless File.exists?("census_employees_overlapping_bgas_report")
-    file_name = "#{Rails.root}/census_employees_overlapping_bgas_report#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
+    file_name = "#{Rails.root}/census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
 
     logger = Logger.new("#{Rails.root}/log/census_employees_overlapping_bgas_report.log") unless Rails.env.test?
     logger.info "Script Start for census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -33,13 +38,13 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
         result = ce_overlapping_benefit_assignments(census_employee)
         result[:benefit_group_assignments].each do |benefit_group_assignment|
           csv << [
-            result[:census_employee][:first_name],
-            result[:census_employee][:last_name],
-            result[:census_employee][:benefit_sponsorship][:organization][:fein],
-            result[:census_employee][:assm_state],
-            benefit_group_assignment[:id].to_s,
-            benefit_group_assignment[:start_on].to_s,
-            benefit_group_assignment[:end_on].to_s
+            result[:census_employee].first_name,
+            result[:census_employee].last_name,
+            result[:census_employee].employee_role.employer_profile.fein || result[:census_employee].employee_role.employer_profile.legal_name,
+            result[:census_employee].aasm_state,
+            benefit_group_assignment.id.to_s,
+            benefit_group_assignment.start_on.to_s,
+            benefit_group_assignment.end_on.to_s
           ]
         end
       end
