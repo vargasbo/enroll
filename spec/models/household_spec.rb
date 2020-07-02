@@ -359,22 +359,22 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
 
   it "should create one active tax household for the specified year" do
     expect(active_household.tax_households.count).to be 0
-    active_household.build_thh_and_eligibility(60, 94, date, slcsp)
+    active_household.build_thh_and_eligibility(60, 94, date, slcsp, "Admin")
     expect(active_household.tax_households.count).to be 1
   end
 
   it "should create one eligibility determination for respective tax household" do
-    active_household.build_thh_and_eligibility(200, 73, date, slcsp)
+    active_household.build_thh_and_eligibility(200, 73, date, slcsp, "Admin")
     expect(active_household.latest_active_thh.eligibility_determinations.count).to be 1
   end
 
   it "end dates all prior THH for the given year" do
-    2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp)}
+    2.times {active_household.build_thh_and_eligibility(200, 73, date, slcsp, "Admin")}
     expect(active_household.active_thh_with_year(TimeKeeper.date_of_record.year).count).to be 1
   end
 
   it 'should create determination with limited csr' do
-    active_household.build_thh_and_eligibility(200, 'limited', date, slcsp)
+    active_household.build_thh_and_eligibility(200, 'limited', date, slcsp, "Admin")
     @eligibility_determination = active_household.latest_active_thh.latest_eligibility_determination
     expect(@eligibility_determination.csr_percent_as_integer).to eq(-1)
     expect(@eligibility_determination.csr_eligibility_kind).to eq('csr_limited')
