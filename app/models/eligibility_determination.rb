@@ -10,6 +10,9 @@ class EligibilityDetermination
 
   CSR_PERCENT_VALUES = %w[100 94 87 73 0 -1].freeze
 
+  SOURCE_KINDS = %w[Curam Admin Renewals].freeze
+
+
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
   CSR_KIND_TO_PLAN_VARIANT_MAP = {
@@ -48,6 +51,11 @@ class EligibilityDetermination
   before_validation :set_premium_credit_strategy, :set_determined_at
 
   validates_presence_of :determined_at, :max_aptc, :csr_percent_as_integer
+
+  validates :source,
+            allow_blank: false,
+            inclusion: { in: SOURCE_KINDS,
+                         message: "%{value} is not a valid source kind" }
 
   validates :premium_credit_strategy_kind,
     allow_blank: false,
