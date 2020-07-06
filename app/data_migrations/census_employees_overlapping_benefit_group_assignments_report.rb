@@ -47,7 +47,7 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
             csv << [
               result[:census_employee].first_name,
               result[:census_employee].last_name,
-              result[:census_employee].employee_role.employer_profile.fein || result[:census_employee].employee_role.employer_profile.legal_name,
+              result[:census_employee]&.employee_role&.employer_profile&.fein || result[:census_employee]&.employee_role&.employer_profile&.legal_name,
               result[:census_employee].aasm_state,
               benefit_group_assignment.id.to_s,
               benefit_group_assignment.start_on.to_s,
