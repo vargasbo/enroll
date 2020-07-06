@@ -66,7 +66,7 @@ describe "Census Employees overlapping Benefit Group Assignments report", dbclea
         expect(File.exist?(file_name)).to eq(true)
         csv = CSV.open(file_name, "r", :headers => true)
         data = csv.to_a
-        expect(data.length).to eq(3)
+        expect(data.length).to eq(1)
         first_row = data[0]
         field_names.each do |field_name|
           expect(first_row[field_name].class).to eq(String)
