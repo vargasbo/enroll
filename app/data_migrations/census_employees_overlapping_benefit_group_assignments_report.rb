@@ -5,7 +5,11 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
     @census_employees ||= CensusEmployee.all
   end
 
-  def ce_overlapping_benefit_assignments(census_employee)
+  def overlapping_benefit_assignments
+    []
+  end
+
+  def ce_with_overlapping_benefit_assignments(census_employee)
     overlapping_bgas = []
     census_employee.benefit_group_assignments.each do |target_bga|
       census_employee.benefit_group_assignments.each do |bga|
@@ -34,18 +38,22 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
     CSV.open(file_name, 'w') do |csv|
       field_names = %w(first_name last_name employer_fein aasm_state bga_id bga_start bga_end)
       csv << field_names
+      overlapping_bgas = overlapping_benefit_assignments
       all_census_employees.each do |census_employee|
-        result = ce_overlapping_benefit_assignments(census_employee)
+        result = ce_with_overlapping_benefit_assignments(census_employee)
         result[:benefit_group_assignments].each do |benefit_group_assignment|
-          csv << [
-            result[:census_employee].first_name,
-            result[:census_employee].last_name,
-            result[:census_employee].employee_role.employer_profile.fein || result[:census_employee].employee_role.employer_profile.legal_name,
-            result[:census_employee].aasm_state,
-            benefit_group_assignment.id.to_s,
-            benefit_group_assignment.start_on.to_s,
-            benefit_group_assignment.end_on.to_s
-          ]
+          unless overlapping_bgas.include?(benefit_group_assignment)
+            overlapping_bgas << benefit_group_assignment
+            csv << [
+              result[:census_employee].first_name,
+              result[:census_employee].last_name,
+              result[:census_employee].employee_role.employer_profile.fein || result[:census_employee].employee_role.employer_profile.legal_name,
+              result[:census_employee].aasm_state,
+              benefit_group_assignment.id.to_s,
+              benefit_group_assignment.start_on.to_s,
+              benefit_group_assignment.end_on.to_s
+            ]
+          end
         end
       end
     end
