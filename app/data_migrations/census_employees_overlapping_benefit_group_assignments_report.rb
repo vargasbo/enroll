@@ -41,19 +41,18 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
       overlapping_bgas = overlapping_benefit_assignments
       all_census_employees.each do |census_employee|
         result = ce_with_overlapping_benefit_assignments(census_employee)
-        result[:benefit_group_assignments].each do |benefit_group_assignment|
-          unless overlapping_bgas.include?(benefit_group_assignment)
-            overlapping_bgas << benefit_group_assignment
-            csv << [
-              result[:census_employee].first_name,
-              result[:census_employee].last_name,
-              result[:census_employee]&.employee_role&.employer_profile&.fein || result[:census_employee]&.employee_role&.employer_profile&.legal_name,
-              result[:census_employee].aasm_state,
-              benefit_group_assignment.id.to_s,
-              benefit_group_assignment.start_on.to_s,
-              benefit_group_assignment.end_on.to_s
-            ]
-          end
+        csv << [
+          result[:census_employee].first_name,
+          result[:census_employee].last_name,
+          result[:census_employee]&.employee_role&.employer_profile&.fein || result[:census_employee]&.employee_role&.employer_profile&.legal_name,
+          result[:census_employee].aasm_state
+        ] + result[:benefit_group_assignments].reject do |bga|
+              overlapping_bgas.include?(bga)
+            end.map do |bga|
+              [bga.id.to_s, bga.start_on.to_s, bga.end_on.to_s ]
+            end.flatten
+        result[:benefit_group_assignments].each do |bga|
+          overlapping_bgas << bga
         end
       end
     end
