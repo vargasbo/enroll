@@ -1,6 +1,6 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MigrationTask
+class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigrationTask
   def all_census_employees
     @census_employees ||= CensusEmployee.all
   end
@@ -24,7 +24,7 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MigrationTask
     }
   end
   def migrate
-    puts("Beginning census employee with overlapping Benefit Group Assignments report generation.")
+    puts("Beginning census employee with overlapping Benefit Group Assignments report generation.") unless Rails.env.test?
     Dir.mkdir("census_employees_overlapping_bgas_report") unless File.exists?("census_employees_overlapping_bgas_report")
     file_name = "#{Rails.root}/census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
 
@@ -32,6 +32,7 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MigrationTask
     logger.info "Script Start for census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
     CSV.open(file_name, 'w') do |csv|
+      puts("Beginning to write to overlapping BGA CSV.") unless Rails.env.test?
       field_names = %w(first_name last_name employer_fein aasm_state bga_1_id bga_1_start bga_1_end bga_2_id bga_2_start bga_2_end bga_3_id bga_3_start bga_3_end bga_4_id bga_4_start bga_4_end bga_5_id bga_5_start bga_5_end)
       csv << field_names
       all_census_employees.each do |census_employee|
@@ -47,4 +48,5 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MigrationTask
       end
     end
   end
+  puts("Generation of overlapping benefit group assignments report complete.") unless Rails.env.test?
 end
