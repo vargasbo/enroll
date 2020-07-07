@@ -59,7 +59,13 @@ describe "Census Employees overlapping Benefit Group Assignments report", dbclea
       end
       let(:file_name) { "#{Rails.root}/census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv" }
       let(:csv) { CSV.new(file_name).read }
-      let(:field_names) { %w(first_name last_name employer_fein aasm_state bga_id bga_start bga_end) }
+      # There are only 3 bgas, so not expecting all of the ones to be present
+      let(:filled_fields) do
+        %w(first_name last_name employer_fein aasm_state bga_1_id bga_1_start bga_1_end bga_2_id bga_2_start bga_2_end bga_3_id bga_3_start bga_3_end)
+      end
+      let(:blank_fields) do
+        %w(bga_4_id bga_4_start bga_4_end bga_5_id bga_5_start bga_5_end)
+      end
 
 
       it "should create a report of census employees with overlapping benefit group assignments" do
@@ -68,8 +74,11 @@ describe "Census Employees overlapping Benefit Group Assignments report", dbclea
         data = csv.to_a
         expect(data.length).to eq(1)
         first_row = data[0]
-        field_names.each do |field_name|
+        filled_fields.each do |field_name|
           expect(first_row[field_name].class).to eq(String)
+        end
+        blank_fields.each do |field_name|
+          expect(first_row[field_name]).to eq(nil)
         end
       end
     end
