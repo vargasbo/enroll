@@ -1,12 +1,8 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigrationTask
+class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MigrationTask
   def all_census_employees
     @census_employees ||= CensusEmployee.all
-  end
-
-  def overlapping_benefit_assignments
-    []
   end
 
   def ce_with_overlapping_benefit_assignments(census_employee)
@@ -18,7 +14,7 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
         bga_end_on = bga.end_on || bga.start_on + 1.year
         if (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.start_on&.to_datetime) ||
           (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.end_on&.to_datetime)
-          overlapping_bgas << bga
+          overlapping_bgas << bga unless overlapping_bgas.include?(bga)
         end
       end
     end
@@ -36,9 +32,8 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
     logger.info "Script Start for census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
 
     CSV.open(file_name, 'w') do |csv|
-      field_names = %w(first_name last_name employer_fein aasm_state bga_id bga_start bga_end)
+      field_names = %w(first_name last_name employer_fein aasm_state bga_1_id bga_1_start bga_1_end bga_2_id bga_2_start bga_2_end bga_3_id bga_3_start bga_3_end bga_4_id bga_4_start bga_4_end bga_5_id bga_5_start bga_5_end)
       csv << field_names
-      overlapping_bgas = overlapping_benefit_assignments
       all_census_employees.each do |census_employee|
         result = ce_with_overlapping_benefit_assignments(census_employee)
         csv << [
@@ -46,14 +41,9 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
           result[:census_employee].last_name,
           result[:census_employee]&.employee_role&.employer_profile&.fein || result[:census_employee]&.employee_role&.employer_profile&.legal_name,
           result[:census_employee].aasm_state
-        ] + result[:benefit_group_assignments].reject do |bga|
-              overlapping_bgas.include?(bga)
-            end.map do |bga|
+        ] + result[:benefit_group_assignments].map do |bga|
               [bga.id.to_s, bga.start_on.to_s, bga.end_on.to_s ]
             end.flatten
-        result[:benefit_group_assignments].each do |bga|
-          overlapping_bgas << bga
-        end
       end
     end
   end
