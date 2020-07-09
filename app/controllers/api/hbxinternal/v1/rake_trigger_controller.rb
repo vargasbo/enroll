@@ -12,7 +12,6 @@ class Api::Hbxinternal::V1::RakeTriggerController < ActionController::Base
   end
 
   def long_running_task
-    # /api/hbxinternal/v1/long_running_task
     response = {
       namespace: 'hbxinternal',
       desc:  'testing triggering long running rake execution from endpoint',

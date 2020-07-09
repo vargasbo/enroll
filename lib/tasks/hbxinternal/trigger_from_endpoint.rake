@@ -1,6 +1,8 @@
 # This rake task used to update phone records on person. check ticket #19754
 # RAILS_ENV=production bundle exec rake hbxit:trigger_from_endpoint
 
+# /api/hbxinternal/v1/long_running_task
+
 namespace :hbxinternal do
   desc "testing triggering rake execution from endpoint"
   task :trigger_from_endpoint => :environment do
