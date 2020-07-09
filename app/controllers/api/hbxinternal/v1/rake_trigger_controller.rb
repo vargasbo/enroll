@@ -9,7 +9,18 @@ class Api::Hbxinternal::V1::RakeTriggerController < ActionController::Base
     }
     system "rake hbxinternal:trigger_from_endpoint &"
     render json: response
-  end  
+  end
+
+  def long_running_task
+    # /api/hbxinternal/v1/long_running_task
+    response = {
+      namespace: 'hbxinternal',
+      desc:  'testing triggering long running rake execution from endpoint',
+      task: 'process_long_running_task'
+    }
+    system "rake hbxinternal:process_long_running_task &"
+    render json: response
+  end
 
   private
 
@@ -17,5 +28,5 @@ class Api::Hbxinternal::V1::RakeTriggerController < ActionController::Base
     options[:rails_env] = Rails.env
     args = options.map { |n, v| "#{n.to_s.upcase}='#{v}"}
     system "rake #{task} #{args.join(' ')} &"
-  end  
-end  
+  end
+end
