@@ -26,4 +26,18 @@ namespace :hbxinternal do
     ActionCable.server.broadcast 'notifications_channel', message: '5/5 Task complete you may close console.'
     puts "5/5 Task complete you may close console."
   end
+
+  task :change_person_dob => :environment do
+    if ENV['hbx_id'] && ENV['dob']
+    else
+      # Missing field to perform action
+    end
+    begin
+      #
+    rescue
+      #
+    ensure
+      # Task Complete
+    end
+  end
 end
