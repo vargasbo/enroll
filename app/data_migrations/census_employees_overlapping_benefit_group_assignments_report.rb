@@ -36,17 +36,17 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
       field_names = %w(first_name last_name employer_fein aasm_state bga_1_id bga_1_start bga_1_end bga_2_id bga_2_start bga_2_end bga_3_id bga_3_start bga_3_end bga_4_id bga_4_start bga_4_end bga_5_id bga_5_start bga_5_end)
       csv << field_names
       all_census_employees.no_timeout.each do |census_employee|
-        if census_employee.benefit_group_assignments.present?
-          result = ce_with_overlapping_benefit_assignments(census_employee)
-          csv << [
-            result[:census_employee].first_name,
-            result[:census_employee].last_name,
-            result[:census_employee]&.employee_role&.employer_profile&.fein || result[:census_employee]&.employee_role&.employer_profile&.legal_name,
-            result[:census_employee].aasm_state
-          ] + result[:benefit_group_assignments].map do |bga|
-                [bga.id.to_s, bga.start_on.to_s, bga.end_on.to_s ]
-              end.flatten
-        end
+        result = ce_with_overlapping_benefit_assignments(census_employee)
+        next if result[:benefit_group_assignments].blank?
+
+        csv << [
+          result[:census_employee].first_name,
+          result[:census_employee].last_name,
+          result[:census_employee]&.employee_role&.employer_profile&.fein || result[:census_employee]&.employee_role&.employer_profile&.legal_name,
+          result[:census_employee].aasm_state
+        ] + result[:benefit_group_assignments].map do |bga|
+              [bga.id.to_s, bga.start_on.to_s, bga.end_on.to_s ]
+            end.flatten
       end
     end
   end
