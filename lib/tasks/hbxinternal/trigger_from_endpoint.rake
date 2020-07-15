@@ -34,7 +34,7 @@ namespace :hbxinternal do
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "1/2 Located person record for #{ENV['hbx_id']}"
       rescue => error
-        p error.message
+        ActionCable.server.broadcast 'notifications_channel', message: error.message
       else
         new_dob = Date.strptime(ENV['dob'],'%m/%d/%Y')
         person.update_attributes(dob:new_dob)
