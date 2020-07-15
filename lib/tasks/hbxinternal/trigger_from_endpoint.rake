@@ -29,15 +29,19 @@ namespace :hbxinternal do
 
   task :change_person_dob => :environment do
     if ENV['hbx_id'] && ENV['dob']
+      begin
+        person = Person.where(hbx_id:ENV['hbx_id']).first
+        raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
+        ActionCable.server.broadcast 'notifications_channel', message: "1/2 Located person record for #{ENV['hbx_id']}"
+      rescue => error
+        p error.message
+      else
+        new_dob = Date.strptime(ENV['dob'],'%m/%d/%Y')
+        person.update_attributes(dob:new_dob)
+        ActionCable.server.broadcast 'notifications_channel', message: "2/2 Updated DOB for person record"
+      end
     else
-      # Missing field to perform action
-    end
-    begin
-      #
-    rescue
-      #
-    ensure
-      # Task Complete
+      raise StandardError.new "Missing fields to perform change person dob task."
     end
   end
 end

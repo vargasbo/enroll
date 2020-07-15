@@ -27,23 +27,17 @@ class Api::Hbxinternal::V1::RakeTriggerController < ActionController::Base
     if available_task.include? params[:task]
       response[:status] = 200
       response[:message] = "Processing request"
-      call_rake(params[:task], params)
+      call_rake(params)
     else
       response[:status] = 400
       response[:message] = "Improper request received"
     end
     render json: response
-
   end
 
   private
 
-  def call_rake(task, options = {})
-    options[:rails_env] = Rails.env
-    str = ""
-    options.each do |option|
-      str += "#{option[0]}=#{option[1]} "
-    end
-    system "rake hbxinternal:#{task} #{str}"
+  def call_rake(params)
+    HbxitTaskWorker.perform_async params.to_json
   end
 end
