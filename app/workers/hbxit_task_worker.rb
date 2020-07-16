@@ -6,10 +6,7 @@ class HbxitTaskWorker
     data = JSON.parse(args[0])
     task = data['task'].to_sym
     options_str = options_to_string(data)
-    case task
-    when :change_person_dob
-      perform_dob_change task, options_str
-    end
+    perform_rake_task task, options_str
   end
 
   def options_to_string(options)
@@ -20,18 +17,8 @@ class HbxitTaskWorker
     str
   end
 
-  def perform_dob_change(task, options)
+  def perform_rake_task(task, options)
     system "rake hbxinternal:#{task} #{options}"
   end
 
-  private
-    def around_cleanup
-      # Do something before perform
-      # SQS beging messaging
-      ActionCable.server.broadcast 'notifications_channel', message: "Starting Job"
-      yield
-      # Do something after perform
-      # SQS end messaging
-      ActionCable.server.broadcast 'notifications_channel', message: "Job has completed"
-    end
 end
