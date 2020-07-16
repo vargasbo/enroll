@@ -91,4 +91,27 @@ namespace :hbxinternal do
     end
   end
 
+  task :move_user_account_between_two_people_accounts => :environment do
+    if ENV['hbx_id_1'] && ENV['hbx_id_2']
+      begin
+        person1 = Person.where(hbx_id: ENV['hbx_id_1']).first
+        person2 = Person.where(hbx_id: ENV['hbx_id_2']).first
+        raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}" if person1.nil?
+        raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}" if person2.nil?
+        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
+      rescue => error
+        ActionCable.server.broadcast 'notifications_channel', message: error.message
+      else
+        user = person1.user
+        raise StandardError.new "Person with HBXID: #{ENV['hbx_id_1']} has no user" if user.nil?
+        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving user account between person accounts"
+        person1.unset(:user.id)
+        person2.set(user_id: user.id)
+        ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
+      end
+    else
+      raise StandardError.new "Missing fields to perform move user account between two people task."
+    end
+  end
+
 end
