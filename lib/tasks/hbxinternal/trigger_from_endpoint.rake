@@ -107,10 +107,33 @@ namespace :hbxinternal do
         ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving user account between person accounts"
         person1.unset(:user.id)
         person2.set(user_id: user.id)
+        sleep 1
         ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
       end
     else
       raise StandardError.new "Missing fields to perform move user account between two people task."
+    end
+  end
+
+  task :change_ce_date_of_termination => :environment do
+    if ENV['ssn'] && ENV['date_of_terminate']
+      begin
+        census_employee = CensusEmployee.by_ssn(ENV['ssn']).first
+        new_termination_date = Date.strptime(ENV['date_of_terminate'],'%m/%d/%Y').to_date
+        raise StandardError.new "No census employee was found with ssn provided" if census_employee.nil?
+        raise StandardError.new "The census employee is not in employment terminated state" if census_employee.aasm_state != "employment_terminated"
+        ActionCable.server.broadcast 'notifications_channel', message: "1/4 Located census employee record"
+      rescue => error
+        ActionCable.server.broadcast 'notifications_channel', message: error.message
+      else
+        ActionCable.server.broadcast 'notifications_channel', message: "2/4 Updating termination date"
+        census_employee.update_attributes(employment_terminated_on: new_termination_date)
+        ActionCable.server.broadcast 'notifications_channel', message: "3/4 Successfully updated termination date"
+        sleep 1
+        ActionCable.server.broadcast 'notifications_channel', message: "4/4 Task complete you may close console"
+      end
+    else
+      raise StandardError.new "Missing fields to perform change census employee date of termination task."
     end
   end
 
