@@ -13,8 +13,8 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
           next if bga.id == target_bga.id
           # TODO: Need to figure out what to do if no end on date
           bga_end_on = bga.end_on || bga.start_on + 1.year
-          if (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.start_on&.to_datetime) ||
-            (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.end_on&.to_datetime)
+          if (bga&.start_on&.to_date..bga_end_on.to_datetime).cover?(target_bga&.start_on&.to_date) ||
+            (bga&.start_on&.to_date..bga_end_on.to_datetime).cover?(target_bga&.end_on&.to_date)
             overlapping_bgas << bga unless overlapping_bgas.include?(bga)
           end
         end
