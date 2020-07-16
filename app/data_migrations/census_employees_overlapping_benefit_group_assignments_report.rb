@@ -7,14 +7,16 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
 
   def ce_with_overlapping_benefit_assignments(census_employee)
     overlapping_bgas = []
-    census_employee.benefit_group_assignments.each do |target_bga|
-      census_employee.benefit_group_assignments.each do |bga|
-        next if [target_bga.start_on, target_bga.end_on].any? { |date| date.blank? }
-        # TODO: Need to figure out what to do if no end on date
-        bga_end_on = bga.end_on || bga.start_on + 1.year
-        if (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.start_on&.to_datetime) ||
-          (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.end_on&.to_datetime)
-          overlapping_bgas << bga unless overlapping_bgas.include?(bga)
+    if census_employee.benefit_group_assignments.count >= 2
+      census_employee.benefit_group_assignments.each do |target_bga|
+        census_employee.benefit_group_assignments.each do |bga|
+          next if [target_bga.start_on, target_bga.end_on].any? { |date| date.blank? }
+          # TODO: Need to figure out what to do if no end on date
+          bga_end_on = bga.end_on || bga.start_on + 1.year
+          if (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.start_on&.to_datetime) ||
+            (bga&.start_on&.to_datetime..bga_end_on.to_datetime).cover?(target_bga&.end_on&.to_datetime)
+            overlapping_bgas << bga unless overlapping_bgas.include?(bga)
+          end
         end
       end
     end
@@ -37,7 +39,8 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
       csv << field_names
       all_census_employees.no_timeout.each do |census_employee|
         result = ce_with_overlapping_benefit_assignments(census_employee)
-        next if result[:benefit_group_assignments].blank?
+        # Need to skip unless there are multiple
+        next unless result[:benefit_group_assignments].length >= 2
 
         csv << [
           result[:census_employee].first_name,
