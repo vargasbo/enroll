@@ -44,4 +44,22 @@ namespace :hbxinternal do
       raise StandardError.new "Missing fields to perform change person dob task."
     end
   end
+
+  task :remove_person_ssn => :environment do
+    if ENV['hbx_id']
+      begin
+        person = Person.where(hbx_id:ENV['hbx_id']).first
+        raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
+        ActionCable.server.broadcast 'notifications_channel', message: "1/2 Located person record for #{ENV['hbx_id']}"
+      rescue => error
+        ActionCable.server.broadcast 'notifications_channel', message: error.message
+      else
+        person.unset(:encrypted_ssn)
+        ActionCable.server.broadcast 'notifications_channel', message: "2/2 Remove ssn from person with HBX ID #{ENV['hbx_id']}"
+      end
+    else
+      raise StandardError.new "Missing fields to perform remove person ssn task."
+    end
+  end
+
 end
