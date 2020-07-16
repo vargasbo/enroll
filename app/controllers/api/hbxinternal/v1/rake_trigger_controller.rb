@@ -22,7 +22,8 @@ class Api::Hbxinternal::V1::RakeTriggerController < ActionController::Base
   end
 
   def perform_task
-    available_task = %w[change_person_dob remove_person_ssn exchange_ssn_between_two_accounts move_user_account_between_two_people_accounts change_ce_date_of_termination]
+    available_task = %w[change_person_dob remove_person_ssn exchange_ssn_between_two_accounts move_user_account_between_two_people_accounts
+      change_ce_date_of_termination employers_failing_minimum_participation]
     response = {}
 
     if available_task.include? params[:data][:task]

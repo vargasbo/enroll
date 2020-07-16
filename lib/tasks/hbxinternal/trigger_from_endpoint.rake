@@ -137,4 +137,15 @@ namespace :hbxinternal do
     end
   end
 
+  task :employers_failing_minimum_participation => :environment do
+    begin
+      ActionCable.server.broadcast 'notifications_channel', message: "... Generating Employers Failing Minimum Participation report ..."
+      Rake::Task['reports:shop:employers_failing_minimum_participation'].invoke
+    rescue => error
+      ActionCable.server.broadcast 'notifications_channel', message: error.message
+    else
+      ActionCable.server.broadcast 'notifications_channel', message: "... Completed report generation ..."
+    end
+  end
+
 end
