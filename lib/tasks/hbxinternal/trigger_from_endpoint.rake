@@ -105,7 +105,7 @@ namespace :hbxinternal do
         user = person1.user
         raise StandardError.new "Person with HBXID: #{ENV['hbx_id_1']} has no user" if user.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving user account between person accounts"
-        person1.unset(:user.id)
+        person1.unset(:user_id)
         person2.set(user_id: user.id)
         sleep 1
         ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
