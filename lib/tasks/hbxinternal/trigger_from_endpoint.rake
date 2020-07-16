@@ -32,13 +32,14 @@ namespace :hbxinternal do
       begin
         person = Person.where(hbx_id:ENV['hbx_id']).first
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "1/2 Located person record for #{ENV['hbx_id']}"
+        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
       rescue => error
         ActionCable.server.broadcast 'notifications_channel', message: error.message
       else
+        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Updated DOB for person record"
         new_dob = Date.strptime(ENV['dob'],'%m/%d/%Y')
         person.update_attributes(dob:new_dob)
-        ActionCable.server.broadcast 'notifications_channel', message: "2/2 Updated DOB for person record"
+        ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
       end
     else
       raise StandardError.new "Missing fields to perform change person dob task."
@@ -50,15 +51,43 @@ namespace :hbxinternal do
       begin
         person = Person.where(hbx_id:ENV['hbx_id']).first
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "1/2 Located person record for #{ENV['hbx_id']}"
+        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
       rescue => error
         ActionCable.server.broadcast 'notifications_channel', message: error.message
       else
+        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Remove ssn from person with HBX ID #{ENV['hbx_id']}"
         person.unset(:encrypted_ssn)
-        ActionCable.server.broadcast 'notifications_channel', message: "2/2 Remove ssn from person with HBX ID #{ENV['hbx_id']}"
+        ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
       end
     else
       raise StandardError.new "Missing fields to perform remove person ssn task."
+    end
+  end
+
+  task :exchange_ssn_between_two_accounts => :environment do
+    if ENV['hbx_id_1'] && ENV['hbx_id_2']
+      begin
+        person1 = Person.where(hbx_id: ENV['hbx_id_1']).first
+        person2 = Person.where(hbx_id: ENV['hbx_id_2']).first
+        raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}" if person1.nil?
+        raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}" if person2.nil?
+        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
+      rescue => error
+        ActionCable.server.broadcast 'notifications_channel', message: error.message
+      else
+        ssn1 = person1.ssn
+        ssn2 = person2.ssn
+        raise StandardError.new "Person with HBXID: #{ENV['hbx_id_1']} has no ssn" if ssn1.nil?
+        raise StandardError.new "Person with HBXID: #{ENV['hbx_id_2']} has no ssn" if ssn2.nil?
+        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving SSN's between accounts"
+        person1.unset(:encrypted_ssn)
+        person2.unset(:encrypted_ssn)
+        person1.update_attributes(ssn: ssn2)
+        person2.update_attributes(ssn: ssn1)
+        ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
+      end
+    else
+      raise StandardError.new "Missing fields to perform exchange ssn between two accounts task."
     end
   end
 
