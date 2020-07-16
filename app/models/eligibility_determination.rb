@@ -12,7 +12,6 @@ class EligibilityDetermination
 
   SOURCE_KINDS = %w[Curam Admin Renewals].freeze
 
-
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
   CSR_KIND_TO_PLAN_VARIANT_MAP = {

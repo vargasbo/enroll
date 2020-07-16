@@ -302,6 +302,21 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
       expect(@ed.source).to eq('Renewals')
     end
   end
+
+  context 'for limited csr determination' do
+    before do
+      active_household.build_thh_and_eligibility(200, 'limited', date, slcsp, 'Admin')
+      @eligibility_determination = active_household.latest_active_thh.latest_eligibility_determination
+    end
+
+    it 'should create determination with limited csr' do
+      expect(@eligibility_determination.csr_eligibility_kind).to eq('csr_limited')
+    end
+
+    it 'should create determination with csr_percent_as_integer as -1' do
+      expect(@eligibility_determination.csr_percent_as_integer).to eq(-1)
+    end
+  end
 end
 
 describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do
