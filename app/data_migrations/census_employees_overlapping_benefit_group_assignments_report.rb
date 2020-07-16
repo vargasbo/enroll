@@ -12,9 +12,9 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
         census_employee.benefit_group_assignments.each do |bga|
           next if bga.id == target_bga.id
           # TODO: Need to figure out what to do if no end on date
-          bga_end_on = bga.end_on || bga.start_on + 1.year
-          if (bga&.start_on&.to_date..bga_end_on.to_datetime).cover?(target_bga&.start_on&.to_date) ||
-            (bga&.start_on&.to_date..bga_end_on.to_datetime).cover?(target_bga&.end_on&.to_date)
+          bga_end_on = bga.end_on || bga.start_on.next_year.prev_day
+          if (bga&.start_on&.to_date..bga_end_on.to_date).cover?(target_bga&.start_on&.to_date) ||
+            (bga&.start_on&.to_date..bga_end_on.to_date).cover?(target_bga&.end_on&.to_date)
             overlapping_bgas << bga unless overlapping_bgas.include?(bga)
           end
         end
@@ -41,7 +41,6 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
         result = ce_with_overlapping_benefit_assignments(census_employee)
         # Need to skip unless there are multiple
         next unless result[:benefit_group_assignments].length >= 2
-
         csv << [
           result[:census_employee].first_name,
           result[:census_employee].last_name,
