@@ -3,10 +3,18 @@
 
 # /api/hbxinternal/v1/long_running_task
 
+require 'aws-sdk'
+
+
 namespace :hbxinternal do
   desc "testing triggering rake execution from endpoint"
   task :trigger_from_endpoint => :environment do
     puts "running hbxinternal rake task"
+    sqs = Aws::SQS::Client.new(region: 'us-west-2')
+    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: 'Beginning rake tast')
+    sleep 4
+    puts "ending hbxinternal rake task"
+    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: 'Ending rake tast')
   end
 
   task :process_long_running_task => :environment do
