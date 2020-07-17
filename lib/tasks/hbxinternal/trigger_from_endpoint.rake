@@ -1,7 +1,6 @@
-# This rake task used to update phone records on person. check ticket #19754
-# RAILS_ENV=production bundle exec rake hbxit:trigger_from_endpoint
+# RAILS_ENV=production bundle exec rake hbxinternal:trigger_from_endpoint
 
-# /api/hbxinternal/v1/long_running_task
+# /api/hbxinternal/v1/trigger_from_endpoint
 
 require 'aws-sdk'
 
@@ -15,24 +14,6 @@ namespace :hbxinternal do
     sleep 4
     puts "ending hbxinternal rake task"
     sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: 'Ending rake tast')
-  end
-
-  task :process_long_running_task => :environment do
-    # rake hbxinternal:process_long_running_task
-    ActionCable.server.broadcast 'notifications_channel', message: '1/5 Retreiving Household members ...'
-    puts "1/5 Retreiving Household members ..."
-    sleep 2
-    ActionCable.server.broadcast 'notifications_channel', message: '2/5 Updating enrollments for members ...'
-    puts "2/5 Updating enrollments for members ..."
-    sleep 4
-    ActionCable.server.broadcast 'notifications_channel', message: '3/5 Finished updating enrollments for members'
-    puts "3/5 Finished updating enrollments for members"
-    sleep 4
-    ActionCable.server.broadcast 'notifications_channel', message: '4/5 Notifing GLUE of enrollment changes ...'
-    puts "4/5 Notifing GLUE of enrollment changes ..."
-    sleep 6
-    ActionCable.server.broadcast 'notifications_channel', message: '5/5 Task complete you may close console.'
-    puts "5/5 Task complete you may close console."
   end
 
   task :change_person_dob => :environment do
@@ -113,12 +94,46 @@ namespace :hbxinternal do
         user = person1.user
         raise StandardError.new "Person with HBXID: #{ENV['hbx_id_1']} has no user" if user.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving user account between person accounts"
-        person1.unset(:user.id)
+        person1.unset(:user_id)
         person2.set(user_id: user.id)
+        sleep 1
         ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
       end
     else
       raise StandardError.new "Missing fields to perform move user account between two people task."
+    end
+  end
+
+  task :change_ce_date_of_termination => :environment do
+    if ENV['ssn'] && ENV['date_of_terminate']
+      begin
+        census_employee = CensusEmployee.by_ssn(ENV['ssn']).first
+        new_termination_date = Date.strptime(ENV['date_of_terminate'],'%m/%d/%Y').to_date
+        raise StandardError.new "No census employee was found with ssn provided" if census_employee.nil?
+        raise StandardError.new "The census employee is not in employment terminated state" if census_employee.aasm_state != "employment_terminated"
+        ActionCable.server.broadcast 'notifications_channel', message: "1/4 Located census employee record"
+      rescue => error
+        ActionCable.server.broadcast 'notifications_channel', message: error.message
+      else
+        ActionCable.server.broadcast 'notifications_channel', message: "2/4 Updating termination date"
+        census_employee.update_attributes(employment_terminated_on: new_termination_date)
+        ActionCable.server.broadcast 'notifications_channel', message: "3/4 Successfully updated termination date"
+        sleep 1
+        ActionCable.server.broadcast 'notifications_channel', message: "4/4 Task complete you may close console"
+      end
+    else
+      raise StandardError.new "Missing fields to perform change census employee date of termination task."
+    end
+  end
+
+  task :employers_failing_minimum_participation => :environment do
+    begin
+      ActionCable.server.broadcast 'notifications_channel', message: "... Generating Employers Failing Minimum Participation report ..."
+      Rake::Task['reports:shop:employers_failing_minimum_participation'].invoke
+    rescue => error
+      ActionCable.server.broadcast 'notifications_channel', message: error.message
+    else
+      ActionCable.server.broadcast 'notifications_channel', message: "... Completed report generation ..."
     end
   end
 
