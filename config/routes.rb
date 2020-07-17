@@ -749,7 +749,6 @@ Rails.application.routes.draw do
       namespace :v1 do
         scope module: :rake_trigger do
           get :say_hello
-          get :long_running_task
           get :perform_task
         end
       end
