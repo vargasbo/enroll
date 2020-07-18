@@ -8,12 +8,12 @@ require 'aws-sdk'
 namespace :hbxinternal do
   desc "testing triggering rake execution from endpoint"
   task :trigger_from_endpoint => :environment do
-    puts "running hbxinternal rake task"
+    puts "running hbxinternal rake task at #{Time.now}"
     sqs = Aws::SQS::Client.new(region: 'us-west-2')
-    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: 'Beginning rake tast')
+    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: "Initiaing rake task: trigger_from_endpoint by Andrej Rasevic at #{Time.now}")
     sleep 4
     puts "ending hbxinternal rake task"
-    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: 'Ending rake tast')
+    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: "Ending rake task: trigger_from_endpoint successfully at #{Time.now}")
   end
 
   task :change_person_dob => :environment do
