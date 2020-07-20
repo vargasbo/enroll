@@ -102,7 +102,6 @@ class EmployerProfile
 
   scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
   scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
-
   scope :all_renewing, ->{ Organization.all_employers_renewing }
   scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
 
@@ -521,6 +520,18 @@ class EmployerProfile
     else
       true
     end
+  end
+
+  # employer_profiles_controller.rb#terminate_employee_roster_enrollments
+  def terminate_roster_enrollments(params)
+    termination_date = Date.strptime(params["termination_date"], "%m/%d/%Y")
+    termination_reason = params["termination_reason"]
+    transmit_xml = params["transmit_xml"]
+    active_plan_year.terminate_employee_enrollments(
+      termination_date,
+      { transmit_xml: transmit_xml, enrollment_term_reason: termination_reason }
+    ) if active_plan_year.present?
+    renewing_plan_year.cancel_employee_enrollments(transmit_xml) if renewing_plan_year.present?
   end
 
   ## Class methods

@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: :after_each do
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    DatabaseCleaner.clean
   end
 
   describe ".sort_by_standard_plans", dbclean: :after_each do
