@@ -33,9 +33,7 @@ RSpec.describe Insured::FamilyMembersController do
     let(:consumer_role) do
       instance_double(
         ConsumerRole,
-        person: double(no_dc_address: false),
-        local_residency_validation: nil,
-        residency_determined_at: nil,
+        person: double(no_dc_address: false)
       )
     end
 
