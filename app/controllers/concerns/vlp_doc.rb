@@ -13,19 +13,21 @@ module VlpDoc
 
   def validate_vlp_params(params, source, consumer_role, dependent)
     params.permit!
-    if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
-      vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
-      result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
-      if result.failure? && source == 'person'
-        invalid_key = result.errors.to_h.keys.first
-        invalid_field = (invalid_key == :description) ? :document_description : invalid_key
-        add_document_errors_to_consumer_role(consumer_role, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
-        return false
-      elsif result.failure? && source == 'dependent'
-        invalid_key = result.errors.to_h.keys.first
-        invalid_field = (invalid_key == :description) ? :document_description : invalid_key
-        add_document_errors_to_dependent(dependent, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
-        return false
+    if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true")
+      if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
+        vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|k,v| v.blank? }
+        result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
+        if result.failure? && source == 'person'
+          invalid_key = result.errors.to_h.keys.first
+          invalid_field = (invalid_key == :description) ? :document_description : invalid_key
+          add_document_errors_to_consumer_role(consumer_role, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
+          return false
+        elsif result.failure? && source == 'dependent'
+          invalid_key = result.errors.to_h.keys.first
+          invalid_field = (invalid_key == :description) ? :document_description : invalid_key
+          add_document_errors_to_dependent(dependent, ['Please fill in your information for', invalid_field.to_s.titlecase + '.'])
+          return false
+        end
       end
     end
     true
@@ -53,15 +55,21 @@ module VlpDoc
 
       doc_params = params.require(source).permit(*vlp_doc_params_list)
       vlp_doc_attribute = doc_params[:consumer_role][:vlp_documents_attributes]["0"]
-      document = consumer_role.find_document(vlp_doc_attribute[:subject])
-      document.update_attributes(vlp_doc_attribute)
-      consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
+      if vlp_doc_attribute
+        document = consumer_role.find_document(vlp_doc_attribute[:subject])
+        document.update_attributes(vlp_doc_attribute)
+        consumer_role.update_attributes!(active_vlp_document_id: document.id) if document.present?
+      end
       if source == 'person'
         add_document_errors_to_consumer_role(consumer_role, document)
       elsif source == 'dependent' && dependent.present?
         add_document_errors_to_dependent(dependent, document)
       end
-      return document.errors.blank?
+      if document.present?
+        return document.errors.blank?
+      else
+        return false
+      end
     else
       return true
     end
