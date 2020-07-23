@@ -270,6 +270,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
+    browser (2.7.0)
     bson (4.8.2)
     builder (3.2.4)
     bunny (1.7.1)
@@ -628,7 +629,7 @@ GEM
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
     public_suffix (4.0.3)
-    puma (3.12.4)
+    puma (3.12.6)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
     rack (2.2.2)
@@ -918,6 +919,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   bootsnap (>= 1.1)
+  browser (= 2.7.0)
   bson (~> 4.3)
   capistrano (~> 3.1)
   capistrano-rails (= 1.4)
