@@ -925,11 +925,13 @@ class HbxEnrollment
 
   def propagate_selection
     Operations::ExecuteProductSelectionEffects.call(
-      Entities::ProductSelection.new({
-        :enrollment => self,
-        :product => self.product,
-        :family => self.family
-      })
+      Entities::ProductSelection.new(
+        {
+          :enrollment => self,
+          :product => self.product,
+          :family => self.family
+        }
+      )
     )
   end
 
