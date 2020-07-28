@@ -148,6 +148,9 @@ Style/StringLiterals:
 Style/SymbolArray:
   Enabled: false
 
+Style/TernaryParentheses:
+  Enabled: false
+
 Style/WordArray:
   Enabled: false
 
