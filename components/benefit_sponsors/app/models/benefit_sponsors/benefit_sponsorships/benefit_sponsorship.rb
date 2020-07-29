@@ -519,6 +519,7 @@ module BenefitSponsors
       # end
       recent_bas = benefit_applications.order_by(:"created_at".desc).to_a.last(3)
       termed_or_ineligible_app = recent_bas.detect { |recent_ba| recent_ba.is_termed_or_ineligible? }
+      return nil unless termed_or_ineligible_app
 
       recent_bas.future_effective_date(termed_or_ineligible_app.end_on).non_canceled.first
     end
