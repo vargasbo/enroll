@@ -46,9 +46,7 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
     let!(:renewal_application)           { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, effective_period: new_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
 
     context 'should return false when an active PY no canceled PY' do
-      it{
-        expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq false
-      }
+      it{expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq false}
     end
 
     context 'should return false when a published PY' do
@@ -100,8 +98,7 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
       before do
         renewal_application.update_attributes(:aasm_state => :enrollment_ineligible)
       end
-      it {
-        expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq true}
+      it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq true}
     end
   end
 end
