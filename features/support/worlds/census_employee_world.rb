@@ -85,11 +85,29 @@ module CensusEmployeeWorld
     end
   end
 
+  def census_employees_by_legal_name(legal_name = nil)
+    if legal_name
+      sponsorship = employer(legal_name).benefit_sponsorships.first
+    end
+    if @census_employees
+      @census_employees
+    else
+      @census_employees = CensusEmployee.where(benefit_sponsorship: benefit_sponsorship)
+    end 
+  end
+
   def census_employee(named_person = nil)
     @census_employee ||= {}
+    person = if named_person
+      people[named_person]
+    else
+      nil
+    end
 
-    if named_person.present?
+    if named_person.present? && @census_employee[named_person]
       @census_employee[named_person]
+    elsif named_person.present?
+      CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
     else
       @census_employee.values.first
     end
@@ -154,7 +172,8 @@ And(/^there is a census employee record and employee role for (.*?) for employer
   create_census_employee_from_person(named_person, legal_name)
   person = people[named_person]
   organization = employer(legal_name)
-  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).first ||
+  FactoryBot.create(:person, :with_family, ssn: person[:ssn], first_name: person[:first_name], last_name: person[:last_name])
   employer_profile = employer_profile(legal_name)
   employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)
   person_record.employee_roles <<  employer_staff_role
@@ -217,7 +236,7 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   profile = sponsorship.profile
   ce = sponsorship.census_employees.where(:first_name => /#{person[:first_name]}/i,
                                           :last_name => /#{person[:last_name]}/i).first
-  person_record = FactoryBot.create(:person_with_employee_role,
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last || FactoryBot.create(:person_with_employee_role,
                                      first_name: person[:first_name],
                                      last_name: person[:last_name],
                                      ssn: person[:ssn],
@@ -229,8 +248,13 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
   sponsorship.benefit_applications.each do |benefit_application|
     benefit_application.benefit_packages.each{|benefit_package| ce.add_benefit_group_assignment(benefit_package) }
   end
-  ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
-  FactoryBot.create :family, :with_primary_family_member, person: person_record
+  if person_record.employee_roles.present?
+    ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
+  else
+    employee_role = FactoryBot.create(:employee_role, person: person_record, benefit_sponsors_employer_profile_id: profile.id)
+    ce.update_attributes(employee_role_id: employee_role.id)
+  end
+  FactoryBot.create(:family, :with_primary_family_member, person: person_record) if person_record.primary_family.blank?
   user = FactoryBot.create(:user,
                             person: person_record,
                             email: person[:email],
@@ -281,9 +305,9 @@ And(/^Employees for (.*?) have both Benefit Group Assignments Employee role$/) d
   step "Assign benefit group assignments to #{legal_name} employee"
 
   employer_profile = employer(legal_name).employer_profile
-
-  @census_employees.each do |employee|
-    person = FactoryBot.create(:person, :with_family, first_name: employee.first_name, last_name: employee.last_name, dob: employee.dob, ssn: employee.ssn)
+  census_employees(legal_name).each do |employee|
+    person = Person.where(first_name: employee.first_name, last_name: employee.last_name).last ||
+    FactoryBot.create(:person, :with_family, first_name: employee.first_name, last_name: employee.last_name, dob: employee.dob, ssn: employee.ssn)
     employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: employer_profile.id)
     employee.update_attributes(employee_role_id: employee_role.id)
   end
@@ -292,7 +316,7 @@ end
 And(/^Assign benefit group assignments to (.*?) employee$/) do |legal_name|
   # try to fetch it from benefit application world
   benefit_package = fetch_benefit_group(legal_name)
-  @census_employees.each do |employee|
+  census_employees_by_legal_name(legal_name).each do |employee|
     employee.add_benefit_group_assignment(benefit_package)
   end
 end
@@ -315,6 +339,43 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
                     sponsored_benefit_id: sponsored_benefit_id}, :with_health_product)
+end
+
+
+And(/employees for employer (.*?) have selected a coverage$/) do |legal_name|
+  employer_profile = employer(legal_name).employer_profile
+  census_employees_by_legal_name(legal_name).each do |census_employee|
+    person = Person.where(first_name: census_employee.first_name, last_name: census_employee.last_name).last ||
+    FactoryBot.create(:person, :with_family, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn)
+    if census_employee.employee_role 
+      employee_role = census_employee.employee_role
+    else 
+      employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: employer_profile.id)
+      census_employee.update_attributes(employee_role_id: employee_role.id)
+      census_employee.employee_role.update_attributes(census_employee_id: census_employee.id)
+    end
+    bga =  census_employee.active_benefit_group_assignment
+    benefit_package = fetch_benefit_group(legal_name)
+    coverage_household = person.primary_family.households.first
+    rating_area_id =  benefit_package.benefit_application.recorded_rating_area_id
+    sponsored_benefit_id = benefit_package.sponsored_benefits.first.id
+    enrollment = FactoryBot.create(:hbx_enrollment,
+                                         family: person.primary_family,
+                                         household: person.primary_family.active_household,
+                                         coverage_kind: "health",
+                                         effective_on: benefit_package.start_on,
+                                         enrollment_kind: "open_enrollment",
+                                         kind: "employer_sponsored",
+                                         submitted_at: benefit_package.start_on - 20.days,
+                                         employee_role_id: census_employee.employee_role.id,
+                                         benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
+                                         benefit_sponsorship_id: census_employee.benefit_sponsorship.id,
+                                         sponsored_benefit_package_id: benefit_package.id,
+                                         sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
+                                         rating_area_id: benefit_package.rating_area.id,
+                                         product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
+                                         issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id)
+  end
 end
 
 And(/^employer (.*?) with employee (.*?) is under open enrollment$/) do |legal_name, named_person|
@@ -354,6 +415,23 @@ And(/^employer (.*?) with employee (.*?) has hbx_enrollment with health product$
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
                     sponsored_benefit_id: sponsored_benefit_id}, :with_health_product)
+end
+
+And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the off cycle benefit application$/) do |named_person, legal_name|
+  census_employee = census_employee(named_person)
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  benefit_sponsorship = census_employee.benefit_sponsorship
+  # TODO: This is returning nil now
+  # off_cycle_benefit_application = benefit_sponsorship.off_cycle_benefit_application
+  # TODO: Is this really the off cycle benefit application?
+  off_cycle_benefit_application = census_employee.benefit_sponsorship.current_benefit_application
+  benefit_package = off_cycle_benefit_application.benefit_packages[0]
+  sponsored_benefit = benefit_package.sponsored_benefits.first
+  end_date = off_cycle_benefit_application.end_on
+  off_cycle_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(off_cycle_benefit_application, sponsored_benefit, end_date)
+  most_recent_enrollment = person_record.primary_family.hbx_enrollments.last
+  expect(off_cycle_enrollments).to include(most_recent_enrollment)
 end
 
 And(/^employer (.*?) with employee (.*?) has has person and user record present$/) do |legal_name, named_person|

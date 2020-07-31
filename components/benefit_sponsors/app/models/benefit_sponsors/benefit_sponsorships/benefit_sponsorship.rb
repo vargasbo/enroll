@@ -508,6 +508,22 @@ module BenefitSponsors
       benefit_applications.where(:aasm_state.ne => :canceled).order_by(:"effective_period.min".desc).first || latest_benefit_application
     end
 
+    def off_cycle_benefit_application
+      # Second to last benefit application is in termination pending and current one is in active or draft
+      # if !self.benefit_applications[-2].nil? &&
+      #   self.benefit_applications[-2]&.aasm_state == :termination_pending &&
+      #   (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES + ::BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_DRAFT_STATES).reject do |state|
+      #     state == :termination_pending
+      #   end.include?(benefit_applications.last.aasm_state)
+      #   benefit_applications.last
+      # end
+      recent_bas = benefit_applications.order_by(:"created_at".desc).to_a.last(3)
+      termed_or_ineligible_app = recent_bas.detect { |recent_ba| recent_ba.is_termed_or_ineligible? }
+      return nil unless termed_or_ineligible_app
+
+      recent_bas.select { |recent_ba| recent_ba.start_on > termed_or_ineligible_app.end_on && recent_ba.aasm_state != :canceled }.first
+    end
+
     # use this only for EDI
     def late_renewal_benefit_application
       benefit_applications.order_by(:created_at.desc).detect do |application|
@@ -521,6 +537,16 @@ module BenefitSponsors
 
     def active_benefit_application
       benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
+    end
+
+    def is_off_cycle?
+      return false unless off_cycle_benefit_application
+
+      off_cycle_benefit_application.present?
+    end
+
+    def is_potential_off_cycle_employer?
+      benefit_applications.order_by(:"created_at".desc).to_a.last(2).any? { |benefit_application| benefit_application.is_termed_or_ineligible? }
     end
 
     def most_recent_benefit_application
