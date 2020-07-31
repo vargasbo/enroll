@@ -15,7 +15,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
   let(:renewal_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
   let(:census_employee1) { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
   let(:user) { FactoryBot.create(:user) }
-
+ # here
   context "Add Plan year display" do
 
     before :each do
@@ -61,6 +61,19 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
 
         before do
           renewal_application.cancel!
+          renewal_application.reload
+        end
+
+        it "should display add plan year button" do
+          render "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits.html.erb"
+          expect(rendered).to have_selector("a", text: "Add Plan Year")
+        end
+      end
+
+      context "when the most recent benefit application is in enrollment ineligible state" do
+
+        before do
+          renewal_application.update_attributes!(:aasm_state => :enrollment_ineligible)
           renewal_application.reload
         end
 
