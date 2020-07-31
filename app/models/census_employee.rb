@@ -606,6 +606,13 @@ class CensusEmployee < CensusMember
     benefit_package_assignment_on(renewal_begin_date)
   end
 
+  def off_cycle_benefit_group_assignment#(coverage_date = TimeKeeper.date_of_record)
+    if active_benefit_group_assignment
+      benefit_package_ids = benefit_sponsorship.off_cycle_benefit_application.benefit_packages.map(&:id)
+      benefit_group_assignments.where(:start_on.gt => active_benefit_group_assignment.start_on, :benefit_package_id => benefit_package_ids).first
+    end
+  end
+
   # DEPRECATE IF POSSIBLE
   def published_benefit_group_assignment
     benefit_group_assignments.select do |benefit_group_assignment|

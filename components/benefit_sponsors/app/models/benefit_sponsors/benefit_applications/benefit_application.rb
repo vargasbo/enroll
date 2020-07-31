@@ -159,6 +159,8 @@ module BenefitSponsors
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
     scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
     scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
+    scope :terminated_or_termination_pending,-> { any_in(aasm_state: [:termination_pending, :terminated]) }
+    scope :termed_or_ineligible,            -> { any_in(aasm_state: [:termination_pending, :terminated] + ENROLLMENT_INELIGIBLE_STATES) }
 
     # Used for specific DataTable Action only
     scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :termination_pending]) }
@@ -333,6 +335,10 @@ module BenefitSponsors
         @recorded_rating_area = new_recorded_rating_area
       end
       @recorded_rating_area
+    end
+
+    def is_termed_or_ineligible?
+      termination_pending? || terminated? || enrollment_ineligible?
     end
 
     def recorded_rating_area
