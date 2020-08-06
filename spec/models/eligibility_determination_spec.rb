@@ -6,6 +6,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :max_aptc }
   it { should validate_presence_of :csr_percent_as_integer }
 
+
   let(:family)                        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:household)                     { family.households.first }
   let(:tax_household)                 { FactoryBot.create(:tax_household, household: household) }
@@ -128,8 +129,13 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       expect(subject.class).to be_const_defined(:SOURCE_KINDS)
     end
 
+    it 'should have SOURCE_KINDS constant' do
+      subject.class.should be_const_defined(:SOURCE_KINDS)
+      expect(described_class::SOURCE_KINDS).to eq(%w(Curam Admin Renewals Haven))
+    end
+
     it 'should have constant SOURCE_KINDS with a specific set of list' do
-      expect(::EligibilityDetermination::SOURCE_KINDS).to eq(['Curam', 'Admin', 'Renewals'])
+      expect(::EligibilityDetermination::SOURCE_KINDS).to eq(['Curam', 'Admin', 'Renewals', 'Haven'])
     end
   end
 end
