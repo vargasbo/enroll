@@ -4,6 +4,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
+
   describe "#can_employee_shop??" do
     it "should return false if date is empty" do
       expect(helper.can_employee_shop?(nil)).to eq false

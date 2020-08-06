@@ -14,6 +14,7 @@ class TaxHousehold
 
   embedded_in :household
 
+  field :application_id, type: BSON::ObjectId
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
 
@@ -68,7 +69,12 @@ class TaxHousehold
   end
 
   def aptc_members
-    tax_household_members.find_all(&:is_ia_eligible?)
+    #Review split brain
+    if application_id.present?
+      active_applicants.find_all(&:is_ia_eligible?)
+    else
+      tax_household_members.find_all(&:is_ia_eligible?)
+    end
   end
 
   def applicant_ids
@@ -246,11 +252,6 @@ class TaxHousehold
     household.family
   end
 
-  #usage: filtering through group_by criteria
-  def group_by_year
-    effective_starting_on.year
-  end
-
   def is_eligibility_determined?
     if self.elegibility_determinizations.size > 0
       true
@@ -261,14 +262,49 @@ class TaxHousehold
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    tax_household_members.detect do |tax_household_member|
-      tax_household_member.is_subscriber == true
+    application_id.present? ? application.applicants.detect{ |applicant| applicant.family_member.is_primary_applicant?} : tax_household_members.detect { |tax_household_member| tax_household_member.is_subscriber }
+  end
+
+  def application
+    FinancialAssistance::Application.find(application_id)
+  end
+
+  def active_applicants
+    return nil unless applicants
+    applicants.where(tax_household_id: self.id)
+  end
+
+
+  def applicants
+    return nil unless application
+    application.applicants.where(tax_household_id: self.id) if application.applicants.present?
+  end
+
+  def any_applicant_ia_eligible?
+    return nil unless active_applicants.present?
+    active_applicants.map(&:is_ia_eligible).include?(true)
+  end
+
+  def preferred_eligibility_determination
+    return nil unless eligibility_determinations.present?
+    if application_id.present?
+      admin_ed = eligibility_determinations.where(source: "Admin").first
+      curam_ed = eligibility_determinations.where(source: "Curam").first
+      return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
+      return curam_ed if curam_ed.present?
+      return eligibility_determinations.max_by(&:determined_at)
+    else
+      eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
     end
   end
 
   # TODO: Refactor this to return Applicants vs TaxHouseholdMembers after FAA merge.
   def tax_members
     tax_household_members
+  end
+
+  def set_effective_starting_on
+    write_attributes(effective_starting_on: TimeKeeper.date_of_record) if effective_starting_on.blank?
   end
 
   private
