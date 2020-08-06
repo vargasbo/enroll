@@ -3640,7 +3640,7 @@ describe ".parent enrollments", dbclean: :around_each do
 
     context 'shop enrollment' do
       it 'should return false' do
-        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp)).to be_falsey
+        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp.start_on)).to be_falsey
       end
     end
 
@@ -3650,7 +3650,7 @@ describe ".parent enrollments", dbclean: :around_each do
       end
 
       it 'should return true' do
-        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp)).to be_truthy
+        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp.start_on)).to be_truthy
       end
     end
   end
