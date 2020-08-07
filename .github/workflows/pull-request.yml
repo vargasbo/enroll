@@ -1,8 +1,5 @@
 name: Pushes and Pull Requests not to master
 on:
-  push:
-    branches-ignore:
-      - master
   pull_request:
     branches-ignore:
       - master
