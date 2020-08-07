@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^the user will navigate to the Other Income page for the corresponding applicant$/) do
   expect(page).to have_content "Other Income for"
 end
@@ -28,8 +30,8 @@ Then(/^the other income form should show$/) do
 end
 
 Given(/^the user fills out the required other income information$/) do
-  fill_in 'financial_assistance_income[amount]', with:'100'
-  fill_in 'financial_assistance_income[start_on]', with:'1/01/2018'
+  fill_in 'financial_assistance_income[amount]', with: '100'
+  fill_in 'financial_assistance_income[start_on]', with: '1/01/2018'
   find(:xpath, '//*[@id="financial_assistance_income_frequency_kind"]/option[2]').select_option
 end
 
@@ -43,7 +45,7 @@ end
 
 Then(/^the other income information should be saved on the page$/) do
   expect(page).to have_content '100.00'
-	expect(page).to have_content '1/01/2018'
+  expect(page).to have_content '1/01/2018'
 end
 
 When(/^the user cancels the form$/) do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class ApplicantsController < ::ApplicationController
 
@@ -36,7 +38,7 @@ module FinancialAssistance
     end
 
     def step
-      save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
       model_name = @model.class.to_s.split('::').last.downcase
@@ -68,12 +70,12 @@ module FinancialAssistance
 
     def age_of_applicant
       applicant = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id])
-      render :plain => "#{applicant.age_of_the_applicant}"
+      render :plain => applicant.age_of_the_applicant.to_s
     end
 
     def primary_applicant_has_spouse
       has_spouse =  @person.person_relationships.where(kind: 'spouse').first.present? ? 'true' : 'false'
-      render :plain => "#{has_spouse}"
+      render :plain => has_spouse.to_s
     end
 
     def update
@@ -85,13 +87,13 @@ module FinancialAssistance
 
     def load_support_texts
       raw_support_text = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
-      @support_texts = set_support_text_placeholders raw_support_text
+      @support_texts = support_text_placeholders raw_support_text
     end
 
-    def format_date_params model_params
-      model_params["pregnancy_due_on"]=Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
-      model_params["pregnancy_end_on"]=Date.strptime(model_params["pregnancy_end_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_end_on"].present?
-      model_params["student_status_end_on"]=Date.strptime(model_params["student_status_end_on"].to_s, "%m/%d/%Y") if model_params["student_status_end_on"].present?
+    def format_date_params(model_params)
+      model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
+      model_params["pregnancy_end_on"] = Date.strptime(model_params["pregnancy_end_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_end_on"].present?
+      model_params["student_status_end_on"] = Date.strptime(model_params["student_status_end_on"].to_s, "%m/%d/%Y") if model_params["student_status_end_on"].present?
     end
 
     def build_error_messages(model)

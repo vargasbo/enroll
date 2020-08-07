@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^that the user is on the FAA Household Info page$/) do
   login_as consumer, scope: :user
   visit financial_assistance.applications_path

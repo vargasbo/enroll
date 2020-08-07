@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class ApplicationController < ::ApplicationController
     protect_from_forgery with: :exception

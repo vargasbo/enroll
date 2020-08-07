@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class IncomesController < ::ApplicationController
 
@@ -37,7 +39,7 @@ module FinancialAssistance
     end
 
     def step
-      save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
       model_name = @model.class.to_s.split('::').last.downcase
@@ -88,7 +90,6 @@ module FinancialAssistance
       end
     end
 
-
     def destroy
       @income = @applicant.incomes.find(params[:id])
       @income.destroy!
@@ -97,36 +98,35 @@ module FinancialAssistance
     end
 
     private
-    def format_date params
+
+    def format_date(params)
       return if params[:financial_assistance_income].blank?
       params[:financial_assistance_income][:start_on] = Date.strptime(params[:financial_assistance_income][:start_on].to_s, "%m/%d/%Y")
-      if params[:financial_assistance_income][:end_on].present?
-        params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y")
-      end
+      params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_income][:end_on].present?
     end
 
     def job_income_type
       FinancialAssistance::Income::JOB_INCOME_TYPE_KIND
     end
 
-    def format_date_params model_params
-      model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
-      model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
+    def format_date_params(model_params)
+      model_params["start_on"] = Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
+      model_params["end_on"] = Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
     end
 
     def build_error_messages(model)
       model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.full_messages.join("<br />")
     end
 
-    def update_employer_contact model, params
+    def update_employer_contact(_model, params)
       if params[:employer_phone].present?
         @model.build_employer_phone
-        params[:employer_phone].merge!(kind: "work") # hack to get pass phone validations
+        params[:employer_phone].merge!(kind: "work") # HACK: to get pass phone validations
         @model.employer_phone.assign_attributes(permit_params(params[:employer_phone]))
       end
       if params[:employer_address].present?
         @model.build_employer_address
-        params[:employer_address].merge!(kind: "work") # hack to get pass phone validations
+        params[:employer_address].merge!(kind: "work") # HACK: to get pass phone validations
         @model.employer_address.assign_attributes(permit_params(params[:employer_address]))
       end
     end
@@ -143,16 +143,14 @@ module FinancialAssistance
 
     def load_support_texts
       file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
-      raw_support_text = YAML.load(File.read(file_path)).with_indifferent_access 
-      @support_texts = set_support_text_placeholders raw_support_text
+      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
+      @support_texts = support_text_placeholders raw_support_text
     end
 
     def find
-      begin
-        FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
-      rescue
-        nil
-      end
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
+    rescue StandardError
+      ''
     end
   end
 end
