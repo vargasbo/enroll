@@ -22,7 +22,7 @@ module Api
 
         raise "SLCSP could not be found" if benefit_coverage_period.nil?
 
-        Plan.find(benefit_coverage_period.slcsp) rescue "SLCSP could not be found"
+        BenefitMarkets::Products::Product.find(benefit_coverage_period.slcsp) rescue "SLCSP could not be found"
       end
     end
   end
