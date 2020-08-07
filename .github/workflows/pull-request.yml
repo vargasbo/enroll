@@ -16,7 +16,7 @@ jobs:
         # with:
           # ref: ${{ github.event.pull_request.head.sha }}
       - name: log payload
-        run: echo ${{ github.event.pull_request }}
+        run: echo ${{ toJson(github.event.pull_request.base) }}
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "2.5.1"
@@ -36,6 +36,7 @@ jobs:
       - name: Run rubocop
         run: |
           git fetch --no-tags origin
+          echo running rubocop on ${{ github.event.pull_request.head.ref }} compared against ${{ github.event.pull_request.base.ref }}
           bundle exec rubocop-git origin/${{github.event.pull_request.base.ref }}
   # testing_matrix:
   #   name: ${{matrix.command_configs.name}}
