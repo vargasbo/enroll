@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class DeductionsController < ::ApplicationController
 
@@ -24,7 +26,7 @@ module FinancialAssistance
     end
 
     def step
-      save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       model_name = @model.class.to_s.split('::').last.downcase
       model_params = params[model_name]
@@ -84,18 +86,16 @@ module FinancialAssistance
 
     private
 
-    def format_date params
+    def format_date(params)
       return if params[:financial_assistance_deduction].blank?
       params[:financial_assistance_deduction][:start_on] = Date.strptime(params[:financial_assistance_deduction][:start_on].to_s, "%m/%d/%Y")
-      if params[:financial_assistance_deduction][:end_on].present?
-        params[:financial_assistance_deduction][:end_on] = Date.strptime(params[:financial_assistance_deduction][:end_on].to_s, "%m/%d/%Y")
-      end
+      params[:financial_assistance_deduction][:end_on] = Date.strptime(params[:financial_assistance_deduction][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_deduction][:end_on].present?
     end
 
     # this might not be needed anymore as forms (with dates) have come out of the YAML. Refactor and Replace with the method above.
-    def format_date_params model_params
-      model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
-      model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
+    def format_date_params(model_params)
+      model_params["start_on"] = Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
+      model_params["end_on"] = Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
     end
 
     def build_error_messages(model)
@@ -118,16 +118,15 @@ module FinancialAssistance
     end
 
     def load_support_texts
-      raw_support_text = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+      file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
+      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
       @support_texts = set_support_text_placeholders raw_support_text
     end
 
     def find
-      begin
-        FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.find(params[:id])
-      rescue
-        nil
-      end
+      FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.find(params[:id])
+    rescue StandardError
+      ''
     end
   end
 end

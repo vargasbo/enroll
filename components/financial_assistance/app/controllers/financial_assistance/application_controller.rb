@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
-  class ApplicationController < ActionController::Base
+  class ApplicationController < ::ApplicationController
     protect_from_forgery with: :exception
+
+    layout "layouts/financial_assistance"
   end
 end

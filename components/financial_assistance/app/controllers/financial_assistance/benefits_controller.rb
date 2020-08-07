@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class BenefitsController < ::ApplicationController
 
@@ -25,7 +27,7 @@ module FinancialAssistance
     end
 
     def step
-      save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
       model_name = @model.class.to_s.split('::').last.downcase
@@ -89,25 +91,22 @@ module FinancialAssistance
 
     private
 
-    def format_date params
+    def format_date(params)
       params[:financial_assistance_benefit][:start_on] = Date.strptime(params[:financial_assistance_benefit][:start_on].to_s, "%m/%d/%Y")
-      if params[:financial_assistance_benefit][:end_on].present?
-        params[:financial_assistance_benefit][:end_on] = Date.strptime(params[:financial_assistance_benefit][:end_on].to_s, "%m/%d/%Y")
-      end
+      params[:financial_assistance_benefit][:end_on] = Date.strptime(params[:financial_assistance_benefit][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_benefit][:end_on].present?
     end
 
-    def update_employer_contact model, params
+    def update_employer_contact(_model, params)
       if params[:employer_phone].present?
         @model.build_employer_phone
-        params[:employer_phone].merge!(kind: "work") # hack to get pass phone validations
+        params[:employer_phone].merge!(kind: "work") # HACK: to get pass phone validations
         @model.employer_phone.assign_attributes(permit_params(params[:employer_phone]))
       end
 
-      if params[:employer_address].present?
-        @model.build_employer_address
-        params[:employer_address].merge!(kind: "work") # hack to get pass phone validations
-        @model.employer_address.assign_attributes(permit_params(params[:employer_address]))
-      end
+      return unless params[:employer_address].present?
+      @model.build_employer_address
+      params[:employer_address].merge!(kind: "work") # HACK: to get pass phone validations
+      @model.employer_address.assign_attributes(permit_params(params[:employer_address]))
     end
 
     def build_error_messages(model)
@@ -124,21 +123,20 @@ module FinancialAssistance
     end
 
     def find
-      begin
-        FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.find(params[:id])
-      rescue
-        nil
-      end
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.find(params[:id])
+    rescue StandardError
+      ''
     end
 
     def load_support_texts
-      raw_support_text = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
-      @support_texts = set_support_text_placeholders raw_support_text
+      file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
+      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
+      @support_texts = support_text_placeholders raw_support_text
     end
 
-    def format_date_params model_params
-      model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["start_on"].present?
-      model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
+    def format_date_params(model_params)
+      model_params["start_on"] = Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["start_on"].present?
+      model_params["end_on"] = Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
     end
   end
 end

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
-  class ApplicationsController < ::ApplicationController
+  class ApplicationsController < ApplicationController
 
     before_action :set_current_person
     before_action :set_primary_family
@@ -46,7 +48,7 @@ module FinancialAssistance
     end
 
     def step
-      save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
       model_name = @model.class.to_s.split('::').last.downcase
@@ -85,7 +87,7 @@ module FinancialAssistance
       end
     end
 
-    def generate_payload application
+    def generate_payload(application)
       render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
     end
 
@@ -166,7 +168,7 @@ module FinancialAssistance
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
 
-      render layout: 'financial_assistance' if params.keys.include?"cur"
+      render layout: 'financial_assistance' if params.keys.include? "cur"
     end
 
     def application_publish_error
@@ -191,9 +193,9 @@ module FinancialAssistance
 
     def check_eligibility_results_received
       application = @person.primary_family.applications.find(params[:id])
-      render :text => "#{application.success_status_codes?(application.determination_http_status_code)}"
+      render :text => application.success_status_codes?(application.determination_http_status_code).to_s
     end
-    
+
     def checklist_pdf
       send_file(Rails.root.join("public", "ivl_checklist.pdf").to_s, :disposition => "inline", :type => "application/pdf")
     end
@@ -240,21 +242,21 @@ module FinancialAssistance
       redirect_to application_checklist_applications_path
     end
 
-    def dummy_data_for_demo(params)
+    def dummy_data_for_demo(_params)
       #Dummy_ED
       coverage_year = @person.primary_family.application_applicable_year
       @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
 
       @model.tax_households.each do |txh|
-        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 01, 01))
+        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
         txh.eligibility_determinations.build(max_aptc: 200.00,
-                                                csr_percent_as_integer: 73,
-                                                csr_eligibility_kind: "csr_73",
-                                                determined_on: TimeKeeper.datetime_of_record - 30.days,
-                                                determined_at: TimeKeeper.datetime_of_record - 30.days,
-                                                premium_credit_strategy_kind: "allocated_lump_sum_credit",
-                                                e_pdc_id: "3110344",
-                                                source: "Haven").save!
+                                             csr_percent_as_integer: 73,
+                                             csr_eligibility_kind: "csr_73",
+                                             determined_on: TimeKeeper.datetime_of_record - 30.days,
+                                             determined_at: TimeKeeper.datetime_of_record - 30.days,
+                                             premium_credit_strategy_kind: "allocated_lump_sum_credit",
+                                             e_pdc_id: "3110344",
+                                             source: "Haven").save!
         txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) if txh.applicants.count > 0
         txh.applicants.second.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) if txh.applicants.count > 1
         txh.applicants.third.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false, is_without_assistance: false) if txh.applicants.count > 2
@@ -277,12 +279,12 @@ module FinancialAssistance
       model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
     end
 
-    def hash_to_param param_hash
+    def hash_to_param(param_hash)
       ActionController::Parameters.new(param_hash)
     end
 
     def load_support_texts
-     @support_texts = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
+      @support_texts = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
     end
 
     def permit_params(attributes)
