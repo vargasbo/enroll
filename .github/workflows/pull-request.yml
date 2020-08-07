@@ -16,7 +16,9 @@ jobs:
         # with:
           # ref: ${{ github.event.pull_request.head.sha }}
       - name: log payload
-        run: echo ${{ toJson(github.event.pull_request.base) }}
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "2.5.1"
