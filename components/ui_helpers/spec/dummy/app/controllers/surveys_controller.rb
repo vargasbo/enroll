@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SurveysController < ApplicationController
   include UIHelpers::WorkflowController
 
@@ -13,7 +15,7 @@ class SurveysController < ApplicationController
     # Saving all the form parameters of a single page as 1 field in database.
     attributes[:form_params] = params
     attributes[:workflow] = {current_step: @current_step.to_i + 1}
-    
+
     @model.attributes = attributes
     @model.save!
 
@@ -26,6 +28,7 @@ class SurveysController < ApplicationController
   end
 
   private
+
   def find
     Survey.first
   end

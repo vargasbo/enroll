@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 # Given(/^that the user is applying for a CONSUMER role$/) do
 #   visit "/users/sign_up"

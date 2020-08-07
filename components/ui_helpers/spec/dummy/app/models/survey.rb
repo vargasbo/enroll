@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Survey < ActiveRecord::Base
   serialize :workflow, JSON
   serialize :results, JSON

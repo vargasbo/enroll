@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   module NavigationHelper
     def tell_us_about_yourself_active?
@@ -19,13 +21,13 @@ module FinancialAssistance
     end
 
     def family_members_index_active?
-    return true if controller_name == "family_members" && action_name == "index"
-    return true if controller_name == "family_relationships" && action_name == "index"
+      return true if controller_name == "family_members" && action_name == "index"
+      return true if controller_name == "family_relationships" && action_name == "index"
     end
 
     def family_members_index_current_step?
-    return true if controller_name == "family_relationships" && action_name == "index"
-    return true if controller_name == "family_members" && action_name == "index"
+      return true if controller_name == "family_relationships" && action_name == "index"
+      return true if controller_name == "family_members" && action_name == "index"
     end
   end
 end

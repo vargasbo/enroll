@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FinancialAssistance::Engine.routes.draw do
   resources :applications do
     get :copy, on: :member

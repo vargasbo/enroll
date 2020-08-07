@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class Deduction
     include Mongoid::Document
@@ -5,10 +7,10 @@ module FinancialAssistance
 
     embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
 
-    TITLE_SIZE_RANGE = 3..30
-    FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
+    TITLE_SIZE_RANGE = (3..30).freeze
+    FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
-    KINDS = %W(
+    KINDS = %w[
         alimony_paid
         deductable_part_of_self_employment_taxes
         domestic_production_activities
@@ -22,7 +24,7 @@ module FinancialAssistance
         ira_deduction
         reservists_performing_artists_and_fee_basis_government_official_expenses
         tuition_and_fees
-      )
+      ].freeze
 
     DEDUCTION_TYPE = {
       alimony_paid: "Alimony paid",
@@ -38,7 +40,7 @@ module FinancialAssistance
       ira_deduction: "IRA deduction",
       reservists_performing_artists_and_fee_basis_government_official_expenses: "Certain business expenses of reservists, performing artists, and fee-basis government officials",
       tuition_and_fees: "Tuition and fees"
-    }
+    }.freeze
 
     field :title, type: String
     field :kind, as: :deduction_type, type: String, default: 'alimony_paid'
@@ -82,7 +84,7 @@ module FinancialAssistance
       end
     end
 
-  private
+    private
 
     def set_submission_timestamp
       write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?

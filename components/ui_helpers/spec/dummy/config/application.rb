@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path('../boot', __FILE__)
 
 # Pick the frameworks you want:
@@ -26,7 +28,7 @@ module Dummy
     # config.i18n.default_locale = :de
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.assets.precompile += %w( *.svg *.eot *.woff *.ttf )
+    config.assets.precompile += %w[*.svg *.eot *.woff *.ttf]
   end
 end
 

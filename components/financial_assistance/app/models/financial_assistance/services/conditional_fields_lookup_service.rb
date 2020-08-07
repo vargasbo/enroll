@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   module Services
     # This service will return boolean if the conditional fields has to be displayed.

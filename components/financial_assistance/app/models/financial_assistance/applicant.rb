@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class Applicant
     include Mongoid::Document
@@ -175,8 +177,8 @@ module FinancialAssistance
               inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
               allow_blank: true
 
-    alias_method :is_medicare_eligible?, :is_medicare_eligible
-    alias_method :is_joint_tax_filing?, :is_joint_tax_filing
+    alias is_medicare_eligible? is_medicare_eligible
+    alias is_joint_tax_filing? is_joint_tax_filing
 
     def is_ia_eligible?
       is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
@@ -302,27 +304,21 @@ module FinancialAssistance
     end
 
     #### Use Person.consumer_role values for following
-    def is_us_citizen?
-    end
+    def is_us_citizen?; end
 
-    def is_amerasian?
-    end
+    def is_amerasian?; end
 
-    def is_native_american?
-    end
+    def is_native_american?; end
 
-    def citizen_status?
-    end
+    def citizen_status?; end
 
-    def lawfully_present?
-    end
+    def lawfully_present?; end
 
     def immigration_status?
       person.citizen_status
     end
 
-    def immigration_date?
-    end
+    def immigration_date?; end
 
     #### Collect insurance from Benefit model
     def is_enrolled_in_insurance?
@@ -333,11 +329,9 @@ module FinancialAssistance
       benefits.where(kind: 'is_eligible').present?
     end
 
-    def had_prior_insurance?
-    end
+    def had_prior_insurance?; end
 
-    def prior_insurance_end_date
-    end
+    def prior_insurance_end_date; end
 
     def has_state_health_benefit?
       benefits.where(insurance_kind: 'medicaid').present?
@@ -671,21 +665,13 @@ module FinancialAssistance
     end
 
     def presence_of_attr_step_1
-      if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
-        errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank")
-      end
+      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank") if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
 
-      if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
-        errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank")
-      end
+      errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
 
-      if is_required_to_file_taxes.nil?
-        errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank")
-      end
+      errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank") if is_required_to_file_taxes.nil?
 
-      if is_claimed_as_tax_dependent.nil?
-        errors.add(:is_claimed_as_tax_dependent, "' is_claimed_as_tax_dependent can't be blank")
-      end
+      errors.add(:is_claimed_as_tax_dependent, "' is_claimed_as_tax_dependent can't be blank") if is_claimed_as_tax_dependent.nil?
     end
 
     def presence_of_attr_other_qns
@@ -702,9 +688,7 @@ module FinancialAssistance
       end
 
       if age_of_applicant > 18 && age_of_applicant < 26
-        if is_former_foster_care.nil?
-          errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered")
-        end
+        errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.nil?
 
         if is_former_foster_care
           errors.add(:foster_care_us_state, "' Where was this person in foster care?' should be answered") if foster_care_us_state.blank?
@@ -718,9 +702,7 @@ module FinancialAssistance
         errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
       end
 
-      if age_of_applicant.between?(18,19) && is_student.nil?
-        errors.add(:is_student, "' Is this person a student?' should be answered")
-      end
+      errors.add(:is_student, "' Is this person a student?' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
     end
 
     def age_of_applicant
@@ -728,13 +710,9 @@ module FinancialAssistance
     end
 
     def clean_params(model_params)
-      if model_params[:is_required_to_file_taxes].present? && model_params[:is_required_to_file_taxes] == 'false'
-        model_params[:is_joint_tax_filing] = nil
-      end
+      model_params[:is_joint_tax_filing] = nil if model_params[:is_required_to_file_taxes].present? && model_params[:is_required_to_file_taxes] == 'false'
 
-      if model_params[:is_claimed_as_tax_dependent].present? && model_params[:is_claimed_as_tax_dependent] == 'false'
-        model_params[:claimed_as_tax_dependent_by] = nil
-      end
+      model_params[:claimed_as_tax_dependent_by] = nil if model_params[:is_claimed_as_tax_dependent].present? && model_params[:is_claimed_as_tax_dependent] == 'false'
 
       # TODO : Revise this logic for conditional saving!
       if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ui_helpers/workflow/step'
 
 module UIHelpers

@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module UIHelpers
   module WorkflowHelper
-
     def find_previous_from_step_one
       model_name = @model.class.to_s.split('::').last.downcase
       if  model_name == "applicant"
@@ -12,32 +13,32 @@ module UIHelpers
       end
     end
 
-    def workflow_form_for(model, &block)
+    def workflow_form_for(model)
       path, method = if model.new_record?
-        [controller.request.path.sub('new', 'step'), :post]
-      else
-        [controller.request.path.sub('new', "#{model.id}/step"), :put]
+                       [controller.request.path.sub('new', 'step'), :post]
+                     else
+                       [controller.request.path.sub('new', "#{model.id}/step"), :put]
       end
-      path.gsub!(/step\/\d$/, 'step')
+      path.gsub!(%r{step/\d$}, 'step')
       form_tag path, method: method do
         yield
       end
     end
 
     def previous_step_for
-      controller.request.path.gsub(/step(?:\/\d)?$/, "step/#{@current_step.to_i - 1}")
+      controller.request.path.gsub(%r{step(?:/\d)?$}, "step/#{@current_step.to_i - 1}")
     end
 
     # The following helper methods are for populating the persisted values of each
     # attributes from the model during the construction of the HTML element.
 
     # Radio Button
-    def radio_checked? model, cell
-      cell.value  == model.send(cell.attribute) ? true : false if cell.attribute.present?
+    def radio_checked?(model, cell)
+      cell.value == model.send(cell.attribute) if cell.attribute.present?
     end
 
     # Dropdown
-    def selected_value model, cell
+    def selected_value(model, cell)
       if cell.accessor.nil?
         model.send(cell.attribute)
       else
@@ -48,7 +49,7 @@ module UIHelpers
     end
 
     # Text Input
-    def input_text_value model, cell
+    def input_text_value(model, cell)
       if cell.accessor.nil?
         model.send(cell.attribute)
       else
@@ -60,7 +61,7 @@ module UIHelpers
 
     # Personalize heading_text from steps.yml
     def personalize_heading_text(heading_text)
-      if (heading_text.include? '<family-member-name-placeholder>')
+      if heading_text.include? '<family-member-name-placeholder>'
         heading_text.sub! '<family-member-name-placeholder>', (@model.class.to_s == "FinancialAssistance::Applicant" ? @model.family_member.person.first_name : (@model.class.to_s == "FinancialAssistance::Application" ? @model.primary_applicant.family_member.person.first_name : @applicant.family_member.person.first_name))
       else
         heading_text
@@ -77,6 +78,5 @@ module UIHelpers
         text
       end
     end
-
   end
 end

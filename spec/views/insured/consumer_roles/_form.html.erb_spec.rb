@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 include ActionView::Context
 RSpec.describe "insured/consumer_roles/_form.html.erb" do

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module UIHelpers
   module NavHelper
-    def nav(options={})
+    def nav(options = {})
       content_tag :ul, class: "nav nav-#{options[:type]} #{options[:class]}" do
         yield NavBuilder.new(options, self)
       end
@@ -10,11 +12,11 @@ module UIHelpers
       attr_accessor :template
       delegate :capture, :content_tag, :link_to, to: :template
 
-      def initialize(options={}, template)
+      def initialize(options = {}, template)
         @template = template || options
       end
 
-      def pill(ref=nil, title=nil, options={}, &block)
+      def pill(ref = nil, title = nil, options = {}, &block)
         title ||= ref.to_s
         ref = title.parameterize.underscore.to_sym if title == ref
         content_tag :li, role: 'presentation', class: options[:active] ? 'active' : '' do
@@ -26,7 +28,7 @@ module UIHelpers
         end
       end
 
-      def tab(title=nil, options={}, &block)
+      def tab(title = nil, options = {}, &block)
         content_tag :li, role: 'presentation', class: options[:active] ? 'active' : '' do
           if block_given?
             link_to '#', &block
