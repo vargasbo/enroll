@@ -121,7 +121,7 @@ end
 
 group :development do
   gem "certified",              '~> 1'
-  gem 'overcommit',             '~> 0.47'
+  gem 'overcommit'
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
   gem 'rubocop-git'

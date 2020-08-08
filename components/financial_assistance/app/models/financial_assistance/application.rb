@@ -96,20 +96,20 @@ module FinancialAssistance
     # validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms
 
     validates :renewal_base_year, allow_nil: true,
-                                numericality: {
-                                  only_integer: true,
-                                  greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first,
-                                  less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last,
-                                  message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}"
-                                }
+                                  numericality: {
+                                    only_integer: true,
+                                    greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first,
+                                    less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last,
+                                    message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}"
+                                  }
 
     validates :years_to_renew,    allow_nil: true,
-                                numericality: {
-                                  only_integer: true,
-                                  greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first,
-                                  less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last,
-                                  message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
-                                }
+                                  numericality: {
+                                    only_integer: true,
+                                    greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first,
+                                    less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last,
+                                    message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
+                                  }
 
 
     scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
@@ -254,24 +254,24 @@ module FinancialAssistance
       income_deduction_per_year = Hash.new(0)
 
       incomes_or_deductions.each do |income_deduction|
-        working_days_in_year = Float(52*5)
+        working_days_in_year = Float(52 * 5)
         daily_income = 0
 
         case income_deduction.frequency
-          when "daily"
-            daily_income = income_deduction.amount_in_cents
-          when "weekly"
-            daily_income = income_deduction.amount_in_cents / (working_days_in_year/52)
-          when "biweekly"
-            daily_income = income_deduction.amount_in_cents / (working_days_in_year/26)
-          when "monthly"
-            daily_income = income_deduction.amount_in_cents / (working_days_in_year/12)
-          when "quarterly"
-            daily_income = income_deduction.amount_in_cents / (working_days_in_year/4)
-          when "half_yearly"
-            daily_income = income_deduction.amount_in_cents / (working_days_in_year/2)
-          when "yearly"
-            daily_income = income_deduction.amount_in_cents / (working_days_in_year)
+        when "daily"
+          daily_income = income_deduction.amount_in_cents
+        when "weekly"
+          daily_income = income_deduction.amount_in_cents / (working_days_in_year / 52)
+        when "biweekly"
+          daily_income = income_deduction.amount_in_cents / (working_days_in_year / 26)
+        when "monthly"
+          daily_income = income_deduction.amount_in_cents / (working_days_in_year / 12)
+        when "quarterly"
+          daily_income = income_deduction.amount_in_cents / (working_days_in_year / 4)
+        when "half_yearly"
+          daily_income = income_deduction.amount_in_cents / (working_days_in_year / 2)
+        when "yearly"
+          daily_income = income_deduction.amount_in_cents / (working_days_in_year)
         end
 
         income_deduction.start_date = TimeKeeper.date_of_record.beginning_of_year if income_deduction.start_date.to_s.eql? "01-01-0001" || income_deduction.start_date.blank?
@@ -289,7 +289,7 @@ module FinancialAssistance
 
     # Compute the actual days a person worked during one year
     def compute_actual_days_worked(year, start_date, end_date)
-      working_days_in_year = Float(52*5)
+      working_days_in_year = Float(52 * 5)
 
       if Date.new(year, 1, 1) < start_date
         start_date_to_consider = start_date
@@ -304,7 +304,7 @@ module FinancialAssistance
       end
 
       # we have to add one to include last day of work. We multiply by working_days_in_year/365 to remove weekends.
-      ((end_date_to_consider - start_date_to_consider + 1).to_i * (working_days_in_year/365)).to_i #actual days worked in 'year'
+      ((end_date_to_consider - start_date_to_consider + 1).to_i * (working_days_in_year / 365)).to_i #actual days worked in 'year'
     end
 
     def is_receiving_benefits_this_year?(alternate_benefit)
@@ -399,10 +399,10 @@ module FinancialAssistance
       #return true #For DEMO purpose only #temporary
       if validity = self.is_schema_valid?(Nokogiri::XML.parse(payload))
         notify("acapi.info.events.assistance_application.submitted",
-                  {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                    :body => payload,
-                    :family_id => self.family_id.to_s,
-                    :assistance_application_id => self.hbx_id.to_s})
+               {:correlation_id => SecureRandom.uuid.gsub("-",""),
+                :body => payload,
+                :family_id => self.family_id.to_s,
+                :assistance_application_id => self.hbx_id.to_s})
       else
         false
       end
@@ -414,26 +414,26 @@ module FinancialAssistance
         message = "Timed-out waiting for eligibility determination response"
         return_status = 504
         notify("acapi.info.events.eligibility_determination.rejected",
-            {:correlation_id => SecureRandom.uuid.gsub("-",""),
-              :body => { error_message: message },
-              :family_id => family_id.to_s,
-              :assistance_application_id => _id.to_s,
-              :return_status => return_status.to_s,
-              :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
+               {:correlation_id => SecureRandom.uuid.gsub("-",""),
+                :body => { error_message: message },
+                :family_id => family_id.to_s,
+                :assistance_application_id => _id.to_s,
+                :return_status => return_status.to_s,
+                :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
       end
 
       if has_eligibility_response && determination_http_status_code == 422 && determination_error_message == "Failed to validate Eligibility Determination response XML"
         message = "Invalid schema eligibility determination response provided"
         notify("acapi.info.events.eligibility_determination.rejected",
-            {:correlation_id => SecureRandom.uuid.gsub("-",""),
-              :body => { error_message: message },
-              :family_id => family_id.to_s,
-              :assistance_application_id => _id.to_s,
-              :return_status => determination_http_status_code.to_s,
-              :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
-              :haven_application_id => haven_app_id,
-              :haven_ic_id => haven_ic_id,
-              :primary_applicant_id => family.primary_applicant.person.hbx_id.to_s })
+               {:correlation_id => SecureRandom.uuid.gsub("-",""),
+                :body => { error_message: message },
+                :family_id => family_id.to_s,
+                :assistance_application_id => _id.to_s,
+                :return_status => determination_http_status_code.to_s,
+                :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
+                :haven_application_id => haven_app_id,
+                :haven_ic_id => haven_ic_id,
+                :primary_applicant_id => family.primary_applicant.person.hbx_id.to_s })
       end
     end
 
@@ -486,7 +486,7 @@ module FinancialAssistance
     def check_verification_response
       if !has_all_uqhp_applicants? && !has_atleast_one_medicaid_applicant? && !has_all_verified_applicants? && (TimeKeeper.datetime_of_record.prev_day > submitted_at)
         if timeout_response_last_submitted_at.blank? || (timeout_response_last_submitted_at.present? && (TimeKeeper.datetime_of_record.prev_day > timeout_response_last_submitted_at))
-           self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.datetime_of_record)
+          self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.datetime_of_record)
           active_applicants.each do |applicant|
             if !applicant.has_income_verification_response && !applicant.has_mec_verification_response
               type = "Income, MEC"
@@ -496,21 +496,20 @@ module FinancialAssistance
               type = "Income" if (!applicant.has_income_verification_response && applicant.has_mec_verification_response)
             end
             notify("acapi.info.events.verification.rejected",
-              { :correlation_id => SecureRandom.uuid.gsub("-",""),
-                :body => JSON.dump({
-                  error: "Timed-out waiting for verification response",
-                  applicant_first_name: applicant.person.first_name,
-                  applicant_last_name: applicant.person.last_name,
-                  applicant_id: applicant.person.hbx_id,
-                  rejected_verification_types: type}),
-                :assistance_application_id => self._id.to_s,
-                :family_id => self.family_id.to_s,
-                :haven_application_id => haven_app_id,
-                :haven_ic_id => haven_ic_id,
-                :reject_status => 504,
-                :submitted_timestamp => TimeKeeper.datetime_of_record.strftime('%Y-%m-%dT%H:%M:%S')
-              }
-            )
+                   { :correlation_id => SecureRandom.uuid.gsub("-",""),
+                     :body => JSON.dump({
+                                          error: "Timed-out waiting for verification response",
+                                          applicant_first_name: applicant.person.first_name,
+                                          applicant_last_name: applicant.person.last_name,
+                                          applicant_id: applicant.person.hbx_id,
+                                          rejected_verification_types: type
+                                        }),
+                     :assistance_application_id => self._id.to_s,
+                     :family_id => self.family_id.to_s,
+                     :haven_application_id => haven_app_id,
+                     :haven_ic_id => haven_ic_id,
+                     :reject_status => 504,
+                     :submitted_timestamp => TimeKeeper.datetime_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
           end
         end
       end
@@ -532,7 +531,7 @@ module FinancialAssistance
       active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
     end
 
-  private
+    private
 
     def clean_params(model_params)
       model_params[:attestation_terms] = nil if model_params[:parent_living_out_of_home_terms].present? && model_params[:parent_living_out_of_home_terms] == 'false'
@@ -602,7 +601,7 @@ module FinancialAssistance
     end
 
     def set_external_identifiers
-      app  = family.active_approved_application
+      app = family.active_approved_application
       if app.present?
         write_attribute(:haven_app_id, app.haven_app_id)
         write_attribute(:haven_ic_id, app.haven_ic_id)
@@ -695,7 +694,7 @@ module FinancialAssistance
       active_applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
 
       non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
-      tax_dependents= active_applicants.where(is_claimed_as_tax_dependent: true)
+      tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true)
 
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.tax_household_of_spouse.present?
@@ -731,7 +730,7 @@ module FinancialAssistance
     def create_verification_documents
       active_applicants.each do |applicant|
         %w[Income MEC].each do |type|
-          applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending' )
+          applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending')
           applicant.move_to_pending!
         end
       end
