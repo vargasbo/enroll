@@ -1,7 +1,4 @@
-# frozen_string_literal: true
-
-When(%r{^the user clicks ADD/EDIT INCOME & COVERAGE INFO button for a given household member$}) do
-  screenshot_and_post_to_slack('household_info_page_left_nav_screenshot', channel: 'new_faa_team')
+When(/^the user clicks ADD\/EDIT INCOME & COVERAGE INFO button for a given household member$/) do
   click_link 'ADD INCOME & COVERAGE INFO'
 end
 
@@ -10,7 +7,7 @@ Then(/^the user will navigate to the Tax Info page for the corresponding applica
 end
 
 Given(/^that the user is on the Tax Info page for a given applicant$/) do
-  visit go_to_step_financial_assistance_application_applicant_path(application, application.primary_applicant, 1)
+  visit financial_assistance.go_to_step_application_applicant_path(application, application.primary_applicant, 1)
 end
 
 When(/^the user clicks My Household section on the left navigation$/) do
@@ -18,7 +15,7 @@ When(/^the user clicks My Household section on the left navigation$/) do
 end
 
 Then(/^the user will navigate to the FAA Household Info page for the corresponding application\.$/) do
-  visit edit_financial_assistance_application_path(application.id.to_s)
+  visit financial_assistance.edit_application_path(application.id.to_s)
 end
 
 When(/^the user clicks Income & Coverage section on the left navigation$/) do
@@ -38,7 +35,7 @@ When(/^the user clicks Job Income section on the left navigation$/) do
 end
 
 Then(/^the user will navigate to the Job Income page for the corresponding applicant$/) do
-  visit edit_financial_assistance_application_path(application.id.to_s)
+  visit financial_assistance.edit_application_path(application.id.to_s)
 end
 
 When(/^the user clicks Other Income section on the left navigation$/) do
@@ -46,7 +43,7 @@ When(/^the user clicks Other Income section on the left navigation$/) do
 end
 
 Then(/^the user will navigate to the Other Income page for the corresponding applicant\.$/) do
-  visit other_financial_assistance_application_applicant_incomes_path(application, application.primary_applicant)
+  visit financial_assistance.other_application_applicant_incomes_path(application, application.primary_applicant)
 end
 
 When(/^the user clicks Income Adjustments section on the left navigation$/) do
@@ -54,7 +51,7 @@ When(/^the user clicks Income Adjustments section on the left navigation$/) do
 end
 
 Then(/^the user will navigate to the Income Adjustments page for the corresponding applicant$/) do
-  visit financial_assistance_application_applicant_deductions_path(application, application.primary_applicant)
+  visit financial_assistance.application_applicant_deductions_path(application, application.primary_applicant)
 end
 
 When(/^the user clicks Health Coverage section on the left navigation$/) do
@@ -62,7 +59,7 @@ When(/^the user clicks Health Coverage section on the left navigation$/) do
 end
 
 Then(/^the user will navigate to the Health Coverage page for the corresponding applicant$/) do
-  visit financial_assistance_application_applicant_benefits_path(application, application.primary_applicant)
+  visit financial_assistance.application_applicant_benefits_path(application, application.primary_applicant)
 end
 
 When(/^the user clicks Other Questions section on the left navigation$/) do
@@ -70,6 +67,5 @@ When(/^the user clicks Other Questions section on the left navigation$/) do
 end
 
 Then(/^the user will navigate to the Other Questions page for the corresponding applicant$/) do
-  visit other_questions_financial_assistance_application_applicant_path(application, application.primary_applicant)
-  screenshot_and_post_to_slack('other_questions_page_left_nav_screenshot', channel: 'new_faa_team')
+  visit financial_assistance.other_questions_application_applicant_path(application, application.primary_applicant)
 end
