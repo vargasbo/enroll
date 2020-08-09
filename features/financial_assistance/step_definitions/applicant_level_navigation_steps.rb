@@ -1,4 +1,6 @@
-When(/^the user clicks ADD\/EDIT INCOME & COVERAGE INFO button for a given household member$/) do
+# frozen_string_literal: true
+
+When(%r{^the user clicks ADD/EDIT INCOME & COVERAGE INFO button for a given household member$}) do
   click_link 'ADD INCOME & COVERAGE INFO'
 end
 
