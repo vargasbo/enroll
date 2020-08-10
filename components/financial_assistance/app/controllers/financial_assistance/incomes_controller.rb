@@ -72,7 +72,7 @@ module FinancialAssistance
 
     def create
       format_date(params)
-      @income = @applicant.incomes.build permit_params(params[:financial_assistance_income])
+      @income = @applicant.incomes.build params.permit![:income]
       if @income.save
         render :create
       else
@@ -83,7 +83,7 @@ module FinancialAssistance
     def update
       format_date(params)
       @income = @applicant.incomes.find params[:id]
-      if @income.update_attributes permit_params(params[:financial_assistance_income])
+      if @income.update_attributes permit_params(params[:income])
         render :update
       else
         render head: 'ok'
@@ -100,9 +100,9 @@ module FinancialAssistance
     private
 
     def format_date(params)
-      return if params[:financial_assistance_income].blank?
-      params[:financial_assistance_income][:start_on] = Date.strptime(params[:financial_assistance_income][:start_on].to_s, "%m/%d/%Y")
-      params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_income][:end_on].present?
+      return if params[:income].blank?
+      params[:income][:start_on] = Date.strptime(params[:income][:start_on].to_s, "%m/%d/%Y")
+      params[:income][:end_on] = Date.strptime(params[:income][:end_on].to_s, "%m/%d/%Y") if params[:income][:end_on].present?
     end
 
     def job_income_type

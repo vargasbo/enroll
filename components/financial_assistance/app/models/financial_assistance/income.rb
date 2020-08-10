@@ -5,9 +5,14 @@ module FinancialAssistance
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
+    before_create :set_submission_timestamp
+
+    embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
+    embeds_one :employer_address, class_name: 'FinancialAssistance::Locations::Address', cascade_callbacks: true
+    embeds_one :employer_phone, class_name: 'FinancialAssistance::Locations::Phone', cascade_callbacks: true
 
     TITLE_SIZE_RANGE = (3..30).freeze
+
     KINDS = %w[
       alimony_and_maintenance
       american_indian_and_alaskan_native
@@ -35,9 +40,10 @@ module FinancialAssistance
       income_from_irs
     ].freeze
 
-    JOB_INCOME_TYPE_KIND = "wages_and_salaries"
-    NET_SELF_EMPLOYMENT_INCOME_KIND = "net_self_employment"
+    JOB_INCOME_TYPE_KIND = 'wages_and_salaries'.freeze
+    NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'.freeze
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
+
     OTHER_INCOME_TYPE_KIND = {
       alimony_and_maintenance: 'Alimony received',
       capital_gains: 'Capital gains',
@@ -54,12 +60,8 @@ module FinancialAssistance
       foreign: 'Foreign income',
       other: 'Other taxable income',
       prizes_and_awards: 'Prizes and awards',
-      scholorship_payments: 'Taxable scholarship payments'
+      scholorship_payments: 'Taxable scholarship payments',
     }.freeze
-
-    #TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
-
-    #WAGE_TYPE_KINDS = %W(W2 1099)
 
     field :title, type: String
     field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
@@ -73,22 +75,14 @@ module FinancialAssistance
     field :is_projected, type: Boolean, default: false
     field :tax_form, type: String
     field :employer_name, type: String
-    field :employer_id, type: Integer
-    #field :income_from_native_american, type: Boolean #infer from income kinds
     field :has_property_usage_rights, type: Boolean
-    #field :has_education_scholarship_income, type: Boolean #infer from income kinds
     field :submitted_at, type: DateTime
-
     field :workflow, type: Hash, default: { }
 
-    scope :jobs, -> { where(kind: JOB_INCOME_TYPE_KIND)}
-    scope :self_employment, -> { where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
-    scope :other, -> { where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND]) }
-    scope :of_kind, ->(kind) { where(kind: kind) }
-
-
-    embeds_one :employer_address, class_name: "::Address"
-    embeds_one :employer_phone, class_name: "::Phone"
+    scope :jobs, -> {where(kind: JOB_INCOME_TYPE_KIND)}
+    scope :self_employment, -> {where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
+    scope :other, -> {where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND])}
+    scope :of_kind, ->(kind) {where(kind: kind)}
 
     validates_length_of :title,
                         in: TITLE_SIZE_RANGE,
@@ -104,30 +98,17 @@ module FinancialAssistance
                      inclusion: { in: KINDS, message: "%<value> is not a valid income type" },
                      on: [:step_1, :submission]
 
-    # validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
-
     validates :frequency_kind, presence: true,
-                               inclusion: { in: FREQUENCY_KINDS, message: "%<value> is not a valid frequency" }
+                               inclusion: { in: FREQUENCY_KINDS, message: '%{value} is not a valid frequency' }
 
     validates :start_on, presence: true, on: [:step_1, :submission]
-
-    # validates :tax_form,        presence: true,
-    #                             inclusion: { in: TAX_FORM_KINDS, message: "%{value} is not a valid tax form type" }
     validate :start_on_must_precede_end_on
-
-    before_create :set_submission_timestamp
-
 
     def hours_worked_per_week
       return 0 if end_on.blank? || end_on > TimeKeeper.date_of_record
       hours_per_week
     end
 
-
-  ##### Methods below were transferred from EDI DB system
-  ##### TODO: verify utility and improve names
-
-    # Change this to spaceship operator
     def same_as?(other)
       amount == other.amount \
         && kind == other.kind \
@@ -158,9 +139,9 @@ module FinancialAssistance
     class << self
       def find(id)
         bson_id = BSON::ObjectId.from_string(id.to_s)
-        applications = ::FinancialAssistance::Application.where("applicants.incomes._id" => bson_id)
+        applications = ::FinancialAssistance::Application.where('applicants.incomes._id' => bson_id)
         return unless applications.size == 1
-        applicants = applications.first.applicants.where("incomes._id" => bson_id)
+        applicants = applications.first.applicants.where('incomes._id' => bson_id)
         applicants.size == 1 ? applicants.first.incomes.find(bson_id) : nil
       end
     end
