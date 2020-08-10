@@ -43,7 +43,7 @@ module FinancialAssistance
           if params.key? :last_step
             @model.update_attributes!(workflow: { current_step: 1 })
             flash[:notice] = 'Benefit Info Added.'
-            redirect_to financial_assistance_application_applicant_benefits_path(@application, @applicant)
+            redirect_to application_applicant_benefits_path(@application, @applicant)
           else
             @model.update_attributes!(workflow: { current_step: @current_step.to_i })
             render 'workflow/step', layout: 'financial_assistance'
@@ -123,9 +123,7 @@ module FinancialAssistance
     end
 
     def find
-      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.find(params[:id])
-    rescue StandardError # rubocop:disable Lint/EmptyRescueClause TODO Remove this
-      ''
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.where(id: params[:id]).last || nil
     end
 
     def load_support_texts

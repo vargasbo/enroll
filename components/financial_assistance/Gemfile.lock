@@ -335,7 +335,10 @@ DEPENDENCIES
   factory_bot_rails (~> 4)
   financial_assistance!
   forgery (~> 0.7.0)
+<<<<<<< HEAD
   money-rails
+=======
+>>>>>>> REFS FFA - Moves stuff into components
   mongoid-rspec (~> 4.0.1)
   mongoid_rails_migrations (~> 1.2.0)
   rails-controller-testing

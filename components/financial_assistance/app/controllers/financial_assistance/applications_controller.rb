@@ -17,8 +17,6 @@ module FinancialAssistance
     include ApplicationHelper
     require 'securerandom'
 
-    before_action :load_support_texts, only: [:edit, :help_paying_coverage]
-
     def index
       @family = @person.primary_family
       @family_members = @person.primary_family.active_family_members
@@ -42,13 +40,14 @@ module FinancialAssistance
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
-      @application = @person.primary_family.applications.find params[:id]
+      @application = @person.primary_family.applications.find(params[:id])
+      load_support_texts
       matrix = @family.build_relationship_matrix
       @missing_relationships = @family.find_missing_relationships(matrix)
       render layout: 'financial_assistance'
     end
 
-    def step # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def step # rubocop:disable Metrics/CyclomaticComplexity
       save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -90,7 +89,7 @@ module FinancialAssistance
     end
 
     def generate_payload(application)
-      render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
+      render_to_string "financial_assistance/events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
     end
 
     def copy
@@ -100,6 +99,8 @@ module FinancialAssistance
     end
 
     def help_paying_coverage
+      @application = @person.primary_family.applications.find(params[:id]) if params[:id]
+      load_support_texts
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
@@ -110,7 +111,7 @@ module FinancialAssistance
     end
 
     def get_help_paying_coverage_response # rubocop:disable Naming/AccessorMethodName
-      if params["is_applying_for_assistance"].nil?
+      if params["is_applying_for_assistance"].blank?
         flash[:error] = "Please choose an option before you proceed."
         redirect_to help_paying_coverage_applications_path
       elsif params["is_applying_for_assistance"] == "true"
@@ -144,7 +145,7 @@ module FinancialAssistance
       @application = @person.primary_family.application_in_progress
       @applicants = @application.active_applicants if @application.present?
       if @application.blank?
-        redirect_to financial_assistance_applications_path
+        redirect_to applications_path
       else
         render layout: 'financial_assistance'
       end
@@ -154,11 +155,11 @@ module FinancialAssistance
       save_faa_bookmark(@person, request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       @applicants = @application.active_applicants if @application.present?
-      redirect_to financial_assistance_applications_path if @application.blank?
+      redirect_to applications_path if @application.blank?
     end
 
     def wait_for_eligibility_response
-      save_faa_bookmark(@person, financial_assistance_applications_path)
+      save_faa_bookmark(@person, applications_path)
       set_admin_bookmark_url
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
@@ -216,7 +217,7 @@ module FinancialAssistance
     def check_eligibility
       call_service
       return if params['action'] == "get_help_paying_coverage_response"
-      [(flash[:error] = l10n(decode_msg(@message))), (redirect_to financial_assistance_applications_path)] unless @assistance_status
+      [(flash[:error] = l10n(decode_msg(@message))), (redirect_to applications_path)] unless @assistance_status
     end
 
     def call_service
@@ -285,7 +286,9 @@ module FinancialAssistance
     end
 
     def load_support_texts
-      @support_texts = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
+      file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
+      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
+      @support_texts = support_text_placeholders raw_support_text
     end
 
     def permit_params(attributes)

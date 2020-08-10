@@ -6,7 +6,7 @@ module FinancialAssistance
     include Mongoid::Timestamps
     include AASM
 
-    embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
+    embedded_in :application
 
     TAX_FILER_KINDS = %w[tax_filer single joint separate dependent non_filer].freeze
     STUDENT_KINDS = %w[
@@ -154,9 +154,15 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
+<<<<<<< HEAD
     embeds_many :incomes,     class_name: "FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
+=======
+    embeds_many :incomes
+    embeds_many :deductions
+    embeds_many :benefits
+>>>>>>> REFS FFA - Moves stuff into components
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
 

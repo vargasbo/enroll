@@ -15,7 +15,7 @@ module FinancialAssistance
     def index
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
+      render html: '', layout: 'financial_assistance'
     end
 
     def other
@@ -48,7 +48,6 @@ module FinancialAssistance
 
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
       update_employer_contact(@model, params) if @model.income_type == job_income_type
-
       if params.key?(model_name)
         if @model.save(context: "step_#{@current_step.to_i}".to_sym)
           @current_step = @current_step.next_step if @current_step.next_step.present?
@@ -148,9 +147,7 @@ module FinancialAssistance
     end
 
     def find
-      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
-    rescue StandardError # rubocop:disable Lint/EmptyRescueClause TODO: Remove this
-      ''
+      @model = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.where(id: params[:id]).last || nil
     end
   end
 end
