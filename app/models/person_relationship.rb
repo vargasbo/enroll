@@ -101,6 +101,7 @@ class PersonRelationship
   field :successor_id, type: BSON::ObjectId
   field :family_id, type: BSON::ObjectId
 
+  # validates_presence_of :relative_id, message: "Choose a relative"
   validates_presence_of :predecessor_id, :successor_id, :family_id
 
   track_history :on => [:fields],
@@ -123,6 +124,10 @@ class PersonRelationship
 
   def notify_updated
     person.notify_updated
+  end
+
+  def check_predecessor_and_successor
+    errors.add(:successor, "can't be the same as predecessor") if successor_id == predecessor_id
   end
 
   def parent
