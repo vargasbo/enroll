@@ -643,7 +643,7 @@ class Family
   #
   # @return [ SpecialEnrollmentPeriod ] The SEP eligibility active on today's date with latest end on date
   def current_sep
-    active_seps.max(&:end_on)
+    active_seps.max { |sep| sep.end_on }
   end
 
   def build_from_employee_role(employee_role)

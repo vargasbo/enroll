@@ -148,6 +148,10 @@ Style/StringLiterals:
 Style/SymbolArray:
   Enabled: false
 
+# Mongoid doesn't play nicely with symbol procs
+Style/SymbolProc:
+  Enabled: false
+
 Style/WordArray:
   Enabled: false
 
