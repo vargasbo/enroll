@@ -114,7 +114,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
 
     it "should not show save button" do
       render :template => "people/landing_pages/_personal.html.erb"
-      expect(rendered).to have_selector('.blocking', text: 'Save' )
+      expect(rendered).to have_selector('.blocking', text: 'Save')
     end
   end
 
