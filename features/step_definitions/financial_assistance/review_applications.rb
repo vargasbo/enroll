@@ -4,6 +4,7 @@ Given(/^that a family has a Financial Assistance application in the (.*?) state$
   hbx_profile = FactoryBot.create(:hbx_profile)
   @family = user.primary_family
   @applications = [FactoryBot.create(:financial_assistance_application, family: @family, aasm_state: state)]
+  application.update_attributes(aasm_state: state)
 end
 
 And(/^the user navigates to the “Help Paying For Coverage” portal$/) do
