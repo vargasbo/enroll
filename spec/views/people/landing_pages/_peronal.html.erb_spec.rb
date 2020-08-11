@@ -40,16 +40,16 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       end
 
       it "should display the is_applying_coverage field option" do
-        expect(rendered).to match /Is #{person.first_name} applying for coverage?/
+        expect(rendered).to match(/Is #{person.first_name} applying for coverage?/)
       end
 
       it "should display the affirmative message" do
-        expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
+        expect(rendered).not_to match(/Your answer to this question does not apply to coverage offered by an employer./)
       end
 
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
-        expect(rendered).to match /homeless DC resident/
+        expect(rendered).to match(/homeless DC resident/)
         expect(rendered).to match(/Currently living outside of DC temporarily and plan to return./)
       end
     end
@@ -65,21 +65,21 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       end
 
       it "should not have no-dc-address-reasons area" do
-        expect(rendered).not_to match /homeless DC resident/
-        expect(rendered).not_to match /living outside of DC temporarily and intend to return/
+        expect(rendered).not_to match(/homeless DC resident/)
+        expect(rendered).not_to match(/living outside of DC temporarily and intend to return/)
       end
 
       it "should not display the is_applying_coverage field option" do
-        expect(rendered).not_to match /Is this person applying for coverage?/
+        expect(rendered).not_to match(/Is this person applying for coverage?/)
       end
 
       it "should display the affirmative message" do
-        expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
+        expect(rendered).not_to match(/Your answer to this question does not apply to coverage offered by an employer./)
       end
 
       it "should have home address fields" do
         expect(rendered).to have_selector('div#address_info')
-        expect(rendered).to match /Home Address/
+        expect(rendered).to match(/Home Address/)
       end
     end
   end
@@ -94,14 +94,14 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       person.emails.build(kind: 'home')
       render :template => "people/landing_pages/_personal.html.erb"
       expect(rendered).to have_selector('div#email_info')
-      expect(rendered).to match /Home Email Address/
+      expect(rendered).to match(/Home Email Address/)
     end
 
     it "should show work email address" do
       person.emails.build(kind: 'work')
       render :template => "people/landing_pages/_personal.html.erb"
       expect(rendered).to have_selector('div#email_info')
-      expect(rendered).to match /Work Email Address/
+      expect(rendered).to match(/Work Email Address/)
     end
   end
 
@@ -133,7 +133,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
     end
 
     it "should display the affirmative message" do
-      expect(rendered).to match /Your answer to this question does not apply to coverage offered by an employer./
+      expect(rendered).to match(/Your answer to this question does not apply to coverage offered by an employer./)
     end
   end
 
@@ -147,7 +147,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
     end
 
     it "should display the affirmative message" do
-      expect(rendered).not_to match /Your answer to this question does not apply to coverage offered by an employer./
+      expect(rendered).not_to match(/Your answer to this question does not apply to coverage offered by an employer./)
     end
   end
 end

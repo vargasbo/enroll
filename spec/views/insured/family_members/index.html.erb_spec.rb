@@ -37,7 +37,7 @@ describe "insured/family_members/index.html.erb" do
     end
 
     it "should call signup_progress" do
-      expect(rendered).to match /Employer/
+      expect(rendered).to match(/Employer/)
     end
   end
 
@@ -50,7 +50,7 @@ describe "insured/family_members/index.html.erb" do
     end
 
     it "should call individual_progress" do
-      expect(rendered).not_to match /Verify Identity/
+      expect(rendered).not_to match(/Verify Identity/)
       expect(rendered).to have_selector("a[href='/insured/families/find_sep?consumer_role_id=#{consumer_role.id}']", text: 'Continue')
     end
   end
@@ -64,7 +64,7 @@ describe "insured/family_members/index.html.erb" do
     end
 
     it "should call individual_progress" do
-      expect(rendered).not_to match /Verify Identity/
+      expect(rendered).not_to match(/Verify Identity/)
       expect(rendered).not_to have_selector("label.static_label", text: 'SOCIAL SECURITY')
     end
   end
