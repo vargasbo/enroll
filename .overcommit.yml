@@ -18,7 +18,7 @@
 PreCommit:
   RuboCop:
     enabled: true
-    command: ["bundle", "exec", "rubocop", "-a"]
+    command: ["bundle", "exec", "rubocop", "-x"]
     problem_on_unmodified_line: warn
 #  TrailingWhitespace:
 #    enabled: true
