@@ -1234,6 +1234,18 @@ class Person
     person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
   end
 
+  def build_relationship(successor, relationship_kind, family_id)
+    person_relationships.build(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+  end
+
+  def remove_relationship(family_id)
+    successor_ids = person_relationships.where(family_id: family_id, predecessor_id: self.id).collect(&:successor_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id).each(&:destroy)
+    successor_ids.each do |s|
+      Person.find(s).person_relationships.where(family_id: family_id, successor_id: self.id).each(&:destroy)
+    end
+  end
+
   private
 
   def is_ssn_composition_correct?
