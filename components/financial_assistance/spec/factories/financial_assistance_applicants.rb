@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory(:financial_assistance_applicant, :class => ::FinancialAssistance::Applicant) do
     association :application, factory: :financial_assistance_application

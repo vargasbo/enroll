@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^the user will navigate to the FAA Household Info page$/) do
   visit financial_assistance.edit_application_path(application({aasm_state: 'draft'}).id.to_s)
 end
@@ -10,7 +12,7 @@ Given(/^the user has an eligible immigration status$/) do
   consumer.person.consumer_role.update_attributes(citizen_status: "alien_lawfully_present")
 end
 
-Given(/^the user has an age between (\d+) and (\d+) years old$/) do |arg1, arg2|
+Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg2|
   consumer.person.update_attributes(dob: TimeKeeper.date_of_record - 19.years)
 end
 
@@ -42,11 +44,11 @@ Given(/^the user answers no to being pregnant$/) do
   choose('is_pregnant_no')
 end
 
-And(/^was this person pregnant in the last (\d+) days question should display$/) do |arg1|
+And(/^was this person pregnant in the last (\d+) days question should display$/) do |_arg1|
   expect(page).to have_content('Was this person pregnant in the last 60 days?')
 end
 
-When(/^they answer yes to was this person pregnant in the last (\d+) days question$/) do |arg1|
+When(/^they answer yes to was this person pregnant in the last (\d+) days question$/) do |_arg1|
   choose('is_post_partum_period_yes')
 end
 
@@ -67,7 +69,7 @@ And(/^the type of student question should display$/) do
 end
 
 And(/^student status end date question should display$/) do
-   expect(page).to have_content('Student status end on date?')
+  expect(page).to have_content('Student status end on date?')
 end
 
 Then(/^type of school question should display$/) do

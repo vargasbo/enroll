@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^a consumer, with a family, exists$/) do
   consumer :with_nuclear_family
 end
@@ -10,8 +12,8 @@ Given(/^a benchmark plan exists$/) do
   create_plan
 end
 
-When /^the consumer views their applications$/ do
-  visit financial_assistance_applications_path
+When(/^the consumer views their applications$/) do
+  visit financial_assistance.applications_path
 end
 
 When(/^they click 'Start New Application' button$/) do
@@ -33,7 +35,7 @@ Given(/^the consumer has started a financial assistance application$/) do
 end
 
 When(/^they view the financial assistance application$/) do
-  visit edit_financial_assistance_application_path(application)
+  visit financial_assistance.edit_application_path(application)
 end
 
 When(/^they click ADD INCOME & COVERAGE INFO for an applicant$/) do
@@ -45,7 +47,7 @@ Then(/^they should be taken to the applicant's Tax Info page$/) do
 end
 
 And(/^they visit the applicant's Job income page$/) do
-  visit financial_assistance_application_applicant_incomes_path(application, application.primary_applicant)
+  visit financial_assistance.application_applicant_incomes_path(application, application.primary_applicant)
 end
 
 And(/^they answer job income question and complete the form for the Job income$/) do
@@ -119,15 +121,15 @@ Given(/^has added tax information for an applicant$/) do
 end
 
 Given(/^they visit the applicant's Income page$/) do
-  visit financial_assistance_application_applicant_incomes_path(application, application.primary_applicant)
+  visit financial_assistance.application_applicant_incomes_path(application, application.primary_applicant)
 end
 
 Given(/^they visit the applicant's Benefits page$/) do
-  visit financial_assistance_application_applicant_benefits_path(application, application.primary_applicant)
+  visit financial_assistance.application_applicant_benefits_path(application, application.primary_applicant)
 end
 
 Given(/^they visit the applicant's Deductions page$/) do
-  visit financial_assistance_application_applicant_deductions_path(application, application.primary_applicant)
+  visit financial_assistance.application_applicant_deductions_path(application, application.primary_applicant)
 end
 
 And(/^they click on the 'Add Income' button$/) do
@@ -179,52 +181,63 @@ end
 
 Given(/^the consumer has completed a financial assistance application$/) do
   # Kelly to John
-  application.active_applicants.second.person.person_relationships.create kind: 'spouse',
-    family_id: consumer.primary_family.id,
-    successor_id: application.active_applicants.first.person.id,
-    predecessor_id: application.active_applicants.second.person.id
-
+  application.active_applicants.second.person.person_relationships.create(
+    {
+      kind: 'spouse',
+      family_id: consumer.primary_family.id,
+      successor_id: application.active_applicants.first.person.id,
+      predecessor_id: application.active_applicants.second.person.id
+    }
+  )
   # Danny to John
-  application.active_applicants.third.person.person_relationships.create kind: 'parent',
-    family_id: consumer.primary_family.id,
-    successor_id: application.active_applicants.first.person.id,
-    predecessor_id: application.active_applicants.third.person.id
-
+  application.active_applicants.third.person.person_relationships.create(
+    {
+      kind: 'parent',
+      family_id: consumer.primary_family.id,
+      successor_id: application.active_applicants.first.person.id,
+      predecessor_id: application.active_applicants.third.person.id
+    }
+  )
   # Danny to Kelly
-  application.active_applicants.third.person.person_relationships.create kind: 'parent',
-    family_id: consumer.primary_family.id,
-    successor_id: application.active_applicants.second.person.id,
-    predecessor_id: application.active_applicants.third.person.id
-
+  application.active_applicants.third.person.person_relationships.create(
+    {
+      kind: 'parent',
+      family_id: consumer.primary_family.id,
+      successor_id: application.active_applicants.second.person.id,
+      predecessor_id: application.active_applicants.third.person.id
+    }
+  )
   application.active_applicants.each do |applicant|
-    applicant.update_attributes is_required_to_file_taxes: false,
+    applicant.update_attributes(
+      is_required_to_file_taxes: false,
       is_claimed_as_tax_dependent: false,
       is_living_in_state: false,
       is_temp_out_of_state: false,
       has_other_income: false,
       has_deductions: false,
       has_enrolled_health_coverage: false
+    )
   end
 end
 
 When(/^they view the financial assistance application for review$/) do
-  visit edit_financial_assistance_application_path(application)
+  visit financial_assistance.edit_application_path(application)
 end
 
-And (/^click the 'Review and Continue' button$/) do
+And(/^click the 'Review and Continue' button$/) do
   click_link "Continue"
 end
 
-And (/^they review and submit the application$/) do
+And(/^they review and submit the application$/) do
   click_link 'Continue'
 end
 
-When(/^click the "([^"]*)" button$/) do |arg1|
+When(/^click the "([^"]*)" button$/) do |_rg1|
   pending # Write code here that turns the phrase above into concrete actions
 end
 
 Then(/^they are taken back to view all applications$/) do
-  visit financial_assistance_applications_path
+  visit financial_assistance.applications_path
 end
 
 Then(/^they will see that their application has been submitted$/) do
@@ -235,11 +248,11 @@ When(/^they click on the 'Add Income Adjustment' button$/) do
   click_link 'Add Income Adjustment'
 end
 
-When (/^they click on 'Add Benefit' button$/) do
+When(/^they click on 'Add Benefit' button$/) do
   click_link 'Add Health Coverage'
 end
 
-# And (/^has added an benefit$/) do
+# And(/^has added an benefit$/) do
 #   choose("yes2")
 #   find('#benefit_kind').select('medicare')
 #   fill_in 'benefit[start_on]', with: "11/11/2016"
@@ -255,7 +268,7 @@ end
 #   fill_in 'benefit[employee_cost]', with: " 2.3"
 # end
 
-And (/^they complete the form for the benefit$/) do
+And(/^they complete the form for the benefit$/) do
   find('#is_eligible').click
   find('#benefit_insurance_kind').select('Acf Refugee Medical Assistance')
   click_button 'CONTINUE'
@@ -264,7 +277,7 @@ end
 Then(/^they should be taken back to the applicant's detail page$/) do
 
 end
-And (/^they should see the newly added benefit$/) do
+And(/^they should see the newly added benefit$/) do
   page.should have_content('Benefit Info Added.')
 end
 
@@ -272,7 +285,7 @@ end
 #   page.should have_content('Edit Applicant')
 # end
 
-When (/^they click on 'Remove Benefit' button/) do
+When(/^they click on 'Remove Benefit' button/) do
   find(:xpath, '//a[@data-method="delete"][span]').click
   page.accept_alert
 end
@@ -282,17 +295,17 @@ When(/^they click on 'Remove Deduction' button$/) do
   page.accept_alert
 end
 
-And (/^they should be taken back to the application's details page for benefit$/) do
+And(/^they should be taken back to the application's details page for benefit$/) do
   page.should have_content("Health Coverage for #{consumer.person.first_name}")
 end
 
 ## Remove Deduction
 
-When (/^they click on 'Add Deduction' button$/) do
+When(/^they click on 'Add Deduction' button$/) do
   click_link 'Add Deductions'
 end
 
-And (/^they complete the form for the deduction/) do
+And(/^they complete the form for the deduction/) do
   find('#deduction_kind').select('Alimony Paid')
   find('#deduction_frequency_kind').select('quarterly')
   fill_in 'deduction[amount]', with: "2.2"
@@ -302,40 +315,37 @@ And (/^they complete the form for the deduction/) do
   click_button 'CONTINUE'
 end
 
-Given (/^the consumer has an income$/) do
-  consumer.primary_family.application_in_progress.active_applicants.first.incomes.create amount: '5000',
-    frequency_kind: 'monthly',
-    employer_name: 'Ideacrew',
-    start_on: '2017/01/01',
-    end_on: '2017/12/31',
-    employer_address: {
-      kind: 'primary',
-      address_1: '2nd St',
-      city: 'Washington',
-      state: 'DC',
-      zip: '20001' },
-    employer_phone: {
-        kind: 'phone main',
-        full_phone_number: '202-222-2222' }
+Given(/^the consumer has an income$/) do
+  consumer.primary_family.application_in_progress.active_applicants.first.incomes.create(
+    {
+      :amount => '5000',
+      :frequency_kind => 'monthly',
+      :employer_name => 'Ideacrew',
+      :start_on => '2017/01/01',
+      :end_on => '2017/12/31',
+      :employer_phone => {:kind => 'phone main', :full_phone_number => '202-222-2222'},
+      :employer_address => {:kind => 'primary', :address_1 => '2nd St', :city => 'Washington', :state => 'DC', :zip => '20001'}
+    }
+  )
 end
 
-Given (/^the consumer has a benefit$/) do
+Given(/^the consumer has a benefit$/) do
   consumer.primary_family.application_in_progress.active_applicants.first.update_attributes has_enrolled_health_coverage: true
 end
 
-Given (/^the consumer has a deduction$/) do
+Given(/^the consumer has a deduction$/) do
   consumer.primary_family.application_in_progress.active_applicants.first.deductions.create! kind: 'alimony_paid'
 end
 
-And (/^they should see the newly added deduction$/) do
+And(/^they should see the newly added deduction$/) do
   page.should have_content('Deduction Added')
 end
 
-Then (/^they click on 'Remove deduction' button/) do
+Then(/^they click on 'Remove deduction' button/) do
   page.find('.interaction-click-control-delete').click
   page.accept_alert
 end
 
-And (/^they should be taken back to the application's details page for deduction$/) do
+And(/^they should be taken back to the application's details page for deduction$/) do
   page.should have_content("Income Adjustments for #{consumer.person.first_name}")
 end

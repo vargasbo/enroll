@@ -25,13 +25,13 @@ FactoryBot.define do
     end
 
     trait :with_nuclear_family do
-      before(:create) do |family, evaluator|
+      before(:create) do |family, _evaluator|
         FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, person: family.person, family: family)
 
         { 'Kelly' => 'spouse', 'Danny' => 'child' }.each do |first_name, relationship|
           person = FactoryBot.create(:person, :with_consumer_role, first_name: first_name, last_name: family.person.last_name)
           family.person.person_relationships.push PersonRelationship.new(relative_id: person.id, kind: relationship, family_id: family.id, successor_id: person.id, predecessor_id: family.person.id)
-          person.person_relationships = [ PersonRelationship.new(kind: relationship, family_id: family.id, successor_id: person.id, predecessor_id: family.person.id) ]
+          person.person_relationships = [PersonRelationship.new(kind: relationship, family_id: family.id, successor_id: person.id, predecessor_id: family.person.id)]
           person.save
           FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, person: person, family: family)
         end
