@@ -394,7 +394,7 @@ module Importers::Transcripts
         else
           raise StaleRecordError, "Person already exists with Hbx ID #{match_person.hbx_id} and created on #{match_person.created_at.strftime('%m/%d/%Y')}"
         end
-      rescue Exception => e
+      rescue StandardError => e
         @updates[:new][:new]['ssn'] = ["Failed", e.inspect.to_s]
       end
     end
@@ -404,11 +404,8 @@ module Importers::Transcripts
       return unless @transcript[:source]['updated_at'].present?
       raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@last_updated_at.strftime('%m/%d/%Y')}" if @last_updated_at > @transcript[:source]['updated_at']
 
-      if @transcript[:other]['updated_at'].present?
-        if @last_updated_at > @transcript[:other]['updated_at']
-          raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@last_updated_at.strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}"
-        end
-      end
+      return unless @transcript[:other]['updated_at'].present?
+      raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@last_updated_at.strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}" if @last_updated_at > @transcript[:other]['updated_at']
       # end
 
       # if section == :base

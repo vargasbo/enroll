@@ -43,21 +43,20 @@ module Forms
 
     def consumer_fields_validation
       return true unless individual_market_is_enabled?
-      if @is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true" #only check this for consumer flow. rubocop:disable Style/GuardClause
-        if @us_citizen.nil?
-          self.errors.add(:base, "Citizenship status is required")
-        elsif @us_citizen == false && @eligible_immigration_status.nil?
-          self.errors.add(:base, "Eligible immigration status is required")
-        elsif @us_citizen == true && @naturalized_citizen.nil?
-          self.errors.add(:base, "Naturalized citizen is required")
-        end
-
-        self.errors.add(:base, "native american / alaskan native status is required") if @indian_tribe_member.nil?
-
-        self.errors.add(:tribal_id, "is required when native american / alaskan native is selected") if !tribal_id.present? && @indian_tribe_member
-
-        self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
+      return unless @is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true"
+      if @us_citizen.nil?
+        self.errors.add(:base, "Citizenship status is required")
+      elsif @us_citizen == false && @eligible_immigration_status.nil?
+        self.errors.add(:base, "Eligible immigration status is required")
+      elsif @us_citizen == true && @naturalized_citizen.nil?
+        self.errors.add(:base, "Naturalized citizen is required")
       end
+
+      self.errors.add(:base, "native american / alaskan native status is required") if @indian_tribe_member.nil?
+
+      self.errors.add(:tribal_id, "is required when native american / alaskan native is selected") if !tribal_id.present? && @indian_tribe_member
+
+      self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
     end
 
     def dob=(val)

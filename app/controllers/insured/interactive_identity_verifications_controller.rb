@@ -74,7 +74,7 @@ module Insured
           if service_response.blank?
             redirect_to :action => "service_unavailable"
           elsif service_response.successful?
-              process_successful_interactive_verification(service_response)
+            process_successful_interactive_verification(service_response)
           else
             @verification_response = service_response
             redirect_to :action => "failed_validation", :verification_transaction_id => @verification_response.transaction_id
