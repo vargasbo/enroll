@@ -172,7 +172,7 @@ module FinancialAssistance
       if embedded_document.class == FinancialAssistance::Deduction
         application_applicant_deductions_path(application, applicant)
       elsif [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
-          application_applicant_incomes_path(application, applicant)
+        application_applicant_incomes_path(application, applicant)
       else
         other_application_applicant_incomes_path(application, applicant)
       end

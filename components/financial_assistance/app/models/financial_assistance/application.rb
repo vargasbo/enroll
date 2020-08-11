@@ -273,7 +273,7 @@ module FinancialAssistance
         when "half_yearly"
           daily_income = income_deduction.amount_in_cents / (working_days_in_year / 2)
         when "yearly"
-          daily_income = income_deduction.amount_in_cents / (working_days_in_year)
+          daily_income = income_deduction.amount_in_cents / working_days_in_year
         end
 
         income_deduction.start_date = TimeKeeper.date_of_record.beginning_of_year if income_deduction.start_date.to_s.eql?("01-01-0001" || income_deduction.start_date.blank?)
