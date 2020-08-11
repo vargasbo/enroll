@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class FinancialAssistance
+module FinancialAssistance
   class HealthBenefits
     class EmployerSponsored
       include Mongoid::Document
