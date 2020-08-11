@@ -108,6 +108,9 @@ Naming/VariableNumber:
 Style/AndOr:
   Enabled: true
 
+Style/AsciiComments:
+  Enabled: false
+
 Style/BlockComments:
   Enabled: false
 
