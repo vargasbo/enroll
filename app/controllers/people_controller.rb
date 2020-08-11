@@ -253,7 +253,7 @@ class PeopleController < ApplicationController
     @employer_profile = EmployerProfile.find_all_by_person(@person).first
 
     build_nested_models
- end
+  end
 
   def select_plan
     hbx_enrollment_id = params.require(:hbx_enrollment_id)
@@ -285,7 +285,7 @@ class PeopleController < ApplicationController
     # puts "finding #{klass} #{id}"
 
     klass.find(id)
-  rescue StandardError
+  rescue StandardError # rubocop:disable Lint/EmptyRescueClause
     nil
   end
 

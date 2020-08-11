@@ -16,7 +16,7 @@ module FinancialAssistance
     end
 
     def user_sign_up
-      @user_sign_up_info ||= FactoryBot.attributes_for :user
+      @user_sign_up ||= FactoryBot.attributes_for :user
     end
 
     def personal_information
@@ -26,7 +26,7 @@ module FinancialAssistance
 
     def create_plan
       hbx_profile = FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
-      benefit_package = hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
     end
 
     def assign_benchmark_plan_id(application)

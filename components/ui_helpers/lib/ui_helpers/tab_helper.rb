@@ -12,13 +12,13 @@ module UIHelpers
       attr_accessor :template
       delegate :capture, :content_tag, :link_to, to: :template
 
-      def initialize(options = {}, template)
+      def initialize(options = {}, template) # rubocop:disable Style/OptionalArguments
         @template = template || options
       end
 
       def tab(id, options = {}, &block)
         content_tag :div, id: id, role: 'tabpanel', class: "tab-pane #{options[:active] ? 'active' : ''}" do
-          capture &block
+          capture(&block)
         end
       end
     end

@@ -194,7 +194,7 @@ module Importers::Transcripts
               end
               @person.send(section).create(association)
               log_success(:add, section, identifier)
-            rescue Exception => e
+            rescue StandardError => e
               @updates[:add][section][identifier] = ["Failed", e.inspect.to_s]
             end
           else
@@ -236,7 +236,7 @@ module Importers::Transcripts
               association = @person.send(section).detect{|assoc| assoc.send(enumerated_association[:enumeration_field]) == identifier}
               raise "#{section} #{identifier} record missing!" if association.blank?
 
-              if key == 'add' || key == 'update'
+              if ['add', 'update'].include?(key)
                 association.update_attributes(v)
               elsif key == 'remove'
                 v.each do |field, _val|
@@ -245,7 +245,7 @@ module Importers::Transcripts
               end
 
               log_success(:update, section, identifier)
-            rescue Exception => e
+            rescue StandardError => e
               @updates[:update][section][identifier] = ["Failed", e.inspect.to_s]
 
             end
@@ -401,13 +401,12 @@ module Importers::Transcripts
 
     def validate_timestamp(_section)
       # if section == :base
-      if @transcript[:source]['updated_at'].present?
-        raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@last_updated_at.strftime('%m/%d/%Y')}" if @last_updated_at > @transcript[:source]['updated_at']
+      return unless @transcript[:source]['updated_at'].present?
+      raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@last_updated_at.strftime('%m/%d/%Y')}" if @last_updated_at > @transcript[:source]['updated_at']
 
-        if @transcript[:other]['updated_at'].present?
-          if @last_updated_at > @transcript[:other]['updated_at']
-            raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@last_updated_at.strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}"
-          end
+      if @transcript[:other]['updated_at'].present?
+        if @last_updated_at > @transcript[:other]['updated_at']
+          raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@last_updated_at.strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}"
         end
       end
       # end

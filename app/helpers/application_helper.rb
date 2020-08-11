@@ -253,7 +253,7 @@ module ApplicationHelper
     args.map(&:to_s).include?(params[:controller].to_s) ? "dropdown active" : "dropdown"
   end
 
-  def link_to_add_fields(name, f, association, classes = '')
+  def link_to_add_fields(name, f, association, classes = '') # rubocop:disable Naming/MethodParameterName
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
 

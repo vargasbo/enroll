@@ -3,9 +3,9 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ChangeIncorrectBookmarkUrlInConsumerRole < MongoidMigrationTask
+  # rubocop:disable Metrics/BlockNesting, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def migrate
     Person.all.each do |person|
-
       if person.is_consumer_role_active? && person.user.present?
         if person.primary_family.present? && person.primary_family.active_household.present? && person.primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
           if person.user.identity_verified? && person.user.idp_verified && (person.addresses.present? || person.no_dc_address.present? || (person.is_homeless || person.is_temporarily_out_of_state))
@@ -14,8 +14,9 @@ class ChangeIncorrectBookmarkUrlInConsumerRole < MongoidMigrationTask
           end
         end
       end
-    rescue StandardError
+    rescue StandardError # rubocop:disable Lint/EmptyRescueClause, Lint/SuppressedException
 
     end
   end
+  # rubocop:enable Metrics/BlockNesting, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 end

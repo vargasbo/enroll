@@ -47,7 +47,7 @@ module FinancialAssistance
       render layout: 'financial_assistance'
     end
 
-    def step
+    def step # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -56,11 +56,12 @@ module FinancialAssistance
       @model.clean_conditional_params(model_params) if model_params.present?
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
 
+      # rubocop:disable Metrics/BlockNesting
       if params.key?(model_name)
         if @model.save
           @current_step = @current_step.next_step if @current_step.next_step.present?
+          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           if params[:commit] == "Submit Application"
-            @model.update_attributes!(workflow: { current_step: @current_step.to_i })
             dummy_data_5_year_bar(@application)
             @application.submit! if @application.complete?
             payload = generate_payload(@application)
@@ -73,7 +74,6 @@ module FinancialAssistance
             end
 
           else
-            @model.update_attributes!(workflow: { current_step: @current_step.to_i })
             render 'workflow/step', layout: 'financial_assistance'
           end
         else
@@ -85,6 +85,7 @@ module FinancialAssistance
       else
         render 'workflow/step', layout: 'financial_assistance'
       end
+      # rubocop:enable Metrics/BlockNesting
     end
 
     def generate_payload(application)
@@ -107,7 +108,7 @@ module FinancialAssistance
       @message = params["message"]
     end
 
-    def get_help_paying_coverage_response
+    def get_help_paying_coverage_response # rubocop:disable Naming/AccessorMethodName
       if params["is_applying_for_assistance"].nil?
         flash[:error] = "Please choose an option before you proceed."
         redirect_to help_paying_coverage_applications_path
@@ -270,9 +271,8 @@ module FinancialAssistance
     end
 
     def dummy_data_5_year_bar(application)
-      if application.primary_applicant.present? && ["bar5"].include?(application.family.primary_applicant.person.last_name.downcase)
-        application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
-      end
+      return unless application.primary_applicant.present? && ["bar5"].include?(application.family.primary_applicant.person.last_name.downcase)
+      application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
     end
 
     def build_error_messages(model)

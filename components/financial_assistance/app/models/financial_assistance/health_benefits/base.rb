@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
-class FinancialAssistance::HealthBenefits::Base
-  include Mongoid::Document
+class FinancialAssistance
+  class HealthBenefits
+    class Base
+      include Mongoid::Document
+    end
+  end
 end

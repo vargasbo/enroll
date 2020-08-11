@@ -228,7 +228,7 @@ class Insured::FamiliesController < FamiliesController
         @person.save!
         send_notice_upload_notifications(notice_document, params.permit![:subject])
         flash[:notice] = "File Saved"
-      rescue StandardError => e
+      rescue StandardError
         flash[:error] = "Could not save file."
       end
     else
@@ -251,7 +251,7 @@ class Insured::FamiliesController < FamiliesController
 
   def sep_request_denial_notice
     ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
-  rescue Exception => e
+  rescue StandardError => e
     log("#{e.message}; person_id: #{@person.id}")
   end
 
@@ -406,7 +406,7 @@ class Insured::FamiliesController < FamiliesController
   def ridp_redirection
     return false if current_user.has_hbx_staff_role?
     consumer = @person.consumer_role
-    not_verified = (@person.user.present? ? @person.user.identity_verified? : false) || consumer.identity_verified? ? false : true
+    not_verified = (@person.user.present? ? @person.user.identity_verified? : false) || consumer.identity_verified? ? false : true # rubocop:disable Style/NestedTernaryOperator
     @person.user && not_verified
   end
 

@@ -18,7 +18,7 @@ module UIHelpers
                        [controller.request.path.sub('new', 'step'), :post]
                      else
                        [controller.request.path.sub('new', "#{model.id}/step"), :put]
-      end
+                     end
       path.gsub!(%r{step/\d$}, 'step')
       form_tag path, method: method do
         yield
@@ -62,14 +62,14 @@ module UIHelpers
     # Personalize heading_text from steps.yml
     def personalize_heading_text(heading_text)
       if heading_text.include? '<family-member-name-placeholder>'
-        heading_text.sub! '<family-member-name-placeholder>', (@model.class.to_s == "FinancialAssistance::Applicant" ? @model.family_member.person.first_name : (@model.class.to_s == "FinancialAssistance::Application" ? @model.primary_applicant.family_member.person.first_name : @applicant.family_member.person.first_name))
+        heading_text.sub! '<family-member-name-placeholder>', (@model.class.to_s == "FinancialAssistance::Applicant" ? @model.family_member.person.first_name : (@model.class.to_s == "FinancialAssistance::Application" ? @model.primary_applicant.family_member.person.first_name : @applicant.family_member.person.first_name)) # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
       else
         heading_text
       end
     end
 
     # set YAML text placeholders
-    def set_text_placeholders(text)
+    def set_text_placeholders(text) # rubocop:disable Naming/AccessorMethodName
       return "" if text.nil?
       # set application applicable year placeholder
       if text.include? '<application-applicable-year-placeholder>'

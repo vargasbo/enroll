@@ -207,6 +207,7 @@ class Insured::ConsumerRolesController < ApplicationController
     authorize @consumer_role, :update?
     save_and_exit = params['exit_after_method'] == 'true'
 
+    # rubocop:disable Metrics/BlockNesting
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
@@ -239,6 +240,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
       end
     end
+    # rubocop:enable Metrics/BlockNesting
   end
 
   def ridp_agreement

@@ -171,16 +171,14 @@ module FinancialAssistance
     def income_and_deductions_edit(application, applicant, embedded_document)
       if embedded_document.class == FinancialAssistance::Deduction
         application_applicant_deductions_path(application, applicant)
-      else
-        if [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
+      elsif [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
           application_applicant_incomes_path(application, applicant)
-        else
-          other_application_applicant_incomes_path(application, applicant)
-        end
+      else
+        other_application_applicant_incomes_path(application, applicant)
       end
     end
 
-    def support_text_placeholders(raw_support_text)
+    def set_support_text_placeholders(raw_support_text) # rubocop:disable Naming/AccessorMethodName
       # set <application-applicable-year> placeholders
       assistance_year = @application.family.application_applicable_year.to_s
       raw_support_text.update(raw_support_text).each do |_key, value|

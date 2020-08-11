@@ -1123,6 +1123,7 @@ class Family
     missing_relationships
   end
 
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
   def apply_rules_and_update_relationships(matrix, family_id)
     missing_relationship = find_missing_relationships(matrix)
 
@@ -1197,6 +1198,7 @@ class Family
 
     matrix
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
 
   def relationships_complete?
     find_missing_relationships(build_relationship_matrix).present? ? false : true
@@ -1342,10 +1344,9 @@ class Family
   private
 
   def build_household
-    if households.empty?
-      irs_group = initialize_irs_group
-      initialize_household(irs_group)
-    end
+    return unless households.empty?
+    irs_group = initialize_irs_group
+    initialize_household(irs_group)
   end
 
   def family_integrity

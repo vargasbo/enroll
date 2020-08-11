@@ -97,17 +97,17 @@ module FinancialAssistance
                         on: [:step_1, :submission]
 
     validates :amount, presence: true,
-                       numericality: { greater_than: 0, message: "%{value} must be greater than $0" },
+                       numericality: { greater_than: 0, message: "%<value> must be greater than $0" },
                        on: [:step_1, :submission]
 
     validates :kind, presence: true,
-                     inclusion: { in: KINDS, message: "%{value} is not a valid income type" },
+                     inclusion: { in: KINDS, message: "%<value> is not a valid income type" },
                      on: [:step_1, :submission]
 
     # validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
 
     validates :frequency_kind, presence: true,
-                               inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
+                               inclusion: { in: FREQUENCY_KINDS, message: "%<value> is not a valid frequency" }
 
     validates :start_on, presence: true, on: [:step_1, :submission]
 
@@ -144,7 +144,7 @@ module FinancialAssistance
     end
 
     def self.from_income_request(income_data)
-      income = Income.new(
+      Income.new(
         amount: (income_data[:amount] * 100).to_i,
         kind: income_data[:kind],
         frequency: income_data[:frequency],
@@ -154,8 +154,6 @@ module FinancialAssistance
         submitted_at: income_data[:submitted_at]
       )
     end
-
-    def hours_worked_per_week; end
 
     class << self
       def find(id)

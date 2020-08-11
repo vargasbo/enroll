@@ -371,7 +371,7 @@ module BenefitSponsors
         write_attribute(:recorded_service_area_ids, new_recorded_service_areas.map(&:_id))
         @recorded_service_areas = new_recorded_service_areas
       end
-      @recorded_service_areas
+      @recorded_service_areas # rubocop:disable Lint/Void
     end
 
     def recorded_service_areas
@@ -403,7 +403,7 @@ module BenefitSponsors
     end
 
     def adjust_open_enrollment_date
-      open_enrollment_period = ((TimeKeeper.date_of_record.to_time.utc.beginning_of_day)..open_enrollment_end_on) if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
+      ((TimeKeeper.date_of_record.to_time.utc.beginning_of_day)..open_enrollment_end_on) if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
     end
 
     def find_census_employees
@@ -999,9 +999,8 @@ module BenefitSponsors
       #   deny_enrollment_eligiblity!
       # end
 
-      if aasm.to_state == :applicant && aasm.current_event == :cancel!
-        cancel! if (enrollment_ineligible? || enrollment_closed?) && may_cancel?
-      end
+      return unless aasm.to_state == :applicant && aasm.current_event == :cancel!
+      cancel! if (enrollment_ineligible? || enrollment_closed?) && may_cancel?
     end
 
     def notify_application(notify = false)

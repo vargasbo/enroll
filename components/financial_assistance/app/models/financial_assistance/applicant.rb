@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  class Applicant
+  class Applicant # rubocop:disable Metrics/ClassLength TODO: Remove this
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
@@ -174,7 +174,7 @@ module FinancialAssistance
     validate :strictly_boolean
 
     validates :tax_filer_kind,
-              inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
+              inclusion: { in: TAX_FILER_KINDS, message: "%<value> is not a valid tax filer kind" },
               allow_blank: true
 
     alias is_medicare_eligible? is_medicare_eligible
@@ -475,7 +475,7 @@ module FinancialAssistance
       has_job_income || has_self_employment_income || has_other_income
     end
 
-    def embedded_document_section_entry_complete?(embedded_document)
+    def embedded_document_section_entry_complete?(embedded_document) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       case embedded_document
       when :income
         return false if has_job_income.nil? || has_self_employment_income.nil?
@@ -674,7 +674,7 @@ module FinancialAssistance
       errors.add(:is_claimed_as_tax_dependent, "' is_claimed_as_tax_dependent can't be blank") if is_claimed_as_tax_dependent.nil?
     end
 
-    def presence_of_attr_other_qns
+    def presence_of_attr_other_qns # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       if is_pregnant
         errors.add(:pregnancy_due_on, "' Pregnency Due date' should be answered if you are pregnant") if pregnancy_due_on.nil?
         errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.nil?
@@ -709,7 +709,7 @@ module FinancialAssistance
       person.age_on(TimeKeeper.date_of_record)
     end
 
-    def clean_params(model_params)
+    def clean_params(model_params) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
       model_params[:is_joint_tax_filing] = nil if model_params[:is_required_to_file_taxes].present? && model_params[:is_required_to_file_taxes] == 'false'
 
       model_params[:claimed_as_tax_dependent_by] = nil if model_params[:is_claimed_as_tax_dependent].present? && model_params[:is_claimed_as_tax_dependent] == 'false'
@@ -733,11 +733,10 @@ module FinancialAssistance
         model_params[:had_medicaid_during_foster_care] = nil
       end
 
-      if model_params[:is_student].present? && model_params[:is_student] == 'false'
-        model_params[:student_kind] = nil
-        model_params[:student_status_end_on] = nil
-        model_params[:student_kind] = nil
-      end
+      return unless model_params[:is_student].present? && model_params[:is_student] == 'false'
+      model_params[:student_kind] = nil
+      model_params[:student_status_end_on] = nil
+      model_params[:student_kind] = nil
     end
 
     def record_transition

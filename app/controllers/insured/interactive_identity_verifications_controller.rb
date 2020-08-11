@@ -73,13 +73,11 @@ module Insured
           service_response = service.check_override(render_verification_override(@transaction_id))
           if service_response.blank?
             redirect_to :action => "service_unavailable"
-          else
-            if service_response.successful?
+          elsif service_response.successful?
               process_successful_interactive_verification(service_response)
-            else
-              @verification_response = service_response
-              redirect_to :action => "failed_validation", :verification_transaction_id => @verification_response.transaction_id
-            end
+          else
+            @verification_response = service_response
+            redirect_to :action => "failed_validation", :verification_transaction_id => @verification_response.transaction_id
           end
         end
       end

@@ -2,7 +2,7 @@
 
 module FinancialAssistance
   module SharedHelper
-    def show_component(url)
+    def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
       if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
         false
       else
@@ -10,7 +10,7 @@ module FinancialAssistance
       end
     end
 
-    def li_nav_classes_for(target)
+    def li_nav_classes_for(target) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       current = if controller_name == 'applications'
                   if action_name == 'edit'
                     :household_info
@@ -37,20 +37,18 @@ module FinancialAssistance
                   :health_coverage
                 elsif controller_name == 'family_relationships'
                   :relationships
-      end
+                end
 
       order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :other_income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
 
       if current.blank?
         ''
+      elsif target == current
+        'activer active'
+      elsif order.index(target) < order.index(current)
+        'activer'
       else
-        if target == current
-          'activer active'
-        elsif order.index(target) < order.index(current)
-          'activer'
-        else
-          ''
-        end
+        ''
       end
     end
   end

@@ -12,7 +12,7 @@ module UIHelpers
       attr_accessor :template
       delegate :capture, :content_tag, :link_to, to: :template
 
-      def initialize(options = {}, template)
+      def initialize(options = {}, template) # rubocop:disable Style/OptionalArguments
         @template = template || options
       end
 

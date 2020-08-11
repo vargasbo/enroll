@@ -11,7 +11,7 @@ module UIHelpers
         @lines = section["lines"].map { |line| Workflow::Line.new line }
         @heading = section["heading"] unless section['heading'].nil?
         @heading_text = section["heading_text"] unless section['heading_text'].nil?
-        @classNames = section["classNames"] unless section['classNames'].nil?
+        @classNames = section["classNames"] unless section['classNames'].nil? # rubocop:disable Naming/VariableName
       end
     end
   end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  class Application
+  class Application # rubocop:disable Metrics/ClassLength TODO: Remove this
 
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -252,7 +252,7 @@ module FinancialAssistance
   ##### Methods below were transferred from EDI DB system
   ##### TODO: verify utility and improve names
 
-    def compute_yearwise(incomes_or_deductions)
+    def compute_yearwise(incomes_or_deductions) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity TODO: Remove this
       income_deduction_per_year = Hash.new(0)
 
       incomes_or_deductions.each do |income_deduction|
@@ -276,8 +276,8 @@ module FinancialAssistance
           daily_income = income_deduction.amount_in_cents / (working_days_in_year)
         end
 
-        income_deduction.start_date = TimeKeeper.date_of_record.beginning_of_year if income_deduction.start_date.to_s.eql? "01-01-0001" || income_deduction.start_date.blank?
-        income_deduction.end_date   = TimeKeeper.date_of_record.end_of_year if income_deduction.end_date.to_s.eql? "01-01-0001" || income_deduction.end_date.blank?
+        income_deduction.start_date = TimeKeeper.date_of_record.beginning_of_year if income_deduction.start_date.to_s.eql?("01-01-0001" || income_deduction.start_date.blank?)
+        income_deduction.end_date   = TimeKeeper.date_of_record.end_of_year if income_deduction.end_date.to_s.eql?("01-01-0001" || income_deduction.end_date.blank?)
         years = (income_deduction.start_date.year..income_deduction.end_date.year)
 
         years.to_a.each do |year|
@@ -403,7 +403,7 @@ module FinancialAssistance
 
     def publish(payload)
       #return true #For DEMO purpose only #temporary
-      if validity = self.is_schema_valid?(Nokogiri::XML.parse(payload))
+      if (validity = self.is_schema_valid?(Nokogiri::XML.parse(payload)))
         notify("acapi.info.events.assistance_application.submitted",
                {:correlation_id => SecureRandom.uuid.gsub("-",""),
                 :body => payload,
@@ -428,19 +428,18 @@ module FinancialAssistance
                 :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
       end
 
-      if has_eligibility_response && determination_http_status_code == 422 && determination_error_message == "Failed to validate Eligibility Determination response XML"
-        message = "Invalid schema eligibility determination response provided"
-        notify("acapi.info.events.eligibility_determination.rejected",
-               {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                :body => { error_message: message },
-                :family_id => family_id.to_s,
-                :assistance_application_id => _id.to_s,
-                :return_status => determination_http_status_code.to_s,
-                :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
-                :haven_application_id => haven_app_id,
-                :haven_ic_id => haven_ic_id,
-                :primary_applicant_id => family.primary_applicant.person.hbx_id.to_s })
-      end
+      return unless has_eligibility_response && determination_http_status_code == 422 && determination_error_message == "Failed to validate Eligibility Determination response XML"
+      message = "Invalid schema eligibility determination response provided"
+      notify("acapi.info.events.eligibility_determination.rejected",
+             {:correlation_id => SecureRandom.uuid.gsub("-",""),
+              :body => { error_message: message },
+              :family_id => family_id.to_s,
+              :assistance_application_id => _id.to_s,
+              :return_status => determination_http_status_code.to_s,
+              :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
+              :haven_application_id => haven_app_id,
+              :haven_ic_id => haven_ic_id,
+              :primary_applicant_id => family.primary_applicant.person.hbx_id.to_s })
     end
 
     def ready_for_attestation?
@@ -489,35 +488,33 @@ module FinancialAssistance
       [200, 203].include?(payload_http_status_code)
     end
 
-    def check_verification_response
-      if !has_all_uqhp_applicants? && !has_atleast_one_medicaid_applicant? && !has_all_verified_applicants? && (TimeKeeper.datetime_of_record.prev_day > submitted_at)
-        if timeout_response_last_submitted_at.blank? || (timeout_response_last_submitted_at.present? && (TimeKeeper.datetime_of_record.prev_day > timeout_response_last_submitted_at))
-          self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.datetime_of_record)
-          active_applicants.each do |applicant|
-            if !applicant.has_income_verification_response && !applicant.has_mec_verification_response
-              type = "Income, MEC"
-            elsif applicant.has_income_verification_response && !applicant.has_mec_verification_response
-              type = "MEC"
-            else
-              type = "Income" if !applicant.has_income_verification_response && applicant.has_mec_verification_response
-            end
-            notify("acapi.info.events.verification.rejected",
-                   { :correlation_id => SecureRandom.uuid.gsub("-",""),
-                     :body => JSON.dump({
-                                          error: "Timed-out waiting for verification response",
-                                          applicant_first_name: applicant.person.first_name,
-                                          applicant_last_name: applicant.person.last_name,
-                                          applicant_id: applicant.person.hbx_id,
-                                          rejected_verification_types: type
-                                        }),
-                     :assistance_application_id => self._id.to_s,
-                     :family_id => self.family_id.to_s,
-                     :haven_application_id => haven_app_id,
-                     :haven_ic_id => haven_ic_id,
-                     :reject_status => 504,
-                     :submitted_timestamp => TimeKeeper.datetime_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
-          end
+    def check_verification_response # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity TODO: Remove this
+      return unless !has_all_uqhp_applicants? && !has_atleast_one_medicaid_applicant? && !has_all_verified_applicants? && (TimeKeeper.datetime_of_record.prev_day > submitted_at)
+      return unless timeout_response_last_submitted_at.blank? || (timeout_response_last_submitted_at.present? && (TimeKeeper.datetime_of_record.prev_day > timeout_response_last_submitted_at))
+      self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.datetime_of_record)
+      active_applicants.each do |applicant|
+        if !applicant.has_income_verification_response && !applicant.has_mec_verification_response
+          type = "Income, MEC"
+        elsif applicant.has_income_verification_response && !applicant.has_mec_verification_response
+          type = "MEC"
+        elsif !applicant.has_income_verification_response && applicant.has_mec_verification_response
+          type = "Income"
         end
+        notify("acapi.info.events.verification.rejected",
+               { :correlation_id => SecureRandom.uuid.gsub("-",""),
+                 :body => JSON.dump({
+                                      error: "Timed-out waiting for verification response",
+                                      applicant_first_name: applicant.person.first_name,
+                                      applicant_last_name: applicant.person.last_name,
+                                      applicant_id: applicant.person.hbx_id,
+                                      rejected_verification_types: type
+                                    }),
+                 :assistance_application_id => self._id.to_s,
+                 :family_id => self.family_id.to_s,
+                 :haven_application_id => haven_app_id,
+                 :haven_ic_id => haven_ic_id,
+                 :reject_status => 504,
+                 :submitted_timestamp => TimeKeeper.datetime_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
       end
     end
 
@@ -545,9 +542,8 @@ module FinancialAssistance
     end
 
     def attestation_terms_on_parent_living_out_of_home
-      if parent_living_out_of_home_terms
-        errors.add(:attestation_terms, "can't be blank") if attestation_terms.nil?
-      end
+      return unless parent_living_out_of_home_terms
+      errors.add(:attestation_terms, "can't be blank") if attestation_terms.nil?
     end
 
     def trigger_eligibilility_notice
@@ -608,11 +604,10 @@ module FinancialAssistance
 
     def set_external_identifiers
       app = family.active_approved_application
-      if app.present?
-        write_attribute(:haven_app_id, app.haven_app_id)
-        write_attribute(:haven_ic_id, app.haven_ic_id)
-        write_attribute(:e_case_id, app.e_case_id)
-      end
+      return unless app.present?
+      write_attribute(:haven_app_id, app.haven_app_id)
+      write_attribute(:haven_ic_id, app.haven_ic_id)
+      write_attribute(:e_case_id, app.e_case_id)
     end
 
     def unset_submission_date
@@ -667,14 +662,13 @@ module FinancialAssistance
     end
 
     def verification_update_for_applicants
-      if aasm_state == "determined"
-        if has_atleast_one_medicaid_applicant?
-          update_verifications_of_applicants("external_source")
-        elsif has_all_uqhp_applicants?
-          update_verifications_of_applicants("not_required")
-        elsif has_atleast_one_assisted_but_no_medicaid_applicant?
-          update_verifications_of_applicants("pending")
-        end
+      return unless aasm_state == "determined"
+      if has_atleast_one_medicaid_applicant?
+        update_verifications_of_applicants("external_source")
+      elsif has_all_uqhp_applicants?
+        update_verifications_of_applicants("not_required")
+      elsif has_atleast_one_assisted_but_no_medicaid_applicant?
+        update_verifications_of_applicants("pending")
       end
     end
 
@@ -726,7 +720,7 @@ module FinancialAssistance
       empty_th = tax_households.select do |th|
         active_applicants.map(&:tax_household).exclude?(th)
       end
-      empty_th.each &:destroy
+      empty_th.each(&:destroy)
     end
 
     def delete_tax_households

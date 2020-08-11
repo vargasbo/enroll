@@ -171,7 +171,7 @@ class Person
 
   validates :gender,
             allow_blank: true,
-            inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
+            inclusion: { in: Person::GENDER_KINDS, message: "%<value> is not a valid gender" }
 
   before_save :generate_hbx_id
   before_save :update_full_name
@@ -476,7 +476,7 @@ class Person
   def date_of_birth=(val)
     self.dob = begin
                  Date.strptime(val, "%m/%d/%Y").to_date
-               rescue StandardError
+               rescue StandardError # rubocop:disable Lint/EmptyRescueClause
                  nil
                end
   end

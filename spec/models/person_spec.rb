@@ -922,7 +922,7 @@ describe Person, :dbclean => :after_each do
         allow(person).to receive(:dob).and_return(dob)
         expect(person.save).to be_falsey
         expect(person.errors[:dob].any?).to be_truthy
-        expect(person.errors[:dob].to_s).to match /future date: #{dob} is invalid date of birth/
+        expect(person.errors[:dob].to_s).to match(/future date: #{dob} is invalid date of birth/)
       end
     end
 
@@ -932,7 +932,7 @@ describe Person, :dbclean => :after_each do
         allow(person).to receive(:date_of_death).and_return(date_of_death)
         expect(person.save).to be_falsey
         expect(person.errors[:date_of_death].any?).to be_truthy
-        expect(person.errors[:date_of_death].to_s).to match /future date: #{date_of_death} is invalid date of death/
+        expect(person.errors[:date_of_death].to_s).to match(/future date: #{date_of_death} is invalid date of death/)
       end
     end
   end

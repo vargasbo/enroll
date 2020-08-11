@@ -43,7 +43,7 @@ module Forms
 
     def consumer_fields_validation
       return true unless individual_market_is_enabled?
-      if @is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true" #only check this for consumer flow.
+      if @is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true" #only check this for consumer flow. rubocop:disable Style/GuardClause
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
         elsif @us_citizen == false && @eligible_immigration_status.nil?
@@ -63,7 +63,7 @@ module Forms
     def dob=(val)
       @dob = begin
                Date.strptime(val, "%Y-%m-%d")
-             rescue StandardError
+             rescue StandardError # rubocop:disable Lint/EmptyRescueClause
                nil
              end
     end
@@ -132,13 +132,13 @@ module Forms
       else
         home_address = begin
                          person.home_address
-                       rescue StandardError
+                       rescue StandardError # rubocop:disable Lint/EmptyRescueClause
                          nil
                        end
         mailing_address = person.has_mailing_address? ? person.mailing_address : nil
 
-        addresses.each do |_key, address|
-          current_address = case address["kind"]
+        addresses.each do |_key, one_address|
+          current_address = case one_address["kind"]
                             when "home"
                               home_address
                             when "mailing"
@@ -146,19 +146,19 @@ module Forms
                             else
                               next
                             end
-          if address["address_1"].blank? && address["city"].blank?
+          if one_address["address_1"].blank? && one_address["city"].blank?
             current_address.destroy if current_address.present?
             next
           end
           if current_address.present?
-            current_address.update(address.permit!)
+            current_address.update(one_address.permit!)
           else
-            person.addresses.create(address.permit!)
+            person.addresses.create(one_address.permit!)
           end
         end
       end
       true
-    rescue StandardError => e
+    rescue StandardError # rubocop:disable Lint/EmptyRescueClause
       false
     end
 
@@ -306,7 +306,7 @@ module Forms
       relationships = {}
       family.active_family_members.each{|fm| relationships[fm._id.to_s] = fm.relationship}
       relationships[self.id.to_s] = self.relationship
-      self.errors.add(:base, "can not have multiple spouse or life partner") if relationships.values.count{|rs| rs == 'spouse' || rs == 'life_partner'} > 1
+      self.errors.add(:base, "can not have multiple spouse or life partner") if relationships.values.count{|rs| ['spouse', 'life_partner'].include?(rs)} > 1
     end
 
     def age_on(date)

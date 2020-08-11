@@ -462,7 +462,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
   expect(@browser.a(href: /consumer.employee.search/).visible?).to be_truthy
 end
 
-When (/^(.*) logs? out$/) do |_someone|
+When(/^(.*) logs? out$/) do |_someone|
   find_link('Logout', wait: 5)
   click_link "Logout"
   visit "/"
