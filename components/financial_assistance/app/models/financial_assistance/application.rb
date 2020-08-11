@@ -86,7 +86,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :applicants#, class_name: "::FinancialAssistance::Applicant"
+    embeds_many :applicants, inverse_of: :application
 
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
@@ -359,7 +359,9 @@ module FinancialAssistance
 
     def populate_applicants_for(family)
       self.applicants = family.active_family_members.map do |family_member|
-        FinancialAssistance::Applicant.new family_member_id: family_member.id
+        applicant = FinancialAssistance::Applicant.new family_member_id: family_member.id, application: self
+        applicant.save
+        applicant
       end
     end
 

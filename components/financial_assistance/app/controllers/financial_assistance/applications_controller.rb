@@ -194,7 +194,7 @@ module FinancialAssistance
 
     def check_eligibility_results_received
       application = @person.primary_family.applications.find(params[:id])
-      render :text => application.success_status_codes?(application.determination_http_status_code).to_s
+      render :plain => application.success_status_codes?(application.determination_http_status_code).to_s
     end
 
     def checklist_pdf
