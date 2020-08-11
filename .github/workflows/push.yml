@@ -36,6 +36,7 @@ jobs:
   testing_matrix:
     name: ${{matrix.command_configs.name}}
     runs-on: ${{ matrix.os }}
+    needs: [rubocop]
     strategy:
       matrix:
         os: [ubuntu-18.04]
