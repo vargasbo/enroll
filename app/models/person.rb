@@ -1206,6 +1206,34 @@ class Person
     end
   end
 
+  # Related to Relationship Matrix
+  def add_relationship(successor, relationship_kind, family_id, destroy_relation=false)
+    if same_successor_exists?(successor, family_id)
+      direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first # Direct Relationship
+
+      # Destroying the relationships associated to the Person other than the new updated relationship.
+      if direct_relationship != nil && destroy_relation
+        other_relations = person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).map(&:successor_id)
+        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+
+        other_relations.each do |otr|
+          otr_relation = Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id).first
+          otr_relation.destroy unless otr_relation.blank?
+        end
+      end
+
+      direct_relationship.update(kind: relationship_kind)
+    else
+      if self.id != successor.id
+        person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+      end
+    end
+  end
+
+  def same_successor_exists?(successor, family_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
+  end
+
   private
 
   def is_ssn_composition_correct?

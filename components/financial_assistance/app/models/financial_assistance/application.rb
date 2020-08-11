@@ -86,7 +86,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :applicants, class_name: "::FinancialAssistance::Applicant"
+    embeds_many :applicants#, class_name: "::FinancialAssistance::Applicant"
 
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 

@@ -14,6 +14,7 @@ class TaxHousehold
 
   embedded_in :household
 
+  field :application_id, type: BSON::ObjectId
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
 
@@ -33,7 +34,8 @@ class TaxHousehold
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
   def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
+    preferred_eligibility_determination
+    # eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
   end
 
   def group_by_year
@@ -41,7 +43,8 @@ class TaxHousehold
   end
 
   def current_csr_eligibility_kind
-    latest_eligibility_determination.csr_eligibility_kind
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_eligibility_kind : "csr_100"
+    # latest_eligibility_determination.csr_eligibility_kind
   end
 
   def valid_csr_kind(hbx_enrollment)
@@ -52,19 +55,13 @@ class TaxHousehold
   end
 
   def current_csr_percent
-    latest_eligibility_determination.csr_percent
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_percent : 0
+    # latest_eligibility_determination.csr_percent
   end
 
   def current_max_aptc
-    eligibility_determination = latest_eligibility_determination
-    # TODO: need business rule to decide how to get the max aptc
-    # during open enrollment and determined_at
-    # Please reference ticket 42408 for more info on the determined on to determined_at migration
-    if eligibility_determination.present? #and eligibility_determination.determined_at.year == TimeKeeper.date_of_record.year
-      eligibility_determination.max_aptc
-    else
-      0
-    end
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.max_aptc : 0
+    # eligibility_determination = latest_eligibility_determination
   end
 
   def aptc_members
@@ -266,9 +263,36 @@ class TaxHousehold
     end
   end
 
+  def active_applicants
+    return nil unless applicants
+    applicants.where(tax_household_id: self.id)
+  end
+
+  def application
+    FinancialAssistance::Application.find(application_id)
+  end
+
+  def applicants
+    return nil unless application
+    application.applicants.where(tax_household_id: self.id) if application.applicants.present?
+  end
+
   # TODO: Refactor this to return Applicants vs TaxHouseholdMembers after FAA merge.
   def tax_members
     tax_household_members
+  end
+
+  def preferred_eligibility_determination
+    return nil unless eligibility_determinations.present?
+    if application_id.present?
+      admin_ed = eligibility_determinations.where(source: "Admin").first
+      curam_ed = eligibility_determinations.where(source: "Curam").first
+      return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
+      return curam_ed if curam_ed.present?
+      return eligibility_determinations.max_by(&:determined_at)
+    else
+      eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+    end
   end
 
   private
