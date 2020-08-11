@@ -2,14 +2,12 @@
 
 # /api/hbxinternal/v1/trigger_from_endpoint
 
-require 'aws-sdk'
-
 
 namespace :hbxinternal do
   desc "testing triggering rake execution from endpoint"
   task :trigger_from_endpoint => :environment do
     puts "running hbxinternal rake task at #{Time.now}"
-    hbxit_broker_uri = Settings.hbxit.rabbit.url
+    hbxit_broker_uri = Settings.hbxit.rabbit.uri
     target_queue = 'mafia'
 
     conn = Bunny.new(hbxit_broker_uri, :heartbeat => 15)
