@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each do
@@ -48,7 +50,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
-        expect(rendered).to match /Currently living outside of DC temporarily and plan to return./
+        expect(rendered).to match(/Currently living outside of DC temporarily and plan to return./)
       end
     end
 
