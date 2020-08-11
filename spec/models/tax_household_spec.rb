@@ -231,7 +231,7 @@ RSpec.describe TaxHousehold, type: :model do
     end
 
     it "return 0 when not in the same year" do
-      allow(@tax_household).to receive(:latest_eligibility_determination).and_return(double(determined_at: TimeKeeper.date_of_record + 1.year, max_aptc: 0))
+      allow(@tax_household).to receive(:preferred_eligibility_determination).and_return(double(determined_at: TimeKeeper.date_of_record + 1.year, max_aptc: 0))
       expect(@tax_household.current_max_aptc).to eq 0
     end
   end
@@ -240,7 +240,7 @@ RSpec.describe TaxHousehold, type: :model do
     let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_at: TimeKeeper.date_of_record)}
     let(:tax_household) {TaxHousehold.new}
 
-    it "should equal to the csr_eligibility_kind of latest_eligibility_determination" do
+    it "should equal to the csr_eligibility_kind of preferred eligibility determination" do
       tax_household.eligibility_determinations = [eligibility_determination]
       expect(tax_household.current_csr_eligibility_kind).to eq eligibility_determination.csr_eligibility_kind
     end

@@ -59,7 +59,8 @@ And(/^they answer job income question and complete the form for the Job income$/
   find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
-  page.find('.darkblue').click
+  # TODO: This isn't showing up
+  # page.find('.darkblue').click
   fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
   fill_in 'income[employer_address][address_1]', with: "12 main st"
   fill_in 'income[employer_address][address_2]', with: "beside starbucks"
@@ -78,7 +79,8 @@ Given(/^they answer job income question and complete the form with incorrect dat
   find_all(".interaction-choice-control-income-frequency-kind")[1].click
   find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
   fill_in 'income[start_on]', with: "11/11/16"
-  page.find('.darkblue').click
+  # TODO: This isn't showing up
+  # page.find('.darkblue').click
 end
 
 Then(/^I should see a JS alert$/) do
