@@ -1,8 +1,6 @@
-name: Push to master
-on:
-  push:
-    branches:
-      - master
+name: Rspec and Cucumbers
+
+on: push
 
 env:
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
@@ -32,10 +30,11 @@ jobs:
       - name: Run rubocop
         run: |
           git fetch --no-tags origin
-          bundle exec rubocop-git ${{github.base_ref}}
+          bundle exec rubocop-git origin/master | grep "no offenses detected"
   testing_matrix:
     name: ${{matrix.command_configs.name}}
     runs-on: ${{ matrix.os }}
+    needs: [rubocop]
     strategy:
       matrix:
         os: [ubuntu-18.04]
