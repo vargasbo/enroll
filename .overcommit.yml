@@ -15,11 +15,11 @@
 #
 # Uncomment the following lines to make the configuration take effect.
 
-PreCommit:
-  RuboCop:
-    enabled: true
-    command: ["bundle", "exec", "rubocop", "-x"]
-    problem_on_unmodified_line: warn
+# PreCommit:
+#   RuboCop:
+#     enabled: true
+#     command: ["bundle", "exec", "rubocop", "-x"]
+#     problem_on_unmodified_line: warn
 #  TrailingWhitespace:
 #    enabled: true
 #    exclude:
