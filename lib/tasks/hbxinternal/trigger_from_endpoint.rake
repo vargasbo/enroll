@@ -9,11 +9,20 @@ namespace :hbxinternal do
   desc "testing triggering rake execution from endpoint"
   task :trigger_from_endpoint => :environment do
     puts "running hbxinternal rake task at #{Time.now}"
-    sqs = Aws::SQS::Client.new(region: 'us-west-2')
-    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: "Initiaing rake task: trigger_from_endpoint by Andrej Rasevic at #{Time.now}")
+    hbxit_broker_uri = Settings.hbxit.rabbit.url
+    target_queue = 'mafia'
+
+    conn = Bunny.new(hbxit_broker_uri, :heartbeat => 15)
+    conn.start
+    chan = conn.create_channel
+    queue = chan.queue('dev')
+    chan.confirm_select
+    chan.default_exchange.publish("Initiating rake task: trigger_from_endpoint by Andrej Rasevic at #{Time.now}",routing_key: queue.name)
     sleep 4
     puts "ending hbxinternal rake task"
-    sqs.send_message(queue_url: 'https://sqs.us-west-2.amazonaws.com/340945082076/EA-Rake-Tasks', message_body: "Ending rake task: trigger_from_endpoint successfully at #{Time.now}")
+    chan.default_exchange.publish("Ending rake task: trigger_from_endpoint successfully by Andrej Rasevic at #{Time.now}",routing_key: queue.name)
+    chan.wait_for_confirms
+    conn.close
   end
 
   task :change_person_dob => :environment do
