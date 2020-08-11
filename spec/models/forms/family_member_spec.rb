@@ -305,7 +305,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
   describe "for a new person" do
     let(:new_family_member_id) { double }
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
-    let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
+    let(:new_person) { double(:save => true, :errors => double(:key? => false)) }
 
     before do
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
@@ -433,7 +433,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       tribal_id: "test"
     }
   end
-  let(:person) { double(:errors => double(:has_key? => false), home_address: nil) }
+  let(:person) { double(:errors => double(:key? => false), home_address: nil) }
   let(:family_member) do
     instance_double(::FamilyMember,
                     person_properties.merge({
