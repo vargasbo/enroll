@@ -70,7 +70,7 @@ Layout/IndentationWidth:
   Enabled: true
 
 Layout/LineLength:
-  Max: 250
+  Max: 500
 
 Layout/Tab:
   Enabled: true
