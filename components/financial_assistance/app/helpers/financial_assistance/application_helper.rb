@@ -46,8 +46,7 @@ module FinancialAssistance
     def applicant_age(applicant)
       now = Time.now.utc.to_date
       dob = applicant.family_member.person.dob
-      age = now.year - dob.year - (now.month > dob.month || (now.month == dob.month && now.day >= dob.day) ? 0 : 1)
-      age
+      now.year - dob.year - (now.month > dob.month || (now.month == dob.month && now.day >= dob.day) ? 0 : 1)
     end
 
     def find_next_application_path(application)
@@ -123,7 +122,7 @@ module FinancialAssistance
               application_applicant_incomes_path(application, applicant)
             else
               application_applicant_income_path(@application, @applicant, income)
-      end
+            end
 
       form_for income, url: url, remote: true do |f|
         yield f
@@ -135,7 +134,7 @@ module FinancialAssistance
               application_applicant_benefits_path(application, applicant)
             else
               application_applicant_benefit_path(@application, @applicant, benefit)
-      end
+            end
 
       form_for benefit, url: url, remote: true do |f|
         yield f
@@ -147,7 +146,7 @@ module FinancialAssistance
               application_applicant_deductions_path(application, applicant)
             else
               application_applicant_deduction_path(@application, @applicant, deduction)
-      end
+            end
 
       form_for deduction, url: url, remote: true do |f|
         yield f
@@ -172,16 +171,14 @@ module FinancialAssistance
     def income_and_deductions_edit(application, applicant, embedded_document)
       if embedded_document.class == FinancialAssistance::Deduction
         application_applicant_deductions_path(application, applicant)
+      elsif [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
+        application_applicant_incomes_path(application, applicant)
       else
-        if [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
-          application_applicant_incomes_path(application, applicant)
-        else
-          other_application_applicant_incomes_path(application, applicant)
-        end
+        other_application_applicant_incomes_path(application, applicant)
       end
     end
 
-    def support_text_placeholders(raw_support_text)
+    def set_support_text_placeholders(raw_support_text) # rubocop:disable Naming/AccessorMethodName
       # set <application-applicable-year> placeholders
       assistance_year = @application.family.application_applicable_year.to_s
       raw_support_text.update(raw_support_text).each do |_key, value|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class Income
     include Mongoid::Document
@@ -5,8 +7,8 @@ module FinancialAssistance
 
     embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
 
-    TITLE_SIZE_RANGE = 3..30
-    KINDS = %W(
+    TITLE_SIZE_RANGE = (3..30).freeze
+    KINDS = %w[
       alimony_and_maintenance
       american_indian_and_alaskan_native
       capital_gains
@@ -31,11 +33,11 @@ module FinancialAssistance
       unemployment_insurance
       wages_and_salaries
       income_from_irs
-    )
+    ].freeze
 
     JOB_INCOME_TYPE_KIND = "wages_and_salaries"
     NET_SELF_EMPLOYMENT_INCOME_KIND = "net_self_employment"
-    FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
+    FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
     OTHER_INCOME_TYPE_KIND = {
       alimony_and_maintenance: 'Alimony received',
       capital_gains: 'Capital gains',
@@ -52,8 +54,8 @@ module FinancialAssistance
       foreign: 'Foreign income',
       other: 'Other taxable income',
       prizes_and_awards: 'Prizes and awards',
-      scholorship_payments: 'Taxable scholarship payments',
-    }
+      scholorship_payments: 'Taxable scholarship payments'
+    }.freeze
 
     #TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
 
@@ -82,30 +84,30 @@ module FinancialAssistance
     scope :jobs, -> { where(kind: JOB_INCOME_TYPE_KIND)}
     scope :self_employment, -> { where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
     scope :other, -> { where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND]) }
-    scope :of_kind, -> (kind) { where(kind: kind) }
+    scope :of_kind, ->(kind) { where(kind: kind) }
 
 
     embeds_one :employer_address, class_name: "::Address"
     embeds_one :employer_phone, class_name: "::Phone"
 
-    validates_length_of :title, 
-                        in: TITLE_SIZE_RANGE, 
+    validates_length_of :title,
+                        in: TITLE_SIZE_RANGE,
                         allow_nil: true,
                         message: "pick a name length between #{TITLE_SIZE_RANGE}",
                         on: [:step_1, :submission]
 
     validates :amount, presence: true,
-                       numericality: { greater_than: 0, message: "%{value} must be greater than $0" },
+                       numericality: { greater_than: 0, message: "%<value> must be greater than $0" },
                        on: [:step_1, :submission]
 
     validates :kind, presence: true,
-                     inclusion: { in: KINDS, message: "%{value} is not a valid income type" },
+                     inclusion: { in: KINDS, message: "%<value> is not a valid income type" },
                      on: [:step_1, :submission]
 
     # validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
 
     validates :frequency_kind, presence: true,
-                               inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
+                               inclusion: { in: FREQUENCY_KINDS, message: "%<value> is not a valid frequency" }
 
     validates :start_on, presence: true, on: [:step_1, :submission]
 
@@ -138,23 +140,19 @@ module FinancialAssistance
 
     def <=>(other)
       [amount, kind, frequency, start_on, end_on, is_projected] ==
-      [other.amount, other.kind, other.frequency, other.start_on, other.end_on, other.is_projected]
+        [other.amount, other.kind, other.frequency, other.start_on, other.end_on, other.is_projected]
     end
 
-
     def self.from_income_request(income_data)
-      income = Income.new(
+      Income.new(
         amount: (income_data[:amount] * 100).to_i,
         kind: income_data[:kind],
         frequency: income_data[:frequency],
         start_on: income_data[:start_on],
         end_on: income_data[:end_on],
         is_projected: income_data[:is_projected],
-        submitted_at: income_data[:submitted_at])
-
-    end
-
-    def hours_worked_per_week
+        submitted_at: income_data[:submitted_at]
+      )
     end
 
     class << self
@@ -167,7 +165,7 @@ module FinancialAssistance
       end
     end
 
-  private
+    private
 
     def set_submission_timestamp
       write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   module FinancialAssistanceWorld
     def consumer(*traits)
@@ -14,7 +16,7 @@ module FinancialAssistance
     end
 
     def user_sign_up
-      @user_sign_up_info ||= FactoryBot.attributes_for :user
+      @user_sign_up ||= FactoryBot.attributes_for :user
     end
 
     def personal_information
@@ -24,22 +26,22 @@ module FinancialAssistance
 
     def create_plan
       hbx_profile = FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
-      benefit_package = hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
     end
-    
+
     def assign_benchmark_plan_id(application)
       hbx_profile = HbxProfile.all.first
       plan = Plan.all.first
       coverage_period = hbx_profile.benefit_sponsorship.current_benefit_coverage_period
       coverage_period.update_attributes!(slcsp_id: plan.id, slcsp: plan.id)
-      application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)    
+      application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)
     end
 
     def create_dummy_eligibility(application)
       coverage_year = TimeKeeper.date_of_record.year
       application.submit!
       application.tax_households.each do |txh|
-        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 01, 01))
+        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
         txh.eligibility_determinations.build(max_aptc: 200.00,
                                              csr_percent_as_integer: 0,
                                              csr_eligibility_kind: "csr_73",

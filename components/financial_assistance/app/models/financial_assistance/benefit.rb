@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   class Benefit
     include Mongoid::Document
@@ -5,10 +7,10 @@ module FinancialAssistance
 
     embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
 
-    TITLE_SIZE_RANGE = 3..30
-    STATE_HEALTH_BENEFITS = %w(medicaid)
+    TITLE_SIZE_RANGE = (3..30).freeze
+    STATE_HEALTH_BENEFITS = %w[medicaid].freeze
 
-    INSURANCE_KINDS = %W(
+    INSURANCE_KINDS = %w[
         acf_refugee_medical_assistance
         americorps_health_benefits
         child_health_insurance_plan
@@ -32,12 +34,12 @@ module FinancialAssistance
         coverage_under_the_state_health_benefits_risk_pool
         veterans_administration_health_benefits
         peace_corps_health_benefits
-      )
+      ].freeze
 
-    KINDS = %W(
+    KINDS = %w[
       is_eligible
       is_enrolled
-    )
+    ].freeze
 
     INSURANCE_TYPE = {
       acf_refugee_medical_assistance: "ACF Refugee Medical Assistance",
@@ -63,9 +65,9 @@ module FinancialAssistance
       coverage_under_the_state_health_benefits_risk_pool: "Coverage under the state health benefits risk pool",
       veterans_administration_health_benefits: "Veterans Administration health benefits",
       peace_corps_health_benefits: "Peace Corps health benefits"
-    }
+    }.freeze
 
-    ESI_COVERED_KINDS = %w(self self_and_spouse family)
+    ESI_COVERED_KINDS = %w[self self_and_spouse family].freeze
 
     field :title, type: String
     field :esi_covered, type: String
@@ -95,8 +97,8 @@ module FinancialAssistance
 
     scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
 
-    validates_length_of :title, 
-                        in: TITLE_SIZE_RANGE, 
+    validates_length_of :title,
+                        in: TITLE_SIZE_RANGE,
                         allow_nil: true,
                         message: "pick a name length between #{TITLE_SIZE_RANGE}",
                         on: [:step_1, :submission]
@@ -104,14 +106,14 @@ module FinancialAssistance
     validates :kind, presence: true,
                      inclusion: {
                        in: KINDS,
-                       message: "%{value} is not a valid benefit kind type"
+                       message: "%<value> is not a valid benefit kind type"
                      },
                      on: [:step_1, :submission]
 
     validates :insurance_kind, presence: true,
                                inclusion: {
                                  in: INSURANCE_KINDS,
-                                 message: "%{value} is not a valid benefit insurance kind type"
+                                 message: "%<value> is not a valid benefit insurance kind type"
                                },
                                on: [:step_1, :submission]
 
@@ -122,7 +124,7 @@ module FinancialAssistance
 
     before_create :set_submission_timestamp
 
-    alias_method :is_employer_sponsored?, :is_employer_sponsored
+    alias is_employer_sponsored? is_employer_sponsored
 
     def is_eligible?
       kind == "is_eligible"
@@ -133,8 +135,7 @@ module FinancialAssistance
     end
 
     # Eligibility through public employee
-    def is_state_health_benefit?
-    end
+    def is_state_health_benefit?; end
 
     def clean_conditional_params(params)
       clean_params(params)
@@ -150,14 +151,14 @@ module FinancialAssistance
       end
     end
 
-  private
+    private
+
     def clean_params(params)
       model_params = params[:benefit]
 
-      if model_params.present? && model_params[:insurance_kind] != "employer_sponsored_insurance"
-        clean_benefit_params_when_not_esi(model_params)
-        clean_employer_params_when_not_esi(params)
-      end
+      return unless model_params.present? && model_params[:insurance_kind] != "employer_sponsored_insurance"
+      clean_benefit_params_when_not_esi(model_params)
+      clean_employer_params_when_not_esi(params)
     end
 
     def clean_benefit_params_when_not_esi(model_params)
@@ -179,9 +180,8 @@ module FinancialAssistance
       params[:employer_phone][:full_phone_number] = nil
     end
 
-
     def set_submission_timestamp
-      write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank? 
+      write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?
     end
 
     def start_on_must_precede_end_on(start_on, end_on)
@@ -190,21 +190,19 @@ module FinancialAssistance
     end
 
     def presence_of_dates_if_enrolled
-      if is_enrolled?
-        errors.add(:start_on, " Start On Date must be present") if start_on.blank?
-        start_on_must_precede_end_on(start_on, end_on)
-      end
+      return unless is_enrolled?
+      errors.add(:start_on, " Start On Date must be present") if start_on.blank?
+      start_on_must_precede_end_on(start_on, end_on)
     end
 
     def presence_of_esi_details_if_esi
-      if insurance_kind == "employer_sponsored_insurance"
-        errors.add(:employer_name, " ' EMPLOYER NAME' can't be blank ") if employer_name.blank?
-        errors.add(:esi_covered, "' Who can be covered?' can't be blank ") if esi_covered.blank?
-        errors.add(:start_on, "' Start On' Date can't be blank ") if start_on.blank?
-        errors.add(:employer_id, "' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ") if employer_id.blank?
-        errors.add(:employee_cost_frequency, "' How Often' can't be blank ") if employee_cost_frequency.blank?
-        errors.add(:employee_cost, "' AMOUNT' can't be blank ") if employee_cost.blank?
-      end
+      return unless insurance_kind == "employer_sponsored_insurance"
+      errors.add(:employer_name, " ' EMPLOYER NAME' can't be blank ") if employer_name.blank?
+      errors.add(:esi_covered, "' Who can be covered?' can't be blank ") if esi_covered.blank?
+      errors.add(:start_on, "' Start On' Date can't be blank ") if start_on.blank?
+      errors.add(:employer_id, "' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ") if employer_id.blank?
+      errors.add(:employee_cost_frequency, "' How Often' can't be blank ") if employee_cost_frequency.blank?
+      errors.add(:employee_cost, "' AMOUNT' can't be blank ") if employee_cost.blank?
     end
   end
 end

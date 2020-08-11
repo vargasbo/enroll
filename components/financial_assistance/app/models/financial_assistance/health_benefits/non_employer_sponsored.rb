@@ -1,3 +1,9 @@
-class FinancialAssistance::HealthBenefits::NonEmployerSponsored
-  include Mongoid::Document
+# frozen_string_literal: true
+
+module FinancialAssistance
+  class HealthBenefits
+    class NonEmployerSponsored
+      include Mongoid::Document
+    end
+  end
 end

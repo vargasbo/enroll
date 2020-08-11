@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^the user is applying for a CONSUMER role$/) do
   visit "/users/sign_up"
   fill_in "user_oim_id", with: user_sign_up[:oim_id]

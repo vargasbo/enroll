@@ -124,11 +124,11 @@ module FinancialAssistance
         params[:employer_phone].merge!(kind: "work") # HACK: to get pass phone validations
         @model.employer_phone.assign_attributes(permit_params(params[:employer_phone]))
       end
-      if params[:employer_address].present?
-        @model.build_employer_address
-        params[:employer_address].merge!(kind: "work") # HACK: to get pass phone validations
-        @model.employer_address.assign_attributes(permit_params(params[:employer_address]))
-      end
+
+      return unless params[:employer_address].present?
+      @model.build_employer_address
+      params[:employer_address].merge!(kind: "work") # HACK: to get pass phone validations
+      @model.employer_address.assign_attributes(permit_params(params[:employer_address]))
     end
 
     def find_application_and_applicant
@@ -149,7 +149,7 @@ module FinancialAssistance
 
     def find
       FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
-    rescue StandardError
+    rescue StandardError # rubocop:disable Lint/EmptyRescueClause TODO: Remove this
       ''
     end
   end

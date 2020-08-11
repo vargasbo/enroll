@@ -26,7 +26,7 @@ module FinancialAssistance
       render 'workflow/step', layout: 'financial_assistance'
     end
 
-    def step
+    def step # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
       save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -124,7 +124,7 @@ module FinancialAssistance
 
     def find
       FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.find(params[:id])
-    rescue StandardError
+    rescue StandardError # rubocop:disable Lint/EmptyRescueClause TODO Remove this
       ''
     end
 

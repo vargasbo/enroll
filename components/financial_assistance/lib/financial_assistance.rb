@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "financial_assistance/engine"
 
 module FinancialAssistance

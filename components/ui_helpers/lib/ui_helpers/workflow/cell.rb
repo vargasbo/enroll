@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UIHelpers
   module Workflow
     class Cell
@@ -25,10 +27,10 @@ module UIHelpers
         @id = attributes['id']
         @prompt = attributes['prompt']
         @support_text_key = attributes['support_text_key']
-        @class_names = attributes['classNames'] ? attributes['classNames'] : ''
+        @class_names = attributes['classNames'] || ''
       end
 
-      def name_attribute(field=nil)
+      def name_attribute(_field = nil)
         "#{@model}[#{attribute}]"
       end
     end

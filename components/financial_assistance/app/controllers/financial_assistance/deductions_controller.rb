@@ -107,11 +107,6 @@ module FinancialAssistance
       @applicant = @application.applicants.find(params[:applicant_id])
     end
 
-    def find_application_and_applicant
-      @application = FinancialAssistance::Application.find(params[:application_id])
-      @applicant = @application.applicants.find(params[:applicant_id])
-    end
-
     def permit_params(attributes)
       return if attributes.blank?
       attributes.permit!
