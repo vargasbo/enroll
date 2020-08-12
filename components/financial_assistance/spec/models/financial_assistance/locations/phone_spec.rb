@@ -62,7 +62,6 @@ module FinancialAssistance
 
     context 'kind' do
       it 'invalid with null value' do
-        binding.pry
         expect(subject.create(kind: '').errors[:kind].any?).to eq true
       end
 
