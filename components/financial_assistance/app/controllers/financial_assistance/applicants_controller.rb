@@ -87,7 +87,7 @@ module FinancialAssistance
 
     def load_support_texts
       raw_support_text = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
-      @support_texts = set_support_text_placeholders raw_support_text
+      @support_texts = support_text_placeholders raw_support_text
     end
 
     def format_date_params(model_params)

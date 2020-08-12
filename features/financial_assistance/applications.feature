@@ -16,6 +16,7 @@ Feature: Start a new Financial Assistance Application
     And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page
 
+  @wip
   Scenario: A consumer adds Job income for an application's applicant
     Given the consumer has started a financial assistance application
     And has added tax information for an applicant
@@ -24,6 +25,7 @@ Feature: Start a new Financial Assistance Application
     Then they should see the newly added Job income
     And they should see the dates in correct format
 
+  @wip
   Scenario: A consumer adds Job income with incorrect date format
     Given the consumer has started a financial assistance application
     And has added tax information for an applicant
