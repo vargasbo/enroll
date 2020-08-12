@@ -11,7 +11,7 @@ module FinancialAssistance
 
     belongs_to :family, class_name: "Family"
 
-    before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id, :set_external_identifiers
+    before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers
     validates :application_submission_validity, presence: true, on: :submission
     validates :before_attestation_validity, presence: true, on: :before_attestation
     validate :attestation_terms_on_parent_living_out_of_home
@@ -86,7 +86,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :applicants, class_name: "::FinancialAssistance::Applicant"
+    embeds_many :applicants, inverse_of: :application
 
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
@@ -126,18 +126,18 @@ module FinancialAssistance
 
     # Set the benchmark plan for this financial assistance application.
     # @param benchmark_plan_id [ {Plan} ] The benchmark plan for this application.
-    def benchmark_plan=(new_benchmark_plan)
-      raise ArgumentError, "expected Plan" unless new_benchmark_plan.is_a?(Plan)
-      write_attribute(:benchmark_plan_id, new_benchmark_plan._id)
-      @benchmark_plan = new_benchmark_plan
-    end
+    # def benchmark_plan=(new_benchmark_plan)
+    #   raise ArgumentError.new("expected Plan") unless new_benchmark_plan.is_a?(Plan)
+    #   write_attribute(:benchmark_plan_id, new_benchmark_plan._id)
+    #   @benchmark_plan = new_benchmark_plan
+    # end
 
     # Get the benchmark plan for this application.
     # @return [ {Plan} ] benchmark plan
-    def benchmark_plan
-      return @benchmark_plan if defined? @benchmark_plan
-      @benchmark_plan = Plan.find(benchmark_plan_id) unless benchmark_plan_id.blank?
-    end
+    # def benchmark_plan
+    #   return @benchmark_plan if defined? @benchmark_plan
+    #   @benchmark_plan = Plan.find(benchmark_plan_id) unless benchmark_plan_id.blank?
+    # end
 
     # Virtual attribute that indicates whether Primary Applicant accepts the Medicaid terms
     # of service presented at the time of application submission
@@ -359,7 +359,9 @@ module FinancialAssistance
 
     def populate_applicants_for(family)
       self.applicants = family.active_family_members.map do |family_member|
-        FinancialAssistance::Applicant.new family_member_id: family_member.id
+        applicant = FinancialAssistance::Applicant.new family_member_id: family_member.id, application: self
+        applicant.save
+        applicant
       end
     end
 
@@ -597,10 +599,10 @@ module FinancialAssistance
       update_attribute(:effective_date, effective_date)
     end
 
-    def set_benchmark_plan_id
-      benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
-      write_attribute(:benchmark_plan_id, benchmark_plan_id)
-    end
+    # def set_benchmark_plan_id
+    #   benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+    #   write_attribute(:benchmark_plan_id, benchmark_plan_id)
+    # end
 
     def set_external_identifiers
       app = family.active_approved_application

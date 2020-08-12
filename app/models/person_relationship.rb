@@ -97,6 +97,9 @@ class PersonRelationship
 
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String
+  field :predecessor_id, type: BSON::ObjectId
+  field :successor_id, type: BSON::ObjectId
+  field :family_id, type: BSON::ObjectId
 
   track_history :on => [:fields],
                 :scope => :person,

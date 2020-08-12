@@ -128,7 +128,13 @@ FactoryBot.define do
 
     trait :with_family do
       after :create do |person|
-        family = FactoryBot.create :family, :with_primary_family_member, person: person
+        FactoryBot.create :family, :with_primary_family_member, person: person
+      end
+    end
+
+    trait :with_nuclear_family do
+      before :create do |person|
+        FactoryBot.create :family, :with_nuclear_family, person: person
       end
     end
 

@@ -32,6 +32,7 @@ describe CoverageHousehold, "when informed that eligiblity has changed for an in
 
   before :each do
     allow(Family).to receive(:find_all_by_person).with(mock_person).and_return([mock_family])
+    allow(mock_family).to receive(:save!).and_return(true)
   end
 
   it "should locate and notify each coverage household containing that individual" do
