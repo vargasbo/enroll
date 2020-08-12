@@ -28,7 +28,7 @@ module FinancialAssistance
 
       validates :kind,
                 inclusion: {in: KINDS, message: '%{value} is not a valid phone type'},
-                allow_blank: true
+                allow_blank: false
 
       validates_presence_of :area_code, :number
 
