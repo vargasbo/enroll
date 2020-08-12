@@ -270,7 +270,6 @@ class TaxHousehold
     applicants.where(tax_household_id: self.id)
   end
 
-
   def applicants
     return nil unless application
     application.applicants.where(tax_household_id: self.id) if application.applicants.present?
@@ -288,9 +287,9 @@ class TaxHousehold
       curam_ed = eligibility_determinations.where(source: "Curam").first
       return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
       return curam_ed if curam_ed.present?
-      return eligibility_determinations.max_by(&:determined_at)
+      eligibility_determinations.max_by(&:determined_at)
     else
-      eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+      eligibility_determinations.max_by{|a, b| a.determined_on <=> b.determined_on}.last
     end
   end
 

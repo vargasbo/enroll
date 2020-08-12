@@ -130,7 +130,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
     it 'should have SOURCE_KINDS constant' do
       subject.class.should be_const_defined(:SOURCE_KINDS)
-      expect(described_class::SOURCE_KINDS).to eq(%w(Curam Admin Renewals Haven))
+      expect(described_class::SOURCE_KINDS).to eq(%w[Curam Admin Renewals Haven])
     end
 
     it 'should have constant SOURCE_KINDS with a specific set of list' do

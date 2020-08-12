@@ -38,7 +38,7 @@ module FinancialAssistance
       product = BenefitMarkets::Products::Product.all.first
       coverage_period = hbx_profile.benefit_sponsorship.current_benefit_coverage_period
       coverage_period.update_attributes!(slcsp_id: product.id, slcsp: product.id)
-      application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)    
+      application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)
     end
 
     def create_dummy_eligibility(application)
