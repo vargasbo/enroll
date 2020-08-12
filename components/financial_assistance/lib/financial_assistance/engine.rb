@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require 'slim'
+require 'devise'
+require 'pundit'
+require 'dry-container'
+
 module FinancialAssistance
   class Engine < ::Rails::Engine
     isolate_namespace FinancialAssistance

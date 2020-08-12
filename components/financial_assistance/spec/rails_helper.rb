@@ -16,7 +16,6 @@ require 'capybara/rspec'
 require 'factory_bot_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
-require 'climate_control'
 
 FactoryBot.definition_file_paths = [
   File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
