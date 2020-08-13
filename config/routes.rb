@@ -310,6 +310,9 @@ Rails.application.routes.draw do
       get :show_resident_dependent, on: :member
     end
 
+    resources :family_relationships
+
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :cancel
