@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 Given(/^that the user is on FAA Household Info: Family Members page$/) do
   login_as consumer, scope: :user
   visit root_path
