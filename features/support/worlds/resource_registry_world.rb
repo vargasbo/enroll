@@ -1,16 +1,17 @@
+# frozen_string_literal: true
+
 module ResourceRegistryWorld
+  def enable_feature(feature_name)
+    return if EnrollRegistry.feature_enabled?(feature_name)
 
-  def enable_feature(feature_key)
-    return if EnrollRegistry.feature_enabled?(:financial_assistance)
-
-    feature_dsl = EnrollRegistry[:financial_assistance]
+    feature_dsl = EnrollRegistry[feature_name]
     feature_dsl.feature.stub(:is_enabled).and_return(true)
   end
 
-  def disable_feature(feature_key)
-    return unless EnrollRegistry.feature_enabled?(:financial_assistance)
+  def disable_feature(feature_name)
+    return unless EnrollRegistry.feature_enabled?(feature_name)
 
-    feature_dsl = EnrollRegistry[:financial_assistance]
+    feature_dsl = EnrollRegistry[feature_name]
     feature_dsl.feature.stub(:is_enabled).and_return(false)
   end
 end
