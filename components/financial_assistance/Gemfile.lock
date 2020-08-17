@@ -335,19 +335,8 @@ DEPENDENCIES
   factory_bot_rails (~> 4)
   financial_assistance!
   forgery (~> 0.7.0)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
   money-rails
-=======
->>>>>>> REFS FFA - Moves stuff into components
   mongoid-rspec (~> 4.0.1)
-=======
-  mongoid-rspec (~> 4)
->>>>>>> Rebases with faa location models
-=======
-  mongoid-rspec (~> 4.0.1)
->>>>>>> REFS FAA Tax info specs adds stuff to make the rspecs run
   mongoid_rails_migrations (~> 1.2.0)
   rails-controller-testing
   rails-perftest (~> 0.0.7)

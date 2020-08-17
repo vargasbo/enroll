@@ -85,8 +85,8 @@ module FinancialAssistance
     field :has_income_verification_response, type: Boolean, default: false
     field :has_mec_verification_response, type: Boolean, default: false
 
-    # field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
-    # field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
+    field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
+    field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
 
     field :magi_as_percentage_of_fpl, type: Float, default: 0.0
     field :magi_medicaid_type, type: String
@@ -154,21 +154,9 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     embeds_many :incomes,     class_name: "FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
-=======
-    embeds_many :incomes
-    embeds_many :deductions
-    embeds_many :benefits
->>>>>>> REFS FFA - Moves stuff into components
-=======
-    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
->>>>>>> Rebases with faa location models
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
 
@@ -695,8 +683,8 @@ module FinancialAssistance
           errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnency?' should be answered") if is_enrolled_on_medicaid.nil?
         end
       else
-        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.nil?
-        errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
+        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.present?
+        errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.present? && pregnancy_end_on.blank?
       end
 
       if age_of_applicant > 18 && age_of_applicant < 26
