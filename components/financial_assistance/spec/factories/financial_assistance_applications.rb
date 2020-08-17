@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :application do
+  factory :application, class: "::FinancialAssistance::Application" do
 
   end
 end

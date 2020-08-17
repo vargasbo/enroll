@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 module FinancialAssistance
   class Application # rubocop:disable Metrics/ClassLength TODO: Remove this
 

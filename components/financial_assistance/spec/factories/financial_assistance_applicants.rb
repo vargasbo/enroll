@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :applicant do
+  factory :applicant, class: "::FinancialAssistance::Applicant" do
     
   end
 end
