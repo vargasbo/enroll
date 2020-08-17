@@ -20,7 +20,8 @@ PATH
     financial_assistance (0.1.0)
       aasm (~> 4.8)
       config (~> 2.0)
-      money-rails (~> 1.13)
+      devise (~> 4.5)
+      money-rails (~> 1.13.3)
       mongoid (~> 7.0.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
@@ -79,6 +80,7 @@ GEM
     amq-protocol (1.9.2)
     arel (9.0.0)
     ast (2.4.1)
+    bcrypt (3.1.15)
     bson (4.10.0)
     builder (3.2.4)
     bunny (1.7.1)
@@ -102,6 +104,12 @@ GEM
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
+    devise (4.7.2)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 4.1.0)
+      responders
+      warden (~> 1.2.3)
     diff-lcs (1.4.4)
     dry-configurable (0.11.6)
       concurrent-ruby (~> 1.0)
@@ -134,7 +142,7 @@ GEM
       dry-equalizer (~> 0.3)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
-    dry-validation (1.5.2)
+    dry-validation (1.5.3)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.7, >= 0.7.1)
       dry-core (~> 0.4)
@@ -183,13 +191,11 @@ GEM
     mongoid-compatibility (0.5.1)
       activesupport
       mongoid (>= 2.0)
-    mongoid-rspec (4.1.0)
+    mongoid-rspec (4.0.1)
       activesupport (>= 3.0.0)
       mongoid (>= 3.1)
       mongoid-compatibility (>= 0.5.1)
-      rspec-core (~> 3.3)
-      rspec-expectations (~> 3.3)
-      rspec-mocks (~> 3.3)
+      rspec (~> 3.3)
     mongoid_rails_migrations (1.2.1)
       activesupport (>= 4.2.0)
       bundler (>= 1.0.0)
@@ -199,6 +205,7 @@ GEM
     nio4r (2.5.2)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
+    orm_adapter (0.5.0)
     parallel (1.19.2)
     parser (2.7.1.4)
       ast (~> 2.4.1)
@@ -240,7 +247,14 @@ GEM
     rainbow (3.0.0)
     rake (13.0.1)
     regexp_parser (1.7.1)
+    responders (3.0.1)
+      actionpack (>= 5.0)
+      railties (>= 5.0)
     rexml (3.2.4)
+    rspec (3.9.0)
+      rspec-core (~> 3.9.0)
+      rspec-expectations (~> 3.9.0)
+      rspec-mocks (~> 3.9.0)
     rspec-core (3.9.2)
       rspec-support (~> 3.9.3)
     rspec-expectations (3.9.2)
@@ -303,6 +317,8 @@ GEM
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
+    warden (1.2.8)
+      rack (>= 2.0.6)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -321,6 +337,7 @@ DEPENDENCIES
   forgery (~> 0.7.0)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   money-rails
 =======
 >>>>>>> REFS FFA - Moves stuff into components
@@ -328,6 +345,9 @@ DEPENDENCIES
 =======
   mongoid-rspec (~> 4)
 >>>>>>> Rebases with faa location models
+=======
+  mongoid-rspec (~> 4.0.1)
+>>>>>>> REFS FAA Tax info specs adds stuff to make the rspecs run
   mongoid_rails_migrations (~> 1.2.0)
   rails-controller-testing
   rails-perftest (~> 0.0.7)

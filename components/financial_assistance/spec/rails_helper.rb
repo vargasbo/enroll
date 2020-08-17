@@ -18,7 +18,9 @@ require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
 
 FactoryBot.definition_file_paths = [
-  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
+  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories')),
+  File.join(Rails.root, 'spec/factories'),
+
 ]
 FactoryBot.find_definitions
 

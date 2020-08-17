@@ -85,8 +85,8 @@ module FinancialAssistance
     field :has_income_verification_response, type: Boolean, default: false
     field :has_mec_verification_response, type: Boolean, default: false
 
-    field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
-    field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
+    # field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
+    # field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
 
     field :magi_as_percentage_of_fpl, type: Float, default: 0.0
     field :magi_medicaid_type, type: String

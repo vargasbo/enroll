@@ -13,7 +13,7 @@ module FinancialAssistance
     include ::UIHelpers::WorkflowController
     include NavigationHelper
     include Acapi::Notifiers
-    include L10nHelper
+    include FinancialAssistance::L10nHelper
     include ApplicationHelper
     require 'securerandom'
 

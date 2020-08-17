@@ -211,7 +211,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     end
 
     context "when there is response from eligibility service" do
-      include L10nHelper
+      include FinancialAssistance::L10nHelper
       include ActionView::Helpers::TranslationHelper
 
       before do
