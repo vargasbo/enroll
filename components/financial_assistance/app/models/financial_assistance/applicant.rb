@@ -6,7 +6,7 @@ module FinancialAssistance
     include Mongoid::Timestamps
     include AASM
 
-    embedded_in :application
+    embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
     TAX_FILER_KINDS = %w[tax_filer single joint separate dependent non_filer].freeze
     STUDENT_KINDS = %w[
@@ -155,6 +155,7 @@ module FinancialAssistance
     field :workflow, type: Hash, default: { }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     embeds_many :incomes,     class_name: "FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
@@ -163,6 +164,11 @@ module FinancialAssistance
     embeds_many :deductions
     embeds_many :benefits
 >>>>>>> REFS FFA - Moves stuff into components
+=======
+    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
+    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
+    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
+>>>>>>> Rebases with faa location models
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
 
@@ -689,8 +695,8 @@ module FinancialAssistance
           errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnency?' should be answered") if is_enrolled_on_medicaid.nil?
         end
       else
-        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.present?
-        errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.present? && pregnancy_end_on.blank?
+        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.nil?
+        errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
       end
 
       if age_of_applicant > 18 && age_of_applicant < 26
