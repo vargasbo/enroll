@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :deduction, class: '::FinancialAssistance::Deduction' do
+  factory :financial_assistance_deduction, class: '::FinancialAssistance::Deduction' do
   association :applicant
   title 'Test'
   amount 10

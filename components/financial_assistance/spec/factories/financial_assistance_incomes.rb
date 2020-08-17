@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :income, class: 'FinancialAssistance::Income' do
+  factory :financial_assistance_income, class: 'FinancialAssistance::Income' do
 
     association :applicant
 
