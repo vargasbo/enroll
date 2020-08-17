@@ -81,7 +81,7 @@ module FinancialAssistance
     field :is_employer_sponsored, type: Boolean
     field :is_esi_waiting_period, type: Boolean
     field :is_esi_mec_met, type: Boolean
-    field :employee_cost, type: Money, default: 0.00
+    # field :employee_cost, type: Money, default: 0.00
     field :employee_cost_frequency, type: String
 
     field :start_on, type: Date

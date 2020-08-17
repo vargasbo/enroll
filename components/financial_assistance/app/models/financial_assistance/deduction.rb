@@ -44,7 +44,7 @@ module FinancialAssistance
 
     field :title, type: String
     field :kind, as: :deduction_type, type: String, default: 'alimony_paid'
-    field :amount, type: Money, default: 0.00
+    # field :amount, type: Money, default: 0.00
     field :start_on, type: Date
     field :end_on, type: Date
     field :frequency_kind, type: String
