@@ -7,6 +7,7 @@ class User
 
   attr_accessor :login
   include PermissionsConcern
+  # include AuthorizationConcern
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -132,12 +133,7 @@ class User
   end
 
   def has_broker_agency_staff_role?
-    person&.has_active_broker_staff_role?
-  end
-
-  def is_benefit_sponsor_active_broker?(profile_id)
-    profile_organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)).first
-    person == profile_organization.employer_profile.active_broker if profile_organization&.employer_profile && profile_organization.employer_profile.active_broker
+    has_role?(:broker_agency_staff)
   end
 
   def has_broker_role?
@@ -166,8 +162,5 @@ class User
       log(message, {:severity => "error"})
       raise e
     end
-  end
-  def get_announcements_by_roles_and_portal(portal_path="")
-    []
   end
 end

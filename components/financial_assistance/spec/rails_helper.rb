@@ -18,7 +18,8 @@ require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
 
 FactoryBot.definition_file_paths = [
-  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))  
+  "spec/dummy/spec/factories"
+  #File.expand_path(File.join(File.dirname(__FILE__),'spec/dummy/spec/factories'))
 ]
 FactoryBot.find_definitions
 
@@ -68,6 +69,7 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
+  DatabaseCleaner.strategy = :truncation  
   config.infer_spec_type_from_file_location!
 
   # Filter lines from Rails gems in backtraces.

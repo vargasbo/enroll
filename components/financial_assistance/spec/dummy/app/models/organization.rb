@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Organization
 
   include Mongoid::Document
@@ -19,5 +17,5 @@ class Organization
   embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :carrier_profile, cascade_callbacks: true, validate: true
   embeds_one :hbx_profile, cascade_callbacks: true, validate: true
-
+      
 end
