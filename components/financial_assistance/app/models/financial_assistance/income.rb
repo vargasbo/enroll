@@ -53,7 +53,7 @@ module FinancialAssistance
       rental_and_royalty: 'Rent and royalties',
       unemployment_insurance: 'Unemployment',
       social_security_benefit: 'Social Security',
-      american_indian_and_alaskan_native: 'American Indian/Alaskan Native income',
+      american_indian_and_alaskan_native: "American Indian/Alaskan Native income",
       employer_funded_disability: 'Employer-funded disability payments',
       estate_trust: 'Estate and trust',
       farming_and_fishing: 'Farming or fishing',
@@ -91,15 +91,21 @@ module FinancialAssistance
                         on: [:step_1, :submission]
 
     validates :amount, presence: true,
-                       numericality: { greater_than: 0, message: "%<value> must be greater than $0" },
+                       numericality: {
+                         greater_than: 0, message: "%<value> must be greater than $0"
+                       },
                        on: [:step_1, :submission]
 
     validates :kind, presence: true,
-                     inclusion: { in: KINDS, message: "%<value> is not a valid income type" },
+                     inclusion: {
+                       in: KINDS, message: "%<value> is not a valid income type"
+                     },
                      on: [:step_1, :submission]
 
     validates :frequency_kind, presence: true,
-                               inclusion: { in: FREQUENCY_KINDS, message: '%{value} is not a valid frequency' }
+                               inclusion: {
+                                 in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency"
+                               }
 
     validates :start_on, presence: true, on: [:step_1, :submission]
     validate :start_on_must_precede_end_on

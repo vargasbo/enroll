@@ -87,7 +87,6 @@ module FinancialAssistance
     field :workflow, type: Hash, default: { }
 
     embeds_many :applicants, inverse_of: :application
-
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions

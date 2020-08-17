@@ -218,11 +218,9 @@ module FinancialAssistance
     end
 
     describe '#kind' do
-      let(:address) {FactoryBot.build(:address)}
-
       it 'should write and return work' do
-        address.write_attribute(:kind, 'work')
-        expect(address.kind).to eq 'work'
+        subject.write_attribute(:kind, 'work')
+        expect(subject.kind).to eq 'work'
       end
     end
   end

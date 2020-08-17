@@ -154,9 +154,9 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
+    embeds_many :incomes,     class_name: "FinancialAssistance::Income"
+    embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
+    embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
 
