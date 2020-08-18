@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 
-RSpec.describe FinancialAssistance::ApplicantsController, type: :controller do
+RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
   render_views
-  let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person, oim_id: "mahesh.")}
+  let!(:user) { FactoryBot.create(:user, :person => person) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 40.years)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
   let!(:plan) { FactoryBot.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
