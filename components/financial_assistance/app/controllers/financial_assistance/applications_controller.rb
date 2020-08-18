@@ -48,7 +48,7 @@ module FinancialAssistance
       render layout: 'financial_assistance_nav'
     end
 
-    def step # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def step # rubocop:disable Metrics/CyclomaticComplexity
       save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
