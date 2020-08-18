@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-# rubocop:disable all
-
-require "financial_assistance/engine"
-require "mongoid"
-require "aasm"
+require 'financial_assistance/engine'
+require 'mongoid'
+require 'aasm'
 require 'config'
 require 'dry-types'
 require 'dry-validation'
@@ -12,9 +10,9 @@ require 'dry-validation'
 module FinancialAssistance
   # Isolate the namespace portion of the passed class
   def parent_namespace_for(klass)
-    klass_name = klass.to_s.split("::")
+    klass_name = klass.to_s.split('::')
     klass_name.slice!(-1) || []
-    klass_name.join("::")
+    klass_name.join('::')
   end
 
   class << self
@@ -64,9 +62,9 @@ module FinancialAssistance
     when Date
       date_range = range_period
     when String
-      begin_on = range_period.split("..")[0]
-      end_on = range_period.split("..")[1]
-      date_range = Date.strptime(begin_on)..Date.strptime(end_on)
+      beginning = range_period.split('..')[0]
+      ending = range_period.split('..')[1]
+      date_range = Date.strptime(beginning)..Date.strptime(ending)
     when Time, DateTime
       begin_on = range_period.begin.to_date
       end_on = range_period.end.to_date
@@ -76,12 +74,7 @@ module FinancialAssistance
       return nil
     end
 
-    if range_is_increasing?(date_range)
-      date_range
-    else
-      # @errors.add(attribute.to_sym, "end date may not preceed begin date") if attribute.present?
-      nil
-    end
+    date_range if range_is_increasing?(date_range)
   end
 
   def self.range_is_increasing?(range)
@@ -89,4 +82,3 @@ module FinancialAssistance
   end
 end
 
-# rubocop:enable all

@@ -123,7 +123,9 @@ module FinancialAssistance
     end
 
     def find
-      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.where(id: params[:id]).last || nil
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.find(params[:id])
+    rescue StandardError
+      ''
     end
 
     def load_support_texts
