@@ -2,11 +2,11 @@
 
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
+RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
   render_views
   let(:person) { FactoryBot.create(:person)}
-  let(:user) { FactoryBot.create(:user, :person => person) }
+  let!(:user) { FactoryBot.create(:user, :person => person) }
 
   describe "GET index" do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
