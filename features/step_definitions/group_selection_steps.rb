@@ -75,25 +75,6 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   final_person.save
 end
 
-And(/generate family relationship matrix/) do
-  family = Family.all.first
-
-  primary_member = family.family_members[0].person
-  spouse_family_member = family.family_members[1].person
-  child_family_member = family.family_members[2].person
-
-  primary_member.add_relationship(spouse_family_member, "spouse", family.id)
-  spouse_family_member.add_relationship(primary_member, "spouse", family.id)
-
-  primary_member.add_relationship(child_family_member, "parent", family.id)
-  child_family_member.add_relationship(primary_member, "child", family.id)
-
-  spouse_family_member.add_relationship(child_family_member, "parent", family.id)
-  child_family_member.add_relationship(spouse_family_member, "child", family.id)
-
-  family.build_relationship_matrix
-end
-
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
   family = Family.all.first
   # qle = FactoryBot.create(:qualifying_life_event_kind,market_kind: @employee_role.present? ? "employer_sponsored" : "individual")
@@ -105,6 +86,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   end
   document = FactoryBot.build(:document, identifier: '525252')
   product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, sbc_document: document, :metal_level_kind => :silver)
+
   if role == 'consumer'
     FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
