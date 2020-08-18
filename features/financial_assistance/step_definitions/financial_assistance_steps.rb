@@ -370,8 +370,7 @@ When(/^the consumer manually enters the "Cost Savings" url in the browser search
   visit financial_assistance.applications_path
 end
 
-Then(/^the consumer will not have access to the Cost Savings page$/) do
-  expect(page).not_to have_selector('h1', text: 'Cost Savings Applications')
+Then(/^the consumer will not have access to the (.*) page$/) do |_title|
   expect(page).to have_content("The page you were looking for doesn't exist.")
 end
 
@@ -381,4 +380,16 @@ end
 
 Then(/^the consumer will navigate to the Cost Savings page$/) do
   expect(page).to have_selector('h1', text: 'Cost Savings Applications')
+end
+
+When(/^the consumer manually enters the "Help Paying for Coverage" url in the browser search bar$/) do
+  visit financial_assistance.help_paying_coverage_applications_path
+end
+
+Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
+  expect(page).to have_selector('h2', text: 'Help Paying for Coverage')
+end
+
+Then(/^the consumer will navigate to the Family Members page$/) do
+  expect(page).to have_selector('h2', text: 'Household Info: Family Members')
 end

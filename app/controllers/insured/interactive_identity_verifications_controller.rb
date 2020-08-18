@@ -98,7 +98,9 @@ module Insured
         consumer_user.save!
       end
       consumer_role.move_identity_documents_to_verified
-      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : financial_assistance.help_paying_coverage_applications_path
+      consumer_redirection_path = insured_family_members_path(:consumer_role_id => consumer_role.id)
+      consumer_redirection_path = financial_assistance.help_paying_coverage_applications_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : consumer_redirection_path
     end
 
     def render_session_start
