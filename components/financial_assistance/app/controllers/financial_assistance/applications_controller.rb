@@ -45,7 +45,7 @@ module FinancialAssistance
       @application = @person.primary_family.applications.find params[:id]
       matrix = @family.build_relationship_matrix
       @missing_relationships = @family.find_missing_relationships(matrix)
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
     def step # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -75,16 +75,16 @@ module FinancialAssistance
             end
 
           else
-            render 'workflow/step', layout: 'financial_assistance'
+            render 'workflow/step', layout: 'financial_assistance_nav'
           end
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance'
+          render 'workflow/step', layout: 'financial_assistance_nav'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance'
+        render 'workflow/step', layout: 'financial_assistance_nav'
       end
       # rubocop:enable Metrics/BlockNesting
     end
@@ -146,7 +146,7 @@ module FinancialAssistance
       if @application.blank?
         redirect_to financial_assistance_applications_path
       else
-        render layout: 'financial_assistance'
+        render layout: 'financial_assistance_nav'
       end
     end
 
@@ -170,7 +170,7 @@ module FinancialAssistance
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
 
-      render layout: 'financial_assistance' if params.keys.include? "cur"
+      render layout: 'financial_assistance_nav' if params.keys.include? "cur"
     end
 
     def application_publish_error
@@ -179,7 +179,7 @@ module FinancialAssistance
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
 
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
     def eligibility_response_error
@@ -190,7 +190,7 @@ module FinancialAssistance
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
 
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
     def check_eligibility_results_received
