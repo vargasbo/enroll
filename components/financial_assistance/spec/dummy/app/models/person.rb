@@ -115,7 +115,7 @@ class Person
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
   embeds_many :general_agency_staff_roles, cascade_callbacks: true, validate: true
 
-  embeds_many :person_relationships, cascade_callbacks: true, validate: true
+   embeds_many :person_relationships, cascade_callbacks: true, validate: true, class_name: "::PersonRelationship"
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
@@ -1198,7 +1198,7 @@ class Person
 
       direct_relationship.update(kind: relationship_kind)
     elsif self.id != successor.id
-      person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+      person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind, relative_id: self.id) # Direct Relationship
     end
   end
 
