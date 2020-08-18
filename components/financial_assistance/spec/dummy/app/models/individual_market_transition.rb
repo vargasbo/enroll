@@ -2,9 +2,8 @@ class IndividualMarketTransition
   include Mongoid::Document
   include Mongoid::Timestamps
   include SetCurrentUser
-  include Mongoid::History::Trackable
 
-  embedded_in :person
+  embedded_in :person, class_name: "::Person"
 
   ROLE_TYPES   = %W(consumer resident)
   REASON_CODES = %W(initial_individual_market_transition_created_using_data_migration eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided generating_consumer_role generating_resident_role)
@@ -17,15 +16,6 @@ class IndividualMarketTransition
   field :reason_code, type: String
   field :submitted_at, type: DateTime, default: nil
   field :user_id, type: BSON::ObjectId
-
-  track_history :on => [:fields],
-                :scope => :person,
-                :modifier_field => :modifier,
-                :modifier_field_optional => true,
-                :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
-                :track_destroy => true
 
 	validates_presence_of :submitted_at
 

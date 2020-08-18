@@ -195,7 +195,7 @@ class ConsumerRole
   # used to track history verification actions can be used on any top node model to build history of changes.
   # in this case consumer role taken as top node model instead of family member bz all verification functionality tied to consumer role model
   # might be encapsulated into new verification model further with verification code refactoring
-  embeds_many :history_action_trackers, as: :history_trackable
+  embeds_many :history_action_trackers, as: :history_trackable, class_name: "::HistoryActionTracker"
 
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
@@ -871,7 +871,7 @@ class ConsumerRole
 
   def create_initial_market_transition
     return if !person.individual_market_transitions.where(role_type:"consumer").first.nil?
-    transition = IndividualMarketTransition.new
+    transition = ::IndividualMarketTransition.new
     transition.role_type = "consumer"
     transition.submitted_at = TimeKeeper.datetime_of_record
     transition.reason_code = "generating_consumer_role"
