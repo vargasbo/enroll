@@ -89,7 +89,10 @@ module FinancialAssistance
     end
 
     def generate_payload(application)
-      render_to_string "financial_assistance/events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
+      # TODO: This is broken
+      # filename = lookup_context.find_template("app/views/financial_assistance/events/financial_assistance_application.xml.haml").identifier
+
+      render_to_string filename, :formats => ["xml"], :locals => { :financial_assistance_application => application }
     end
 
     def copy
@@ -286,7 +289,7 @@ module FinancialAssistance
     end
 
     def load_support_texts
-      file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
+      file_path = Rails.root.to_s + "/app/views/financial_assistance/shared/support_text.yml"
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
       @support_texts = support_text_placeholders raw_support_text
     end

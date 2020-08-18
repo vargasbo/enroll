@@ -2,10 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::BenefitsController, type: :controller do
+RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
-  let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :person => person, oim_id: "mahesh.")}
+  let!(:user) { FactoryBot.create(:user, :person => person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
   let!(:plan) { FactoryBot.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}

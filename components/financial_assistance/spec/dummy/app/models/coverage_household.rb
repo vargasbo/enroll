@@ -76,17 +76,40 @@ class CoverageHousehold
       family_member: family_member,
       is_subscriber: family_member.is_primary_applicant?
     )
+
+
+    # chm.save_parent
+    # household.save
   end
 
   def remove_family_member(family_member)
     coverage_household_members.where(family_member_id: family_member.id).each do |chm|
       chm.destroy
     end
+
+    # if chm = coverage_household_members.first
+    #   chm.reload
+    #   chm.save_parent
+    # end
+
+    # household.save
   end
 
   def remove_coverage_household_member(coverage_household_member_id, family_member_id)
     chm = coverage_household_members.where(id: coverage_household_member_id).and(family_member_id: family_member_id).first
     chm.destroy if !chm.nil?
+  end
+
+  def notify_the_user(member)
+    if member.person && (role = member.person.consumer_role)
+      if role.is_hbx_enrollment_eligible? && role.identity_verified_date
+        IvlNotificationMailer.lawful_presence_verified(role)
+      elsif role.is_hbx_enrollment_eligible? && role.identity_verification_pending?
+        IvlNotificationMailer.lawful_presence_unverified(role)
+      elsif !role.is_hbx_enrollment_eligible?
+        IvlNotificationMailer.lawfully_ineligible(role)
+      end
+    end
   end
 
   aasm do
@@ -125,6 +148,43 @@ class CoverageHousehold
     end
   end
 
+  def self.update_individual_eligibilities_for(consumer_role)
+    found_families = Family.find_all_by_person(consumer_role.person)
+    found_families.each do |ff|
+      update_eligibility_for_family(ff)
+    end
+  end
+
+  def self.update_eligibility_for_family(family)
+    family.households.each do |hh|
+      hh.coverage_households.map(&:evaluate_individual_market_eligiblity)
+      hh.hbx_enrollments.map(&:evaluate_individual_market_eligiblity)
+    end
+
+    family.save!
+  end
+
+  def evaluate_individual_market_eligiblity
+    eligibility_ruleset = ::RuleSet::CoverageHousehold::IndividualMarketVerification.new(self)
+    if eligibility_ruleset.applicable?
+      self.send(eligibility_ruleset.determine_next_state)
+    end
+  end
+
+  def active_individual_enrollments
+    household.hbx_enrollments.select do |he|
+      (he.coverage_household_id == self.id.to_s) &&
+         (!he.benefit_sponsored?) &&
+         he.currently_active?
+    end
+  end
+
+  def notify_verification_outstanding
+  end
+
+  def notify_verification_success
+  end
+
 private
   def presence_of_coverage_household_members
     if self.coverage_household_members.size == 0 && is_immediate_family
@@ -139,4 +199,5 @@ private
       event: aasm.current_event
     )
   end
+
 end

@@ -730,7 +730,7 @@ module FinancialAssistance
     def create_verification_documents
       active_applicants.each do |applicant|
         %w[Income MEC].each do |type|
-          applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending')
+          applicant.verification_types << ::VerificationType.new(type_name: type, validation_status: 'pending')
           applicant.move_to_pending!
         end
       end

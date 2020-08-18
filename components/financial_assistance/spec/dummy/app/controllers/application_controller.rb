@@ -3,6 +3,18 @@
 class ApplicationController < ActionController::Base
   helper FinancialAssistance::Engine.helpers
 
+  def set_admin_bookmark_url(url = nil) # rubocop:disable Naming/AccessorMethodName
+    set_current_person
+    bookmark_url = url || request.original_url
+    role = current_user.has_hbx_staff_role?
+    @person.consumer_role.update_attributes(:admin_bookmark_url => bookmark_url) if !role.nil? && !prior_ridp_bookmark_urls(bookmark_url) && @person.has_consumer_role?
+  end
+
+  def save_faa_bookmark(person, url)
+    return if person.consumer_role.blank?
+    person.consumer_role.update_attribute(:bookmark_url, url) if person.consumer_role.identity_verified?
+  end
+
   def set_current_person(required: true) # rubocop:disable Naming/AccessorMethodName
     @person = if current_user.try(:person).try(:agent?) && session[:person_id].present?
                 Person.find(session[:person_id])
