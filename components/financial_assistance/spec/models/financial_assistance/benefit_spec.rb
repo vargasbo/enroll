@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each do
   let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-  let(:application) {FactoryBot.create(:financial_assistance_application, family: family)}
+  let(:application) {FactoryBot.create(:application, family: family)}
   let(:household) {family.households.first}
   let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_ending_on: nil)}
   let(:family_member) {family.primary_applicant}
-  let(:applicant) {FactoryBot.create(:financial_assistance_applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member.id)}
+  let(:applicant) {FactoryBot.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member.id)}
   let(:benefit) {FinancialAssistance::Benefit.new(applicant: applicant)}
   let(:valid_params) do
     {
