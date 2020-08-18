@@ -47,7 +47,7 @@ module BenefitSponsors
 
     private
 
-    def enrollment_eligiblity_policy_for(model_instance)
+    def enrollment_eligiblity_policy_for(_model_instance)
       business_policies[:enrollment_elgibility_policy]
     end
   end
