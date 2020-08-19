@@ -560,7 +560,7 @@ class Person
 
   def person_relationship_for(other_person)
     person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
+      person_relationship.successor_id == other_person.id
     end
   end
 
@@ -571,19 +571,23 @@ class Person
     if direct_relationship.present?
       direct_relationship.update_attributes(:kind => PersonRelationship::InverseMap[relationship])
     elsif id != person.id
-      self.person_relationships << PersonRelationship.new({:kind => PersonRelationship::InverseMap[relationship],
-                                                           :successor_id => person.id,
-                                                           :predecessor_id => self.id,
-                                                           :family_id => family_id})
+      self.person_relationships.build({:kind => PersonRelationship::InverseMap[relationship],
+                                         :relative_id => person.id,
+                                         :successor_id => person.id,
+                                         :predecessor_id => self.id,
+                                         :family_id => family_id})
     end
     if inverse_relationship.present?
       inverse_relationship.update_attributes(:kind => relationship)
     elsif id != person.id
-      person.person_relationships << PersonRelationship.new({:kind => relationship,
-                                                             :successor_id => self.id,
-                                                             :predecessor_id => person.id,
-                                                             :family_id => family_id})
+      person.person_relationships.build({:kind => relationship,
+                                           :successor_id => self.id,
+                                           :relative_id => person.id,
+                                           :predecessor_id => person.id,
+                                           :family_id => family_id})
     end
+
+    # binding.pry
   end
 
   def add_work_email(email)

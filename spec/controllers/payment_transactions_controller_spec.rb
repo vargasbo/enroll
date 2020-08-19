@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe PaymentTransactionsController, :type => :controller do
   let(:user){ FactoryBot.create(:user, :consumer) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-  let(:primary_person) { family.primary_family_member.person }
+  let!(:primary_person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:family) { FactoryBot.create(:family, :with_persisted_primary_family_member_and_dependent, person: primary_person) }
   let(:child1) { family.family_members[1].person }
   let(:child2) { family.family_members[2].person }
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: 'shopping') }

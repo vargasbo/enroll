@@ -57,6 +57,25 @@ FactoryBot.define do
         end
       end
     end
+
+    trait :with_persisted_primary_family_member_and_dependent do
+      family_members {
+        [
+          FactoryBot.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
+          FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryBot.create(:person, first_name: "John", last_name: "Doe")),
+          FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryBot.create(:person, first_name: "Alex", last_name: "Doe"))
+        ]
+      }
+      before(:create)  do |family, evaluator|
+        family.family_members.each(&:save!)
+        family.dependents.each do |dependent|
+          family.relate_new_member(dependent.person, "child")
+        end
+
+        family.households.first.add_household_coverage_member(family.family_members.first)
+        family.save
+      end
+    end
   end
 end
 
