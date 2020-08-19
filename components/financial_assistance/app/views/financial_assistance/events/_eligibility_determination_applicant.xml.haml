@@ -1,7 +1,7 @@
 %eligibility_determination_applicant
   %individual
   - person = eligibility_determination_applicant.person
-  = render :partial => "events/individuals/individual", :object => person
+  = render :partial => "financial_assistance/events/individual", :object => person
   %is_primary_applicant= eligibility_determination_applicant.family_member.is_primary_applicant
   %is_consent_applicant= eligibility_determination_applicant.family_member.is_consent_applicant
   %is_coverage_applicant= eligibility_determination_applicant.family_member.is_coverage_applicant
@@ -22,4 +22,4 @@
           %is_disabled= eligibility_determination_applicant.person.is_disabled
   / we currently do not have the below data. implmenetation will follow at a later date. We will need to fully implement at a later date if still desired. 
   %total_incomes_by_year
-    = render :partial => "events/financial_assistance/total_income_by_year", :collection => 
+    = render :partial => "financial_assistance/events/total_income_by_year", :collection => 

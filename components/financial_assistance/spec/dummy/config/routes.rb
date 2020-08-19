@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
   namespace :insured do
+    resources :family_members
     resources :families do
       collection do
         get 'inbox'

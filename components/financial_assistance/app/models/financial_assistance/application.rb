@@ -26,7 +26,7 @@ module FinancialAssistance
     SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined].freeze
 
-    FAA_SCHEMA_FILE_PATH     = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
+    FAA_SCHEMA_FILE_PATH     = File.join(FinancialAssistance::Engine.root, 'lib', 'schemas', 'financial_assistance.xsd')
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 

@@ -93,3 +93,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 end
+
+def main_app
+  Rails.application.class.routes.url_helpers
+end

@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
-  # render_views
-  let(:person) { FactoryBot.create(:person)}
+
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
 
   describe "GET index" do
@@ -102,8 +102,7 @@ end
 
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
-  # render_views
-  let(:person) { FactoryBot.create(:person)}
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
   let!(:plan) { FactoryBot.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
@@ -268,11 +267,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
     end
 
-    it "should redirect to insured family memebers if 'no' is answered to is_applying_for_assistance" do
+    it "should redirect to insured family members if 'no' is answered to is_applying_for_assistance" do
       get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "false" }
-      # TODO: Path not working for some reason
-      #expect(response).to redirect_to(insured_family_members_path(consumer_role_id: person.consumer_role.id))
-      expect(response).to redirect_to("http://test.host/insured/family_members?consumer_role_id=#{person.consumer_role.id}")
+      expect(response).to redirect_to(main_app.insured_family_members_path(consumer_role_id: person.consumer_role.id))
     end
 
     it "should remain on the same page and flash an error message if nothing is answered to is_applying_for_assistance" do
@@ -283,10 +280,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "uqhp_flow" do
-    it "should redirect to insured family memebers" do
+    it "should redirect to insured family members" do
       get :uqhp_flow
       expect(family.applications.where(aasm_state: "draft").count).to eq 0
-      expect(response).to redirect_to("http://test.host/insured/family_members?consumer_role_id=#{person.consumer_role.id}")
+      expect(response).to redirect_to(main_app.insured_family_members_path(consumer_role_id: person.consumer_role.id))
     end
   end
 

@@ -89,10 +89,11 @@ module FinancialAssistance
     end
 
     def generate_payload(application)
-      # TODO: This is broken
-      # filename = lookup_context.find_template("app/views/financial_assistance/events/financial_assistance_application.xml.haml").identifier
-
-      render_to_string filename, :formats => ["xml"], :locals => { :financial_assistance_application => application }
+      ActionController::Base.new.render_to_string(
+        "financial_assistance/events/financial_assistance_application",
+        :formats => ["xml"],
+        :locals => { :financial_assistance_application => @application }
+      )
     end
 
     def copy
