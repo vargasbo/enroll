@@ -5,7 +5,6 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
-  render_views
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 40.years)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
