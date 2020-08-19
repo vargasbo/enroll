@@ -178,7 +178,7 @@ module FinancialAssistance
       end
     end
 
-    def support_text_placeholders(raw_support_text) # rubocop:disable Naming/AccessorMethodName
+    def support_text_placeholders(raw_support_text)
       # set <application-applicable-year> placeholdersr
       return [] if @application.nil?
       assistance_year = @application&.family&.application_applicable_year&.to_s

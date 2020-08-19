@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IndividualMarketTransition
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -5,8 +7,8 @@ class IndividualMarketTransition
 
   embedded_in :person, class_name: "::Person"
 
-  ROLE_TYPES   = %W(consumer resident)
-  REASON_CODES = %W(initial_individual_market_transition_created_using_data_migration eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided generating_consumer_role generating_resident_role)
+  ROLE_TYPES   = %w[consumer resident].freeze
+  REASON_CODES = %w[initial_individual_market_transition_created_using_data_migration eligibility_failed_or_documents_not_received_by_due_date eligibility_documents_provided generating_consumer_role generating_resident_role].freeze
 
   field :role_type, type: String
   field :effective_starting_on, type: Date
@@ -17,19 +19,19 @@ class IndividualMarketTransition
   field :submitted_at, type: DateTime, default: nil
   field :user_id, type: BSON::ObjectId
 
-	validates_presence_of :submitted_at
+  validates_presence_of :submitted_at
 
   validates :role_type,
             presence: true,
             allow_blank: false,
-            allow_nil:   false,
+            allow_nil: false,
             inclusion: {in: ROLE_TYPES, message: "%{value} is not a valid individual market role type"}
 
   validates :reason_code,
-          presence: true,
-          allow_blank: false,
-          allow_nil:   false,
-          inclusion: {in: REASON_CODES, message: "%{value} is not a valid transistion reason code"}
+            presence: true,
+            allow_blank: false,
+            allow_nil: false,
+            inclusion: {in: REASON_CODES, message: "%{value} is not a valid transistion reason code"}
 
   before_validation :set_submitted_at
 

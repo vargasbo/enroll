@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   module Locations
     class Phone
@@ -47,7 +49,7 @@ module FinancialAssistance
         if length > 10
           self.area_code = phone_number[0, 3]
           self.number = phone_number[3, 7]
-          self.extension = phone_number[10, length-10]
+          self.extension = phone_number[10, length - 10]
         elsif length == 10
           self.area_code = phone_number[0, 3]
           self.number = phone_number[3, 7]

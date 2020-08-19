@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'profile.rb'
 
 
@@ -22,13 +24,11 @@ class IssuerProfile < Profile
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
 
-  def benefit_products
-  end
+  def benefit_products; end
 
-  def benefit_products_by_effective_date(effective_date)
-  end
+  def benefit_products_by_effective_date(effective_date); end
 
-  private 
+  private
 
   def initialize_profile
     return unless is_benefit_sponsorship_eligible.blank?
@@ -42,12 +42,12 @@ class IssuerProfile < Profile
 
     def find_by_issuer_name(issuer_name)
       issuer_org = BenefitSponsors::Organizations::Organization.where(:legal_name => issuer_name, :"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile").first
-      issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
+      issuer_org.profiles.where(:_type => "BenefitSponsors::Organizations::IssuerProfile").first
     end
 
     def find_by_abbrev(abbrev)
       issuer_org = BenefitSponsors::Organizations::Organization.where(:"profiles.abbrev" => abbrev, :"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile").first
-      issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
+      issuer_org.profiles.where(:_type => "BenefitSponsors::Organizations::IssuerProfile").first
     end
   end
-end 
+end

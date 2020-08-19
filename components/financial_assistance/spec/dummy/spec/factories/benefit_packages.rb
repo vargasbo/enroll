@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_package do
     title {"individual_health_benefits_#{TimeKeeper.date_of_record.year}"}
@@ -7,7 +9,7 @@ FactoryBot.define do
     benefit_categories { ["health"]}
 
     after :build do |bp|
-     
+
     end
 
     trait :next_coverage_year_title do

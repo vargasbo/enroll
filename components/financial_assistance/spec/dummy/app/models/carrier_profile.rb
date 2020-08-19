@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CarrierProfile
   include Mongoid::Document
   include Config::AcaModelConcern
@@ -41,7 +43,7 @@ class CarrierProfile
   class << self
     def find(id)
       organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id.to_s)).to_a
-      organizations.size > 0 ? organizations.first.carrier_profile : nil
+      !organizations.empty? ? organizations.first.carrier_profile : nil
     end
 
     def carrier_profile_service_area_pairs_for(employer_profile, start_on)

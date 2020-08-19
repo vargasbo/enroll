@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LawfulPresenceDetermination
   SSA_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.lawful_presence.ssa_verification_request"
   VLP_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.lawful_presence.vlp_verification_request"
@@ -61,11 +63,7 @@ class LawfulPresenceDetermination
 
   def latest_denial_date
     responses = (ssa_responses.to_a + vlp_responses.to_a)
-    if self.verification_outstanding? && responses.present?
-      responses.max_by(&:received_at).received_at
-    else
-      nil
-    end
+    responses.max_by(&:received_at).received_at if self.verification_outstanding? && responses.present?
   end
 
   def start_ssa_process
@@ -81,23 +79,20 @@ class LawfulPresenceDetermination
   end
 
   private
+
   def record_approval_information(*args)
     approval_information = args.first
     self.update_attributes!(vlp_verified_at: approval_information.determined_at,
                             vlp_authority: approval_information.vlp_authority)
 
     self.qualified_non_citizenship_result = approval_information.qualified_non_citizenship_result if approval_information.qualified_non_citizenship_result
-    if approval_information.citizenship_result
-      self.citizenship_result = approval_information.citizenship_result
-    else
-      self.ivl_role.is_native? ? self.citizenship_result = "us_citizen" : self.citizenship_result = "non_native_citizen"
-    end
+    self.citizenship_result = (approval_information.citizenship_result || (self.ivl_role.is_native? ? "us_citizen" : "non_native_citizen"))
     if ["ssa", "curam"].include?(approval_information.vlp_authority)
       if self.ivl_role
         if self.ivl_role.person
           unless self.ivl_role.person.ssn.blank?
             self.ivl_role.ssn_validation = "valid"
-            self.ivl_role.person.verification_types.active.where(type_name:"Social Security Number").first.validation_status = "verified"
+            self.ivl_role.person.verification_types.active.where(type_name: "Social Security Number").first.validation_status = "verified"
           end
         end
       end
@@ -113,7 +108,7 @@ class LawfulPresenceDetermination
                             citizenship_result: ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS)
   end
 
-  def record_transition(*args)
+  def record_transition(*_args)
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,

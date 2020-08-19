@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TimeKeeper
   include Config::AcaModelConcern
   include Mongoid::Document
@@ -8,8 +10,7 @@ class TimeKeeper
 
   # time zone management
 
-  def initialize
-  end
+  def initialize; end
 
   def self.local_time(a_time)
     a_time.in_time_zone("Eastern Time (US & Canada)")

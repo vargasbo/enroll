@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User
   MIN_USERNAME_LENGTH = 8
   MAX_USERNAME_LENGTH = 60
@@ -22,10 +24,10 @@ class User
   validates_presence_of     :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
-  validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
+  validates_format_of :email, with: Devise.email_regexp, allow_blank: true, :message => "(optional) is invalid"
 
   def oim_id_rules
-    if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
+    if oim_id.present? && oim_id.match(%r{[;#%=|+,">< \\/]})
       errors.add :oim_id, "cannot contain special charcters ; # % = | + , \" > < \\ \/"
     elsif oim_id.present? && oim_id.length < MIN_USERNAME_LENGTH
       errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
@@ -35,21 +37,21 @@ class User
   end
 
   def password_complexity
-    if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
+    if password.present? && !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
       errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
-    elsif password.present? and password.match(/#{::Regexp.escape(oim_id)}/i)
+    elsif password.present? && password.match(/#{::Regexp.escape(oim_id)}/i)
       errors.add :password, "cannot contain username"
-    elsif password.present? and password_repeated_chars_limit(password)
+    elsif password.present? && password_repeated_chars_limit(password)
       errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
-    elsif password.present? and password.match(/(.)\1\1/)
+    elsif password.present? && password.match(/(.)\1\1/)
       errors.add :password, "must not repeat consecutive characters more than once"
-    elsif password.present? and !password.match(/(.*?[a-zA-Z]){4,}/)
+    elsif password.present? && !password.match(/(.*?[a-zA-Z]){4,}/)
       errors.add :password, "must have at least 4 alphabetical characters"
     end
   end
 
   def password_repeated_chars_limit(password)
-    return true if password.chars.group_by(&:chr).map{ |k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
+    return true if password.chars.group_by(&:chr).map{ |_k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
     false
   end
 
@@ -69,10 +71,10 @@ class User
 
   def self.generate_valid_password
     password = Devise.friendly_token.first(16)
-    password = password + "aA1!"
+    password += "aA1!"
     password = password.squeeze
     if password_invalid?(password)
-      password = generate_valid_password
+      generate_valid_password
     else
       password
     end
@@ -154,11 +156,11 @@ class User
     self.idp_verified = true
     begin
       self.save!
-    rescue => e
+    rescue StandardError => e
       message = "#{e.message}; "
-      message = message + "user: #{self}, "
-      message = message + "errors.full_messages: #{self.errors.full_messages}, "
-      message = message + "stacktrace: #{e.backtrace}"
+      message += "user: #{self}, "
+      message += "errors.full_messages: #{self.errors.full_messages}, "
+      message += "stacktrace: #{e.backtrace}"
       log(message, {:severity => "error"})
       raise e
     end

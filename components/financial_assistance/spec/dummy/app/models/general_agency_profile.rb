@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 class GeneralAgencyProfile
   include Mongoid::Document
   include Mongoid::Timestamps
 
 
   # for market_kind
-  MARKET_KINDS = %W[individual shop both]
+  MARKET_KINDS = %w[individual shop both].freeze
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
-  }
+  }.freeze
 
 
   field :entity_kind, type: String
@@ -36,7 +38,7 @@ class GeneralAgencyProfile
 
 
   # embeds_many :documents, as: :documentable
-  embeds_one  :inbox, as: :recipient, cascade_callbacks: true
+  embeds_one :inbox, as: :recipient, cascade_callbacks: true
   accepts_nested_attributes_for :inbox
   after_initialize :build_nested_models
 
@@ -59,7 +61,7 @@ class GeneralAgencyProfile
 
   def languages
     if languages_spoken.any?
-      return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
+      languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
     end
   end
 
@@ -85,7 +87,9 @@ class GeneralAgencyProfile
   end
 
   def current_staff_state
-    primary_staff.current_state rescue ""
+    primary_staff.current_state
+  rescue StandardError
+    ""
   end
 
   def current_state
@@ -97,11 +101,9 @@ class GeneralAgencyProfile
   end
 
   def general_agency_hired_notice(employer_profile)
-    begin
-      ShopNoticesNotifierJob.perform_later(self.id.to_s, "general_agency_hired_notice", employer_profile_id: employer_profile.id.to_s)
-    rescue Exception => e
-      (Rails.logger.error {"Unable to deliver general_agency_hired_notice to General Agency: #{self.legal_name} due to #{e}"}) unless Rails.env.test?
-    end
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "general_agency_hired_notice", employer_profile_id: employer_profile.id.to_s)
+  rescue Exception => e
+    (Rails.logger.error {"Unable to deliver general_agency_hired_notice to General Agency: #{self.legal_name} due to #{e}"}) unless Rails.env.test?
   end
 
   class << self
@@ -113,8 +115,12 @@ class GeneralAgencyProfile
       list_embedded Organization.exists(general_agency_profile: true).order_by([:legal_name]).to_a
     end
 
-    def all_by_broker_role(broker_role, options={})
-      favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue [] 
+    def all_by_broker_role(broker_role, options = {})
+      favorite_general_agency_ids = begin
+                                      broker_role.favorite_general_agencies.map(&:general_agency_profile_id)
+                                    rescue StandardError
+                                      []
+                                    end
       all_ga = if options[:approved_only]
                  all.select{|ga| ga.aasm_state == 'is_approved'}
                else
@@ -144,18 +150,19 @@ class GeneralAgencyProfile
       organization.profiles.where(id: BSON::ObjectId.from_string(id)).first if organization.present?
     end
 
-    def filter_by(status="is_applicant")
+    def filter_by(status = "is_applicant")
       if status == 'all'
         all
       else
         list_embedded Organization.exists(general_agency_profile: true).where(:'general_agency_profile.aasm_state' => status).order_by([:legal_name]).to_a
       end
-    rescue
+    rescue StandardError
       []
     end
   end
 
   private
+
   def build_nested_models
     build_inbox if inbox.nil?
   end

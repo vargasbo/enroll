@@ -85,7 +85,7 @@ module FinancialAssistance
       # rubocop:enable Metrics/BlockNesting
     end
 
-    def generate_payload(application)
+    def generate_payload(_application)
       ::FinancialAssistance::ApplicationController.new.render_to_string(
         "financial_assistance/events/financial_assistance_application",
         :formats => ["xml"],
@@ -245,7 +245,7 @@ module FinancialAssistance
       end
       redirect_to application_checklist_applications_path
     end
-    
+
     # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED

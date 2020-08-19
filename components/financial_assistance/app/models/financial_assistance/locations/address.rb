@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   module Locations
     class Address
@@ -32,7 +34,7 @@ module FinancialAssistance
       validates :state, presence: true
 
       validates :kind,
-                inclusion: {in: KINDS , message: '%{value} is not a valid address kind'},
+                inclusion: {in: KINDS, message: '%{value} is not a valid address kind'},
                 allow_blank: true
 
       validates :address_1, presence: {message: 'Please enter address_1'}
@@ -69,9 +71,9 @@ module FinancialAssistance
       # @return [ String ] the full address
       def to_html
         if address_2.blank?
-          "<div>#{address_1.strip()}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+          "<div>#{address_1.strip}</div><div>#{city}, #{state} #{zip}</div>".html_safe
         else
-          "<div>#{address_1.strip()}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+          "<div>#{address_1.strip}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
         end
       end
 
@@ -184,11 +186,7 @@ module FinancialAssistance
       # @return [ String ] The four digit zip code extension.
       def zip_extension
         return nil if zip.blank?
-        if zip.match?(/-/)
-          zip.split('-').last
-        else
-          nil
-        end
+        zip.split('-').last if zip.match?(/-/)
       end
 
       # Determine if this address is type: 'mailing'

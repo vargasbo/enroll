@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HbxStaffRole
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -16,7 +18,7 @@ class HbxStaffRole
 
   validates_presence_of :hbx_profile_id
 
-  alias_method :is_active?, :is_active
+  alias is_active? is_active
   #subrole is for documentation. should be redundant with permission_id
   field :subrole, type: String, default: ""
   field :permission_id, type: BSON::ObjectId
@@ -32,7 +34,7 @@ class HbxStaffRole
 
   # belongs_to Hbx
   def hbx_profile=(new_hbx_profile)
-    raise ArgumentError.new("expected HbxProfile") unless new_hbx_profile.is_a? HbxProfile
+    raise ArgumentError, "expected HbxProfile" unless new_hbx_profile.is_a? HbxProfile
     self.hbx_profile_id = new_hbx_profile._id
     @hbx_profile = new_hbx_profile
   end

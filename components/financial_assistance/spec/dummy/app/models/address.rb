@@ -1,5 +1,7 @@
- class Address
- include Mongoid::Document
+# frozen_string_literal: true
+
+class Address
+  include Mongoid::Document
   include Mongoid::Timestamps
 
   embedded_in :office_location

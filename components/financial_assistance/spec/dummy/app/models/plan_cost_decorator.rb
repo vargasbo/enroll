@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PlanCostDecorator < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :reference_plan
 
@@ -13,7 +15,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def plan_year_start_on
-    #FIXME only for temp ivl
+    #FIXME: only for temp ivl
     if @benefit_group.present?
       benefit_group.plan_year.start_on
     else
@@ -22,7 +24,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def child_index(member)
-    @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
+    @children = members.select{|member| age_of(member) < 21} unless defined?(@children)
     @children.index(member)
   end
 
@@ -61,7 +63,7 @@ class PlanCostDecorator < SimpleDelegator
       "grandchild" => nil,
       "unrelated" => nil,
       "great_grandparent" => nil,
-      "great_grandchild" => nil,
+      "great_grandchild" => nil
     }[person_relationship]
   end
 
@@ -72,7 +74,7 @@ class PlanCostDecorator < SimpleDelegator
 
   def employer_contribution_percent(member)
     relationship_benefit = relationship_benefit_for(member)
-    if relationship_benefit && relationship_benefit.offered?
+    if relationship_benefit&.offered?
       relationship_benefit.premium_pct
     else
       0.00
@@ -87,22 +89,22 @@ class PlanCostDecorator < SimpleDelegator
     # FIXME: I've just fixed this to use the plan rate cache - it seems there
     #        multiple areas where this isn't being used - we need to correct this.
     (reference_plan_member_premium(member) * large_family_factor(member)).round(2)
-  rescue
+  rescue StandardError
     0.00
   end
 
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
-    if relationship_benefit && relationship_benefit.offered?
+    if relationship_benefit&.offered?
       value = (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member))
-      BigDecimal.new("#{value}").round(2).to_f
+      BigDecimal(value.to_s).round(2).to_f
     else
       0.00
     end
   end
 
   def max_employer_contribution(member)
-    return @max_contribution_cache.fetch(member._id) if @max_contribution_cache.has_key?(member._id)
+    return @max_contribution_cache.fetch(member._id) if @max_contribution_cache.key?(member._id)
     @max_contribution_cache[member._id] = ((large_family_factor(member) * (reference_premium_for(member) * employer_contribution_percent(member))) / 100.00).round(2)
   end
 
@@ -113,9 +115,9 @@ class PlanCostDecorator < SimpleDelegator
 
   def employee_cost_for(member)
     (if @benefit_group.present?
-      premium_for(member) - employer_contribution_for(member)
-    else
-      __getobj__.premium_for(plan_year_start_on, age_of(member))
+       premium_for(member) - employer_contribution_for(member)
+     else
+       __getobj__.premium_for(plan_year_start_on, age_of(member))
     end * large_family_factor(member)).round(2)
   end
 

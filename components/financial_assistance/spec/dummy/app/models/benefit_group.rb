@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BenefitGroup
 
   include Mongoid::Document
@@ -8,10 +10,10 @@ class BenefitGroup
 
   attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
-  PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level)
-  EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
-  OFFSET_KINDS = [0, 1, 30, 60]
-  TERMINATE_ON_KINDS = %w(end_of_month)
+  PLAN_OPTION_KINDS = %w[single_plan single_carrier metal_level].freeze
+  EFFECTIVE_ON_KINDS = %w[date_of_hire first_of_month].freeze
+  OFFSET_KINDS = [0, 1, 30, 60].freeze
+  TERMINATE_ON_KINDS = %w[end_of_month].freeze
 
   PERSONAL_RELATIONSHIP_KINDS = [
     :employee,
@@ -76,13 +78,13 @@ class BenefitGroup
   accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
   def reference_plan=(new_reference_plan)
-    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan._id
     @reference_plan = new_reference_plan
   end
 
   def dental_reference_plan=(new_reference_plan)
-    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
     self.dental_reference_plan_id = new_reference_plan._id
     @dental_reference_plan = new_reference_plan
   end
@@ -97,26 +99,23 @@ class BenefitGroup
     @dental_reference_plan = Plan.find(dental_reference_plan_id) if dental_reference_plan_id.present?
   end
 
-
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
       if organization = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id }).first
         plan_year = organization.employer_profile.plan_years.where({"benefit_groups._id" => id }).first
         plan_year.benefit_groups.unscoped.detect{|bg| bg.id == id }
-      else
-        nil
       end
     end
   end
 
   def reference_plan=(new_reference_plan)
-    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan._id
     @reference_plan = new_reference_plan
   end
 
   def dental_reference_plan=(new_reference_plan)
-    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
     self.dental_reference_plan_id = new_reference_plan._id
     @dental_reference_plan = new_reference_plan
   end
@@ -134,11 +133,11 @@ class BenefitGroup
   def elected_plans=(new_plans)
     return unless new_plans.present?
 
-    if new_plans.is_a? Array
-      self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
-    else
-      self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
-    end
+    self.elected_plan_ids = if new_plans.is_a? Array
+                              new_plans.reduce([]) { |list, plan| list << plan._id }
+                            else
+                              Array.new(1, new_plans.try(:_id))
+                            end
 
     set_bounding_cost_plans
     @elected_plans = new_plans
@@ -165,15 +164,15 @@ class BenefitGroup
   def set_bounding_cost_plans
     return if reference_plan_id.nil?
 
-    if plan_option_kind == "single_plan"
-      plans = [reference_plan]
-    else
-      if plan_option_kind == "single_carrier"
-        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
-      else
-        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
-      end
-    end
+    plans = if plan_option_kind == "single_plan"
+              [reference_plan]
+            else
+              if plan_option_kind == "single_carrier"
+                Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+              else
+                Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+                      end
+            end
 
     set_lowest_and_highest(plans)
   end
@@ -191,10 +190,10 @@ class BenefitGroup
   end
 
   def set_lowest_and_highest(plans)
-    if plans.size > 0
+    unless plans.empty?
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 
-      self.lowest_cost_plan_id  = plans_by_cost.first.id
+      self.lowest_cost_plan_id = plans_by_cost.first.id
       @lowest_cost_plan = plans_by_cost.first
 
       self.highest_cost_plan_id = plans_by_cost.last.id
@@ -233,13 +232,13 @@ class BenefitGroup
 
   def build_relationship_benefits
     self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-       self.relationship_benefits.build(relationship: relationship, offered: true)
+      self.relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
   def build_dental_relationship_benefits
     self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-       self.dental_relationship_benefits.build(relationship: relationship, offered: true)
+      self.dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
@@ -251,17 +250,13 @@ class BenefitGroup
     end
   end
 
-  def monthly_employer_contribution_amount(plan = reference_plan)
-  end
+  def monthly_employer_contribution_amount(plan = reference_plan); end
 
-  def employee_cost_for_plan(ce, plan = reference_plan)
-  end
+  def employee_cost_for_plan(ce, plan = reference_plan); end
 
-  def monthly_min_employee_cost(coverage_kind = nil)
-  end
+  def monthly_min_employee_cost(coverage_kind = nil); end
 
-  def monthly_max_employee_cost(coverage_kind = nil)
-  end
+  def monthly_max_employee_cost(coverage_kind = nil); end
 
   def build_composite_tier_contributions
     composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
@@ -273,11 +268,11 @@ class BenefitGroup
     plan_option_kind == "single_plan"
   end
 
-  def sic_factor_for(plan)
-    return 1.0
+  def sic_factor_for(_plan)
+    1.0
   end
 
-  def group_size_factor_for(plan)
-    return 1.0
+  def group_size_factor_for(_plan)
+    1.0
   end
 end

@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module FinancialAssistance
-
   RSpec.describe Locations::Address, 'address validations' do
     describe 'with proper validations' do
       let(:address_kind) {'home'}
@@ -10,15 +11,15 @@ module FinancialAssistance
       let(:state) {'CA'}
       let(:zip) {'20171'}
 
-      let(:address_params) {
+      let(:address_params) do
         {
-            kind: address_kind,
-            address_1: address_1,
-            city: city,
-            state: state,
-            zip: zip
+          kind: address_kind,
+          address_1: address_1,
+          city: city,
+          state: state,
+          zip: zip
         }
-      }
+      end
 
       subject {FinancialAssistance::Locations::Address.new(address_params)}
 
@@ -113,15 +114,15 @@ module FinancialAssistance
     end
 
     describe 'view helpers/presenters' do
-      let(:address) {
+      let(:address) do
         FinancialAssistance::Locations::Address.new(
-            address_1: "An address line 1",
-            address_2: "An address line 2",
-            city: "A City",
-            state: "CA",
-            zip: "21222"
+          address_1: "An address line 1",
+          address_2: "An address line 2",
+          city: "A City",
+          state: "CA",
+          zip: "21222"
         )
-      }
+      end
 
       describe '#to_s' do
         it 'returns a string with a formated address' do
@@ -181,15 +182,15 @@ module FinancialAssistance
     end
 
     describe '#matches_addresses?' do
-      let(:address) {
+      let(:address) do
         FinancialAssistance::Locations::Address.new(
-            address_1: 'An address line 1',
-            address_2: 'An address line 2',
-            city: 'A City',
-            state: 'CA',
-            zip: '21222'
+          address_1: 'An address line 1',
+          address_2: 'An address line 2',
+          city: 'A City',
+          state: 'CA',
+          zip: '21222'
         )
-      }
+      end
 
       context 'addresses are the same' do
         let(:second_address) {address.clone}

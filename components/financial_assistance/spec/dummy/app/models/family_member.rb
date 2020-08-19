@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FamilyMember
   include Mongoid::Document
   include SetCurrentUser
@@ -67,7 +69,7 @@ class FamilyMember
   associated_with_one :person, :person_id, "Person"
 
   def former_family=(new_former_family)
-    raise ArgumentError.new("expected Family") unless new_former_family.is_a?(Family)
+    raise ArgumentError, "expected Family" unless new_former_family.is_a?(Family)
     self.former_family_id = new_former_family._id
     @former_family = new_former_family
   end
@@ -83,7 +85,7 @@ class FamilyMember
   end
 
   def households
-    # TODO parent.households.coverage_households.where()
+    # TODO: parent.households.coverage_households.where()
   end
 
   def broker=(new_broker)
@@ -129,7 +131,7 @@ class FamilyMember
   end
 
   def update_relationship(relationship)
-    return if (primary_relationship == relationship)
+    return if primary_relationship == relationship
     family.remove_family_member(person)
     self.reactivate!(relationship)
     family.save!
@@ -141,11 +143,11 @@ class FamilyMember
     family.family_members.detect { |member| member._id.to_s == family_member_id.to_s } unless family.blank?
   end
 
-  private 
+  private
 
   def no_duplicate_family_members
     return unless family
-    family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+    family.family_members.group_by { |appl| appl.person_id }.select { |_k, v| v.size > 1 }.each_pair do |k, _v|
       errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
     end
   end

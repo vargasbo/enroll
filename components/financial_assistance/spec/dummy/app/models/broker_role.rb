@@ -1,24 +1,26 @@
+# frozen_string_literal: true
+
 class BrokerRole
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  PROVIDER_KINDS = %W[broker assister]
+  PROVIDER_KINDS = %w[broker assister].freeze
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
-  }
+  }.freeze
 
   BROKER_CARRIER_APPOINTMENTS = {"Aetna Health Inc" => nil,
-    "Aetna Life Insurance Company" => nil,
-     "Carefirst Bluechoice Inc" => nil,
-     "Group Hospitalization and Medical Services Inc" => nil,
-     "Kaiser Foundation" => nil,
-     "Optimum Choice" => nil,
-     "United Health Care Insurance" => nil,
-     "United Health Care Mid Atlantic" => nil}
+                                 "Aetna Life Insurance Company" => nil,
+                                 "Carefirst Bluechoice Inc" => nil,
+                                 "Group Hospitalization and Medical Services Inc" => nil,
+                                 "Kaiser Foundation" => nil,
+                                 "Optimum Choice" => nil,
+                                 "United Health Care Insurance" => nil,
+                                 "United Health Care Mid Atlantic" => nil}.freeze
 
   embedded_in :person
 
@@ -37,7 +39,7 @@ class BrokerRole
   field :accept_new_clients, type: Boolean
   field :license, type: Boolean
   field :training, type: Boolean
-  field :carrier_appointments, type: Hash , default: BROKER_CARRIER_APPOINTMENTS
+  field :carrier_appointments, type: Hash, default: BROKER_CARRIER_APPOINTMENTS
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
@@ -46,7 +48,7 @@ class BrokerRole
       if new_broker_agency.nil?
         self.benefit_sponsors_broker_agency_profile_id = nil
       else
-        raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+        raise ArgumentError, "expected BenefitSponsors::Organizations::BrokerAgencyProfile class" unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
         self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
         @broker_agency_profile = new_broker_agency
       end
@@ -54,7 +56,7 @@ class BrokerRole
       if new_broker_agency.nil?
         self.broker_agency_profile_id = nil
       else
-        raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
+        raise ArgumentError, "expected BrokerAgencyProfile class" unless new_broker_agency.is_a? BrokerAgencyProfile
         self.broker_agency_profile_id = new_broker_agency._id
         @broker_agency_profile = new_broker_agency
       end

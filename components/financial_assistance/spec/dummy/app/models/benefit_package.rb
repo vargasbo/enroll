@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 class BenefitPackage
   include Mongoid::Document
   include Mongoid::Timestamps
 
   embedded_in :benefit_coverage_period
 
-  BENEFIT_BEGIN_AFTER_EVENT_OFFSET_KINDS = [0, 30, 60, 90]
-  BENEFIT_EFFECTIVE_DATE_KINDS      = %w(date_of_event first_of_month)
-  BENEFIT_TERMINATION_DATE_KINDS    = %w(date_of_event end_of_month)
+  BENEFIT_BEGIN_AFTER_EVENT_OFFSET_KINDS = [0, 30, 60, 90].freeze
+  BENEFIT_EFFECTIVE_DATE_KINDS      = %w[date_of_event first_of_month].freeze
+  BENEFIT_TERMINATION_DATE_KINDS    = %w[date_of_event end_of_month].freeze
 
 
-  PREMIUM_CREDIT_STRATEGY_KINDS  = %w(unassisted employer_fixed_cost employee_fixed_cost allocated_lump_sum_credit 
-                                      percentage_contribution indexed_percentage_contribution, federal_employee_health_benefit)
+  PREMIUM_CREDIT_STRATEGY_KINDS = %w[unassisted employer_fixed_cost employee_fixed_cost allocated_lump_sum_credit
+                                     percentage_contribution indexed_percentage_contribution federal_employee_health_benefit].freeze
 
 
   field :title, type: String, default: ""
@@ -25,12 +27,12 @@ class BenefitPackage
 
   delegate :start_on, :end_on, to: :benefit_coverage_period
 
-  delegate :market_places, :enrollment_periods, :family_relationships, :benefit_categories, 
+  delegate :market_places, :enrollment_periods, :family_relationships, :benefit_categories,
            :incarceration_status, :age_range, :citizenship_status, :residency_status, :ethnicity, :cost_sharing,
            to: :benefit_eligibility_element_group
 
-  delegate :market_places=, :enrollment_periods=, :family_relationships=, :benefit_categories=, 
-           :incarceration_status=, :age_range=, :citizenship_status=, :residency_status=, :ethnicity=, 
+  delegate :market_places=, :enrollment_periods=, :family_relationships=, :benefit_categories=,
+           :incarceration_status=, :age_range=, :citizenship_status=, :residency_status=, :ethnicity=,
            to: :benefit_eligibility_element_group
 
 

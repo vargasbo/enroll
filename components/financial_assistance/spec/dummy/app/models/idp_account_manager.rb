@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IdpAccountManager
   attr_accessor :provider
   include Singleton
@@ -5,6 +7,5 @@ class IdpAccountManager
   CURAM_NAVIGATION_FLAG = "2"
   ENROLL_NAVIGATION_FLAG = "1"
 
-  def self.create_account(email, username, password, personish, account_role, timeout = 15)
-  end
+  def self.create_account(email, username, password, personish, account_role, timeout = 15); end
 end

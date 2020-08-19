@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployerProfile
 
   include Mongoid::Document
@@ -43,15 +45,12 @@ class EmployerProfile
 
   def self.find(id)
     organizations = Organization.where("employer_profile._id" => BSON::ObjectId.from_string(id))
-    organizations.size > 0 ? organizations.first.employer_profile : nil
+    !organizations.empty? ? organizations.first.employer_profile : nil
   end
 
-  def active_plan_year
-  end
+  def active_plan_year; end
 
-  def is_converting?
-
-  end
+  def is_converting?; end
 
   def census_employees
     []

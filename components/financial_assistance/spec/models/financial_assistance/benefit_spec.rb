@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each do
@@ -64,13 +66,13 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
       end
 
       it 'with a title less than size range on step_1' do
-        benefit.title='TI'
+        benefit.title = 'TI'
         benefit.valid?(:step_1)
         expect(benefit.errors['title']).to include('pick a name length between 3..30')
       end
 
       it 'with a title less than size range on submission' do
-        benefit.title='TI'
+        benefit.title = 'TI'
         benefit.valid?(:submission)
         expect(benefit.errors['title']).to include('pick a name length between 3..30')
       end
@@ -191,7 +193,7 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
     context 'if step_1 and submit start_on validations' do
       it 'with a missing start_on' do
         benefit.start_on = nil
-        benefit.kind ='is_enrolled'
+        benefit.kind = 'is_enrolled'
         benefit.valid?(:step_1)
         expect(benefit.errors['start_on']).to include('Start On Date must be present')
         benefit.valid?(:submission)
@@ -209,10 +211,10 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
 
     context 'if step_1 and submit end on date occur before start on date' do
       it "end on date can't occur before start on date" do
-        now= Date.today
+        now = Date.today
         benefit.start_on = now
-        benefit.end_on = now-90
-        benefit.kind ='is_enrolled'
+        benefit.end_on = now - 90
+        benefit.kind = 'is_enrolled'
         benefit.valid?(:step_1)
         expect(benefit.errors['end_on']).to include("End On Date can't occur before Start On Date")
         benefit.valid?(:submission)

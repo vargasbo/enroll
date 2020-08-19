@@ -40,8 +40,8 @@ module FinancialAssistance
       income_from_irs
     ].freeze
 
-    JOB_INCOME_TYPE_KIND = 'wages_and_salaries'.freeze
-    NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'.freeze
+    JOB_INCOME_TYPE_KIND = 'wages_and_salaries'
+    NET_SELF_EMPLOYMENT_INCOME_KIND = 'net_self_employment'
     FREQUENCY_KINDS = %w[biweekly daily half_yearly monthly quarterly weekly yearly].freeze
 
     OTHER_INCOME_TYPE_KIND = {
@@ -60,7 +60,7 @@ module FinancialAssistance
       foreign: 'Foreign income',
       other: 'Other taxable income',
       prizes_and_awards: 'Prizes and awards',
-      scholorship_payments: 'Taxable scholarship payments',
+      scholorship_payments: 'Taxable scholarship payments'
     }.freeze
 
     field :title, type: String

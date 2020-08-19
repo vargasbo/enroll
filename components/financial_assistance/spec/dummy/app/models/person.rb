@@ -115,7 +115,7 @@ class Person
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
   embeds_many :general_agency_staff_roles, cascade_callbacks: true, validate: true
 
-   embeds_many :person_relationships, cascade_callbacks: true, validate: true, class_name: "::PersonRelationship"
+  embeds_many :person_relationships, cascade_callbacks: true, validate: true, class_name: "::PersonRelationship"
   embeds_many :addresses, cascade_callbacks: true, validate: true
   embeds_many :phones, cascade_callbacks: true, validate: true
   embeds_many :emails, cascade_callbacks: true, validate: true
@@ -393,8 +393,7 @@ class Person
     # notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id })
   end
 
-  def notify_updated
-  end
+  def notify_updated; end
 
   def is_aqhp?
     family = self.primary_family if self.primary_family
@@ -1249,11 +1248,11 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
-    if broker_role || broker_agency_staff_roles.present?
-      welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
-    else
-      welcome_body = "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
-    end
+    welcome_body = if broker_role || broker_agency_staff_roles.present?
+                     "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+                   else
+                     "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
+                   end
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: site_short_name.to_s)
   end

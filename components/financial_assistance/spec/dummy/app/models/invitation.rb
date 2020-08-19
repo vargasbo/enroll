@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Invitation
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -12,7 +14,7 @@ class Invitation
     "csr_role" => "csr_role",
     "hbx_staff_role" => "hbx_staff_role",
     "general_agency_staff_role" => "general_agency_staff_role"
-  }
+  }.freeze
   ROLES = INVITE_TYPES.values
   SOURCE_KINDS = INVITE_TYPES.keys
 
@@ -39,7 +41,7 @@ class Invitation
     state :claimed
 
     event :claim do
-      transitions from: :sent, to: :claimed, :after => Proc.new { |*args| process_claim!(*args) }
+      transitions from: :sent, to: :claimed, :after => proc { |*args| process_claim!(*args) }
     end
   end
 
@@ -84,7 +86,7 @@ class Invitation
     end
   end
 
-  def claim_employee_role(user_obj, redirection_obj)
+  def claim_employee_role(_user_obj, redirection_obj)
     census_employee = CensusEmployee.find(source_id)
     redirection_obj.redirect_to_employee_match(census_employee)
   end
@@ -92,10 +94,8 @@ class Invitation
   def allowed_invite_types
     result_type = INVITE_TYPES[self.source_kind]
     check_role = result_type.blank? ? nil : result_type.downcase
-    return if (self.source_kind.blank? || self.role.blank?)
-    if result_type != self.role.downcase
-      errors.add(:base, "a combination of source #{self.source_kind} and role #{self.role} is invalid")
-    end
+    return if self.source_kind.blank? || self.role.blank?
+    errors.add(:base, "a combination of source #{self.source_kind} and role #{self.role} is invalid") if result_type != self.role.downcase
   end
 
   def send_invitation!(invitee_name)
@@ -119,7 +119,7 @@ class Invitation
   end
 
   def self.invite_employee!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",
@@ -132,7 +132,7 @@ class Invitation
   end
 
   def self.invite_employee_for_open_enrollment!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",
@@ -145,7 +145,7 @@ class Invitation
   end
 
   def self.invite_future_employee_for_open_enrollment!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",
@@ -158,7 +158,7 @@ class Invitation
   end
 
   def self.invite_renewal_employee!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       created_at_range = Date.today.all_day
       return if self.invitation_already_sent?(
         census_employee,
@@ -180,7 +180,7 @@ class Invitation
   end
 
   def self.invite_initial_employee!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",

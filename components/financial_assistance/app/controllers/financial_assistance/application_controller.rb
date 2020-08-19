@@ -5,9 +5,9 @@ module FinancialAssistance
     protect_from_forgery with: :exception
 
     before_action :verify_financial_assistance_enabled
-    
+
     helper FinancialAssistance::Engine.helpers
-    
+
     layout "layouts/financial_assistance"
 
     private

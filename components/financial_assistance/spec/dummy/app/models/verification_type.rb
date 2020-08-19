@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 class VerificationType
   include Mongoid::Document
   include Mongoid::Timestamps
 
   embedded_in :person
 
-  ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"]
-  NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"]
+  ALL_VERIFICATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship", "Immigration status"].freeze
+  NON_CITIZEN_IMMIGRATION_TYPES = ["DC Residency", "Social Security Number", "American Indian Status"].freeze
 
-  VALIDATION_STATES = %w(na unverified pending review outstanding verified attested expired curam)
-  OUTSTANDING_STATES = %w(outstanding)
-  DUE_DATE_STATES = %w(review outstanding)
+  VALIDATION_STATES = %w[na unverified pending review outstanding verified attested expired curam].freeze
+  OUTSTANDING_STATES = %w[outstanding].freeze
+  DUE_DATE_STATES = %w[review outstanding].freeze
 
   field :type_name, type: String
   field :validation_status, type: String
@@ -22,7 +24,7 @@ class VerificationType
   field :updated_by
   field :inactive, type: Boolean #use this field (assign true) only if type was present but for some reason if is not applicable anymore
 
-  scope :active, -> { where(:inactive.ne => true ) }
+  scope :active, -> { where(:inactive.ne => true) }
   scope :by_name, ->(type_name) { where(:type_name => type_name) }
 
   # embeds_many :external_service_responses  -> needs datamigration
@@ -61,7 +63,7 @@ class VerificationType
   end
 
   def add_type_history_element(params)
-    type_history_elements<<TypeHistoryElement.new(params)
+    type_history_elements << TypeHistoryElement.new(params)
   end
 
   def verif_due_date

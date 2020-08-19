@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencyProfile
 
   include Mongoid::Document
@@ -30,7 +32,7 @@ class BrokerAgencyProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-  embeds_one  :inbox, as: :recipient, cascade_callbacks: true
+  embeds_one :inbox, as: :recipient, cascade_callbacks: true
   # embeds_many :documents, as: :documentable
   accepts_nested_attributes_for :inbox
 
@@ -38,12 +40,12 @@ class BrokerAgencyProfile
 
   def self.find(id)
     organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
-    organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+    !organizations.empty? ? organizations.first.broker_agency_profile : nil
   end
 
   def primary_broker_role=(new_primary_broker_role = nil)
     if new_primary_broker_role.present?
-      raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
+      raise ArgumentError, "expected BrokerRole class" unless new_primary_broker_role.is_a? BrokerRole
       self.primary_broker_role_id = new_primary_broker_role._id
     else
       unset("primary_broker_role_id")
@@ -60,7 +62,7 @@ class BrokerAgencyProfile
     def find(id)
       return nil if id.blank?
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
-      organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+      !organizations.empty? ? organizations.first.broker_agency_profile : nil
     end
   end
 

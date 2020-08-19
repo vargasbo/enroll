@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class VlpDocument
 
   include Mongoid::Document
@@ -19,5 +21,5 @@ class VlpDocument
     "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
     "Other (With Alien Number)",
     "Other (With I-94 Number)"
-  ]
+  ].freeze
 end

@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :user do
-    sequence(:email) {|n| "examplen}@example.com"}
-    sequence(:oim_id) {|n| "examplen}"}
+    sequence(:email) {|_n| "examplen}@example.com"}
+    sequence(:oim_id) {|_n| "examplen}"}
     gen_pass = User.generate_valid_password
     password gen_pass
     password_confirmation gen_pass
-    sequence(:authentication_token) {|n| "jn}-n}DwiJY4XwSnmywdMW"}
+    sequence(:authentication_token) {|_n| "jn}-n}DwiJY4XwSnmywdMW"}
     approved true
     roles ['web_service']
   end
@@ -20,10 +22,10 @@ FactoryBot.define do
   end
   trait :hbx_staff do
     roles ["hbx_staff"]
-    after :create do |user, evaluator|
+    after :create do |user, _evaluator|
       if user.person.present?
-      user.person.hbx_staff_role = FactoryBot.build :hbx_staff_role
-      user.save
+        user.person.hbx_staff_role = FactoryBot.build :hbx_staff_role
+        user.save
       end
     end
   end
@@ -64,10 +66,10 @@ FactoryBot.define do
       organization {}
     end
     after :create do |user, evaluator|
-      erson = FactoryBot.create :person, :with_family, :user => user
+      FactoryBot.create :person, :with_family, :user => user
       evaluator.organization.employer_profile = FactoryBot.create(:employer_profile,
-        employee_roles: [ FactoryBot.create(:employee_role, :person => user.person) ],
-        organization: evaluator.organization)
+                                                                  employee_roles: [FactoryBot.create(:employee_role, :person => user.person)],
+                                                                  organization: evaluator.organization)
       user.person.employer_staff_roles.push FactoryBot.create(:employer_staff_role, employer_profile_id: evaluator.organization.employer_profile.id)
       user.save
     end

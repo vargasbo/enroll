@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Acapi
   module Notifiers
     def notify(event_name, payload = {})

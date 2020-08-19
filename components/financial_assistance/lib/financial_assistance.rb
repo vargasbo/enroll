@@ -8,7 +8,6 @@ require 'dry-types'
 require 'dry-validation'
 
 module FinancialAssistance
-
   # Isolate the namespace portion of the passed class
   def parent_namespace_for(klass)
     klass_name = klass.to_s.split("::")
@@ -56,31 +55,30 @@ module FinancialAssistance
 
 
   # Ensure class type and integrity of date period ranges
-  def self.tidy_date_range(range_period, attribute = nil)
-
+  def self.tidy_date_range(range_period, _attribute = nil)
     return range_period if (range_period.begin.class == Date) && (range_period.end.class == Date) && (range_is_increasing? range_period)
 
     case range_period.begin
-      when Date
-        date_range  = range_period
-      when String
-        begin_on    = range_period.split("..")[0]
-        end_on      = range_period.split("..")[1]
-        date_range  = Date.strptime(beginning)..Date.strptime(ending)
-      when Time, DateTime
-        begin_on    = range_period.begin.to_date
-        end_on      = range_period.end.to_date
-        date_range  = begin_on..end_on
-      else
+    when Date
+      date_range = range_period
+    when String
+      begin_on = range_period.split("..")[0]
+      end_on = range_period.split("..")[1]
+      date_range = Date.strptime(begin_on)..Date.strptime(end_on)
+    when Time, DateTime
+      begin_on = range_period.begin.to_date
+      end_on = range_period.end.to_date
+      date_range = begin_on..end_on
+    else
         # @errors.add(attribute.to_sym, "values must be Date or Time") if attribute.present?
-        return nil
+      return nil
     end
 
     if range_is_increasing?(date_range)
-      return date_range
+      date_range
     else
       # @errors.add(attribute.to_sym, "end date may not preceed begin date") if attribute.present?
-      return nil
+      nil
     end
   end
 

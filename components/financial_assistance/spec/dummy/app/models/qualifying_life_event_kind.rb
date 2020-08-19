@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
   include Config::AcaModelConcern
 
-  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative]
-  MarketKinds = %w[shop]
+  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative].freeze
+  MarketKinds = %w[shop].freeze
 
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
+  EffectiveOnKinds = %w[date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date].freeze
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -42,7 +44,7 @@ class QualifyingLifeEventKind
     "exceptional_circumstances_domestic_abuse",
     "exceptional_circumstances_civic_service",
     "exceptional_circumstances"
-  ]
+  ].freeze
 
   field :event_kind_label, type: String
   field :action_kind, type: String
@@ -74,7 +76,7 @@ class QualifyingLifeEventKind
   validates :market_kind,
             presence: true,
             allow_blank: false,
-            allow_nil:   false,
+            allow_nil: false,
             inclusion: {in: MarketKinds}
 
   validates_presence_of :title, :market_kind, :effective_on_kinds, :pre_event_sep_in_days,
@@ -83,30 +85,30 @@ class QualifyingLifeEventKind
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
 
 
-  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, consumer_coverage_effective_on = nil)
+  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, _consumer_coverage_effective_on = nil)
     coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month.day)
-    if coverage_end_on == coverage_end_last_day_of_month
-      if TimeKeeper.date_of_record <= coverage_end_on
-        coverage_effective_on = coverage_end_last_day_of_month + 1.day
-      else
-        coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
-      end
-    else
-      if TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
-        coverage_effective_on = if selected_effective_on.blank?
+    coverage_effective_on = if coverage_end_on == coverage_end_last_day_of_month
+                              if TimeKeeper.date_of_record <= coverage_end_on
+                                coverage_end_last_day_of_month + 1.day
+                              else
+                                TimeKeeper.date_of_record.end_of_month + 1.day
+                                                      end
+                            else
+                              if TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
+                                if selected_effective_on.blank?
                                   [coverage_end_on.beginning_of_month, coverage_end_last_day_of_month + 1.day]
                                 else
                                   selected_effective_on
-                                end
-      else
-        coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
-      end
-    end
+                                                        end
+                              else
+                                TimeKeeper.date_of_record.end_of_month + 1.day
+                                                      end
+                            end
     coverage_effective_on
   end
 
   def is_dependent_loss_of_coverage?
-    %w(employee_gaining_medicare employer_sponsored_coverage_termination).include? reason
+    %w[employee_gaining_medicare employer_sponsored_coverage_termination].include? reason
   end
 
   def is_moved_to_dc?
@@ -120,7 +122,7 @@ class QualifyingLifeEventKind
 
   def family_structure_changed?
     #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
-    %w(birth adoption marriage divorce domestic_partnership).include? reason
+    %w[birth adoption marriage divorce domestic_partnership].include? reason
   end
 
   def is_loss_of_other_coverage?
@@ -144,6 +146,6 @@ class QualifyingLifeEventKind
   def date_hint
     start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
-      "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+    "(must fall between #{start_date.strftime('%B %d')} and #{end_date.strftime('%B %d')})"
   end
 end
