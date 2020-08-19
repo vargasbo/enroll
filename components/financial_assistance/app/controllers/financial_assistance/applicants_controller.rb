@@ -2,12 +2,9 @@
 
 module FinancialAssistance
   class ApplicantsController < ::ApplicationController
+    include ::UIHelpers::WorkflowController
 
     before_action :set_current_person
-
-    include ::UIHelpers::WorkflowController
-    include ApplicationHelper
-
     before_action :find, :find_application, :except => [:age_of_applicant, :primary_applicant_has_spouse] #except the ajax requests
     before_action :load_support_texts, only: [:other_questions, :step]
 
@@ -89,7 +86,7 @@ module FinancialAssistance
     def load_support_texts
       file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = support_text_placeholders raw_support_text
+      @support_texts = helpers.support_text_placeholders raw_support_text
     end
 
     def format_date_params(model_params)
