@@ -11,10 +11,7 @@ module FinancialAssistance
     before_action :family_relationships, only: :review_and_submit
 
     include ::UIHelpers::WorkflowController
-    include NavigationHelper
     include Acapi::Notifiers
-    include FinancialAssistance::L10nHelper
-    include ApplicationHelper
     require 'securerandom'
 
     def index
@@ -89,7 +86,7 @@ module FinancialAssistance
     end
 
     def generate_payload(application)
-      ActionController::Base.new.render_to_string(
+      ::FinancialAssistance::ApplicationController.new.render_to_string(
         "financial_assistance/events/financial_assistance_application",
         :formats => ["xml"],
         :locals => { :financial_assistance_application => @application }
@@ -221,7 +218,7 @@ module FinancialAssistance
     def check_eligibility
       call_service
       return if params['action'] == "get_help_paying_coverage_response"
-      [(flash[:error] = l10n(decode_msg(@message))), (redirect_to applications_path)] unless @assistance_status
+      [(flash[:error] = helpers.l10n(helpers.decode_msg(@message))), (redirect_to applications_path)] unless @assistance_status
     end
 
     def call_service
@@ -248,7 +245,8 @@ module FinancialAssistance
       end
       redirect_to application_checklist_applications_path
     end
-
+    
+    # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED
       coverage_year = @person.primary_family.application_applicable_year
@@ -276,6 +274,7 @@ module FinancialAssistance
       end
     end
 
+    # TODO: Remove dummy stuff before prod
     def dummy_data_5_year_bar(application)
       return unless application.primary_applicant.present? && ["bar5"].include?(application.family.primary_applicant.person.last_name.downcase)
       application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
@@ -292,7 +291,7 @@ module FinancialAssistance
     def load_support_texts
       file_path = Rails.root.to_s + "/app/views/financial_assistance/shared/support_text.yml"
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = support_text_placeholders raw_support_text
+      @support_texts = helpers.support_text_placeholders raw_support_text
     end
 
     def permit_params(attributes)

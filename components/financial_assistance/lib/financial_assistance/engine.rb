@@ -13,6 +13,7 @@ module FinancialAssistance
       FactoryBot.definition_file_paths << File.expand_path('../../../spec/factories', __FILE__) if defined?(FactoryBot)
     end
 
+
     config.generators do |g|
       g.orm :mongoid
       g.test_framework :rspec, :fixture => false
@@ -20,5 +21,9 @@ module FinancialAssistance
       g.assets false
       g.helper true
     end
+
+    # config.to_prepare do
+    #  FinancialAssistance::ApplicationController.helper Rails.application.helpers
+    # end
   end
 end

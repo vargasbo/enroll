@@ -5,7 +5,7 @@
     %sex= "urn:openhbx:terms:v1:gender#unknown"
   - else
     %sex= "urn:openhbx:terms:v1:gender##{person_demographics.gender}"
-  %birth_date= simple_date_for(person_demographics.dob)
+  %birth_date= simple_date_for(person_demographics.dob) 
   - if !person_demographics.is_incarcerated.present?
     %is_incarcerated= "false"
   - else

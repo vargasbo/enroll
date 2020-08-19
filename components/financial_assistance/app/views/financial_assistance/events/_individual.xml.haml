@@ -11,8 +11,7 @@
         %relationship_uri= "urn:openhbx:terms:v1:individual_relationship##{vocab_relationship_map(rel.kind)}"
         %object_individual
           %id= rel.relative.hbx_id
-=# TODO: Need to find where this is
-=# render :partial => "financial_assistance/events/person_demographics", :object => individual
+= render :partial => "financial_assistance/events/person_demographics", :object => individual
 - if individual.broker_role.present?
   - if !individual.broker_role.broker_agency_profile_id.blank?
     - broker_role = individual.broker_role
