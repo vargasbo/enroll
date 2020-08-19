@@ -262,7 +262,7 @@ module Factories
 
       if person.present? && person.persisted?
         relationship = person_relationship_for(dependent.employee_relationship)
-        primary.ensure_relationship_with(person, relationship)
+        primary.ensure_relationship_with(person, relationship, family_id)
         family.add_family_member(person) unless family.find_family_member_by_person(person)
       end
       person

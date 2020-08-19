@@ -10,6 +10,7 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
       p.save; p
     }
 
+
     let!(:child1)  { 
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "child")
@@ -57,10 +58,13 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
       end
 
       def build_person_relationships
-        person.person_relationships.build(relative: spouse, kind: "spouse")
-        person.person_relationships.build(relative: child1, kind: "child")
-        person.person_relationships.build(relative: child2, kind: "child")
+        person.person_relationships.build(successor_id: spouse.id, predecessor_id: person.id, kind: "spouse", family_id: source_family.id)
+        person.person_relationships.build(successor_id: child1.id, predecessor_id: person.id, kind: "parent", family_id: source_family.id)
+        person.person_relationships.build(successor_id: child2.id, predecessor_id: person.id, kind: "parent", family_id: source_family.id)
         person.save!
+        spouse.person_relationships.create(successor_id: person.id, predecessor_id: spouse.id, kind: "spouse", family_id: source_family.id)
+        child1.person_relationships.create(successor_id: person.id, predecessor_id: child1.id, kind: "child", family_id: source_family.id)
+        child2.person_relationships.create(successor_id: person.id, predecessor_id: child2.id, kind: "child", family_id: source_family.id)
       end
 
       def change_relationship

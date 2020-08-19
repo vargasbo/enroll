@@ -564,18 +564,25 @@ class Person
     end
   end
 
-  def ensure_relationship_with(person, relationship)
+  def ensure_relationship_with(person, relationship, family_id)
     return if person.blank?
-    existing_relationship = self.person_relationships.detect do |rel|
-      rel.relative_id.to_s == person.id.to_s
-    end
-    if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+    direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: person.id).first
+    inverse_relationship = person.person_relationships.where(family_id: family_id, predecessor_id: person.id, successor_id: self.id).first
+    if direct_relationship.present?
+      direct_relationship.update_attributes(:kind => PersonRelationship::InverseMap[relationship])
     elsif id != person.id
-      self.person_relationships << PersonRelationship.new({
-                                                            :kind => relationship,
-                                                            :relative_id => person.id
-                                                          })
+      self.person_relationships << PersonRelationship.new({:kind => PersonRelationship::InverseMap[relationship],
+                                                           :successor_id => person.id,
+                                                           :predecessor_id => self.id,
+                                                           :family_id => family_id})
+    end
+    if inverse_relationship.present?
+      inverse_relationship.update_attributes(:kind => relationship)
+    elsif id != person.id
+      person.person_relationships << PersonRelationship.new({:kind => relationship,
+                                                             :successor_id => self.id,
+                                                             :predecessor_id => person.id,
+                                                             :family_id => family_id})
     end
   end
 
