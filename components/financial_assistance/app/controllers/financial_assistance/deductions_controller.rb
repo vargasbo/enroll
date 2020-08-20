@@ -15,14 +15,14 @@ module FinancialAssistance
     def index
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
     def new
       @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
       load_steps
       current_step
-      render 'workflow/step', layout: 'financial_assistance'
+      render 'workflow/step', layout: 'financial_assistance_nav'
     end
 
     def step
@@ -44,14 +44,14 @@ module FinancialAssistance
             flash[:notice] = "Deduction Added - (#{@model.kind})"
             redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
           else
-            render 'workflow/step', layout: 'financial_assistance'
+            render 'workflow/step', layout: 'financial_assistance_nav'
           end
         else
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance'
+          render 'workflow/step', layout: 'financial_assistance_nav'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance'
+        render 'workflow/step', layout: 'financial_assistance_nav'
       end
     end
 
