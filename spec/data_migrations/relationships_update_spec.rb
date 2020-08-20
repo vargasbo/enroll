@@ -15,22 +15,22 @@ describe RelationshipsUpdate do
 
 
   describe "mike's family with relationships" do
-    let(:mike) { FactoryGirl.create(:person, first_name: "mike") }
-    let(:carol) { FactoryGirl.create(:person, first_name: "carol") }
-    let(:greg) { FactoryGirl.create(:person, first_name: "greg") }
-    let(:jan) { FactoryGirl.create(:person, first_name: "jan") }
+    let(:mike) { FactoryBot.create(:person, first_name: "mike") }
+    let(:carol) { FactoryBot.create(:person, first_name: "carol") }
+    let(:greg) { FactoryBot.create(:person, first_name: "greg") }
+    let(:jan) { FactoryBot.create(:person, first_name: "jan") }
     let!(:mikes_family) do
-      family = FactoryGirl.build(:family)
+      family = FactoryBot.build(:family)
       mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse", predecessor_id: mike.id, :successor_id => carol.id, family_id: family.id)
       mike.person_relationships << PersonRelationship.new(relative_id: greg.id, kind: "child", predecessor_id: mike.id, :successor_id => greg.id, family_id: family.id)
       mike.person_relationships << PersonRelationship.new(relative_id: jan.id, kind: "child", predecessor_id: mike.id, :successor_id => jan.id, family_id: family.id)
       mike.save
 
       family.family_members = [
-          FactoryGirl.build(:family_member, family: family, person: mike, is_primary_applicant: true),
-          FactoryGirl.build(:family_member, family: family, person: carol, is_primary_applicant: false),
-          FactoryGirl.build(:family_member, family: family, person: greg, is_primary_applicant: false),
-          FactoryGirl.build(:family_member, family: family, person: jan, is_primary_applicant: false)
+          FactoryBot.build(:family_member, family: family, person: mike, is_primary_applicant: true),
+          FactoryBot.build(:family_member, family: family, person: carol, is_primary_applicant: false),
+          FactoryBot.build(:family_member, family: family, person: greg, is_primary_applicant: false),
+          FactoryBot.build(:family_member, family: family, person: jan, is_primary_applicant: false)
       ]
       family.save
       family

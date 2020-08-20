@@ -3,9 +3,9 @@ require "rails_helper"
 RSpec.describe Insured::FamilyRelationshipsHelper, :type => :helper do
   describe "#calculate_age_by_dob" do
     context "return full name by id" do
-      let(:person) {FactoryGirl.create(:person, first_name: "first", last_name: "last")}
-      let(:test_family) {FactoryGirl.create(:family, :with_primary_family_member)}
-      let(:child) {FactoryGirl.create(:family_member, :family => test_family, :person => person)}
+      let(:person) {FactoryBot.create(:person, first_name: "first", last_name: "last")}
+      let(:test_family) {FactoryBot.create(:family, :with_primary_family_member)}
+      let(:child) {FactoryBot.create(:family_member, :family => test_family, :person => person)}
 
       it "should return family member's full_name" do
         assign(:family, test_family)

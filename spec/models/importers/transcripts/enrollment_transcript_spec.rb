@@ -9,7 +9,7 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
     let!(:spouse) { FactoryBot.create(:person) }
     let!(:child1) { FactoryBot.create(:person) }
     let!(:child2) { FactoryBot.create(:person) }
-    let!(:person)  { FactoryGirl.create(:person)}
+    let!(:person)  { FactoryBot.create(:person)}
 
     let(:source_effective_on) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
     let(:other_effective_on) { Date.new(TimeKeeper.date_of_record.year, 3, 1) }
