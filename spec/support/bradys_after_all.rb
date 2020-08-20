@@ -69,7 +69,7 @@ module BradysAfterAll
 
       mike.ensure_relationship_with(carol, 'spouse', family.id)
       brady_children.each do |child|
-        mike.ensure_relationship_with(child, 'parent', family.id)
+        mike.ensure_relationship_with(child, 'child', family.id)
       end
 
       family.add_family_member(mike, is_primary_applicant: true)
@@ -85,7 +85,7 @@ module BradysAfterAll
 
       carol.ensure_relationship_with(mike, 'spouse', family.id)
       brady_children.each do |child|
-        carol.ensure_relationship_with(child, 'parent', family.id)
+        carol.ensure_relationship_with(child, 'child', family.id)
       end
 
       family.add_family_member(carol, is_primary_applicant: true)

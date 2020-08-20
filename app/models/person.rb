@@ -546,11 +546,8 @@ class Person
     ridp_verification_types
   end
 
-  def relatives
+  def relatives(family_id)
     person_relationships.where(family_id: family_id).map(&:relative)
-    # person_relationships.reject do |p_rel|
-    #   p_rel.relative_id.to_s == self.id.to_s
-    # end.map(&:relative)
   end
 
   def find_relationship_with(other_person, family_id)
