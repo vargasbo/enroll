@@ -98,7 +98,7 @@ class PersonRelationship
 
   Kinds = SymmetricalRelationships | Relationships | BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
 
-  field :relative_id, type: BSON::ObjectId
+  field :relative_id, type: BSON::ObjectId # Deprecated
   field :kind, type: String
   field :predecessor_id, type: BSON::ObjectId
   field :successor_id, type: BSON::ObjectId

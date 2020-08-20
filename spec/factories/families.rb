@@ -64,10 +64,13 @@ FactoryBot.define do
     end
 
     trait :with_persisted_primary_family_member_and_dependent do
-      FactoryBot.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person)
-      FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryBot.create(:person, first_name: "John", last_name: "Doe"))
-      FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryBot.create(:person, first_name: "Alex", last_name: "Doe"))
-
+      family_members {
+        [
+          FactoryBot.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
+          FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryBot.create(:person, first_name: "John", last_name: "Doe")),
+          FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryBot.create(:person, first_name: "Alex", last_name: "Doe"))
+        ]
+      }
       before(:create)  do |family|
         family.family_members.each(&:save!)
         primary_person = family.primary_applicant.person
