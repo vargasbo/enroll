@@ -1,6 +1,9 @@
-require "rails_helper"
-include ActionView::Context
+# frozen_string_literal: true
+
 RSpec.describe "insured/family_relationships/_form.html.erb" do
+  require "rails_helper"
+  include ActionView::Context
+
   let(:person) { Person.new }
   let(:current_user) {FactoryBot.create(:user)}
   let(:test_family) {FactoryBot.create(:family, :with_primary_family_member)}
@@ -14,15 +17,15 @@ RSpec.describe "insured/family_relationships/_form.html.erb" do
   end
 
   it "should have title" do
-    expect(rendered).to match /Household Relationships/
+    expect(rendered).to match "Household Relationships"
   end
 
   it "should render form with missing relationship questions" do
-    expect(rendered).to match /Relationship to/
+    expect(rendered).to match "Relationship to"
   end
 
   it "should not display the message" do
-    expect(rendered).not_to match /All the relationships are added/
+    expect(rendered).not_to match "All the relationships are added"
   end
 
   it "should display family member's name" do
@@ -39,8 +42,8 @@ RSpec.describe "insured/family_relationships/_form.html.erb" do
     end
 
     it "should display message if all relationships are defined" do
-      expect(rendered).to match /Household Relationships/
-      expect(rendered).to match /All the relationships are added/
+      expect(rendered).to match "Household Relationships"
+      expect(rendered).to match "All the relationships are added"
     end
   end
 end

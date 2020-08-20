@@ -153,4 +153,3 @@ describe PersonRelationship, dbclean: :after_each do
     end
   end
 end
-

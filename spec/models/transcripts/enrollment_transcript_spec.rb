@@ -41,7 +41,7 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
       let(:source_enrollment_hbx_id1) { '1000001' }
       let(:source_enrollment_hbx_id2) { '1000002' }
 
-      let(:source_family) {
+      let(:source_family) do
         family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
         person.person_relationships.update_all(family_id: family.id)
         primary = family.family_members.build(is_primary_applicant: true, person: person)
@@ -56,11 +56,11 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
         enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
         enrollment.save!
 
-        enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: (source_effective_on), aasm_state: 'coverage_selected'})
-        enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
+        enrollment = family.active_household.hbx_enrollments.build hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: source_effective_on, aasm_state: 'coverage_selected'
+        enrollment.hbx_enrollment_members.build applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month)
         family.save
         family
-      }
+      end
 
       context "and enrollment member missing & plan hios is different" do
 
@@ -98,4 +98,3 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
     end
   end
 end
-

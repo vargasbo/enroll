@@ -557,7 +557,6 @@ end
 
 
 describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :after_each do
-
   let(:submitted_at)  { DateTime.current}
   let(:spouse)        { FactoryBot.create(:person, last_name: "richards", first_name: "denise") }
   let(:child)         { FactoryBot.create(:person, last_name: "sheen", first_name: "sam") }
@@ -574,7 +573,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:single_family)          { Family.find_or_build_from_employee_role(single_employee_role) }
   let(:married_family)         { Family.find_or_build_from_employee_role(married_employee_role) }
   let(:large_family)           { Family.find_or_build_from_employee_role(family_employee_role) }
-  
+
   let(:married_family) do
     family = Family.new
     married_dude.ensure_relationship_with(spouse, 'spouse', family.id)
@@ -1403,7 +1402,7 @@ describe Family, "given a primary applicant and 2 dependents with valid relation
   end
 
   it "should update relationships based on rules" do
-    matrix = test_family.build_relationship_matrix
+    test_family.build_relationship_matrix
     silbling_rule_relation = test_family.find_existing_relationship(greg_person.id, mary_person.id, test_family.id)
     expect(silbling_rule_relation).to eq "sibling"
 
@@ -1506,7 +1505,7 @@ context "verifying employee_role is active?" do
 end
 
 describe "remove_family_member" do
-  let(:family) { 
+  let(:family) {
     family = FactoryBot.create(:family, :with_primary_family_member_and_dependent)
     family
   }

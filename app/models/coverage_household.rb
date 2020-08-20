@@ -157,12 +157,12 @@ class CoverageHousehold
 
   def self.update_eligibility_for_family(family)
     family.households.each do |hh|
-     hh.coverage_households.each do |ch|
-       ch.evaluate_individual_market_eligiblity
-     end
-     hh.hbx_enrollments.each do |he|
-       he.evaluate_individual_market_eligiblity
-     end
+      hh.coverage_households.each do |ch|
+        ch.evaluate_individual_market_eligiblity
+      end
+      hh.hbx_enrollments.each do |he|
+        he.evaluate_individual_market_eligiblity
+      end
     end
 
     family.save!

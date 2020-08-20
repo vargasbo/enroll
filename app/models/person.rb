@@ -584,8 +584,6 @@ class Person
                                            :predecessor_id => person.id,
                                            :family_id => family_id})
     end
-
-    # binding.pry
   end
 
   def add_work_email(email)
