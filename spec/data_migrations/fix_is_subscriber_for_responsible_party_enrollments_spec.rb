@@ -16,18 +16,22 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
   describe "given an responsible party enrollment with no active subscribers" do
     let(:dependent_1) { FactoryBot.create(:person, hbx_id: 1, dob: TimeKeeper.date_of_record - 1.week, ssn: '555555551') }
     let(:dependent_2) { FactoryBot.create(:person, hbx_id: 2, dob: TimeKeeper.date_of_record - 1.year, ssn: '555555552') }
-    let(:family_relationships) { [
-      PersonRelationship.new(relative: dependent_1, kind: "child"),
-      PersonRelationship.new(relative: dependent_2, kind: "child")]
-    }
-    let(:subscriber) { FactoryBot.create(
+    let(:subscriber) do
+      person = FactoryBot.create(
       :person,
-      person_relationships: family_relationships,
       dob: TimeKeeper.date_of_record - 30.years,
       ssn: '555555550')
-    }
+      person
+    end
     let(:family_members) { [subscriber, dependent_1, dependent_2] }
-    let(:family) { FactoryBot.create(:family, :with_family_members, person: subscriber, people: family_members) }
+    let(:family) do
+      family = FactoryBot.build(:family, :with_primary_family_member, person: subscriber)
+      family.relate_new_member(dependent_1, 'child')
+      family.relate_new_member(dependent_2, 'child')
+      family.save
+      family
+    end
+
     let(:family_member_1) { family.family_members.where(person_id: dependent_1).first }
     let(:family_member_2) { family.family_members.where(person_id: dependent_2).first }
     let(:hbx_enrollment_member_1) {

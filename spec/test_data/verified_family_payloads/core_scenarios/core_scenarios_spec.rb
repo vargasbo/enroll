@@ -63,7 +63,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
 
-          let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
+          let(:family_db) { 
+            family = Family.where(e_case_id: parser.integrated_case_id).first 
+            family
+          }
           let(:tax_household_db) { family_db.active_household.tax_households.first }
           let(:person_db) { family_db.primary_applicant.person }
           let(:consumer_role_db) { person_db.consumer_role }
@@ -77,7 +80,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it "updates the tax household with aptc from the payload on the primary persons family" do
             if tax_household_db
               expect(tax_household_db).to be_truthy
-              expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
+              expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_households.last
               expect(tax_household_db.primary_applicant.family_member.person).to eq person
               expect(tax_household_db.allocated_aptc.to_f).to eq 0
               expect(tax_household_db.is_eligibility_determined).to be_truthy
@@ -123,7 +126,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should have a new tax household with the same aptc data" do
             if tax_household_db
-              updated_tax_household = tax_household_db.household.latest_active_tax_household
+              updated_tax_household = tax_household_db.household.latest_active_tax_households.last
               expect(updated_tax_household).to be_truthy
               expect(updated_tax_household.primary_applicant.family_member.person).to eq person
               expect(updated_tax_household.allocated_aptc.to_f).to eq 0

@@ -53,13 +53,19 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model, dbclean
           employee_role
         }
        
-        let!(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: family_members) }
-        let(:person) { FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name, person_relationships: family_relationships) }
+        let!(:family) do
+          family = Family.new
+          family.add_family_member(person, {is_primary_applicant: true})
+          family.relate_new_member(spouse, 'spouse')
+          family.relate_new_member(child, 'child')
+          family.save
+          family
+        end
+
+        let(:person) { FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name) }
         let(:ce) { renewing_employees[0] }
-        let(:family_members) { [person, spouse, child]}
         let(:spouse) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 50.years) }
         let(:child)  { FactoryBot.create(:person, dob: child_age) }
-        let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
 
         let!(:enrollment) {
           FactoryBot.create(
