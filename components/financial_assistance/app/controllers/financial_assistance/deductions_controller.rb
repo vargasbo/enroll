@@ -57,7 +57,7 @@ module FinancialAssistance
 
     def create
       format_date(params)
-      @deduction = @applicant.deductions.build permit_params(params[:financial_assistance_deduction])
+      @deduction = @applicant.deductions.build permit_params(params[:deduction])
 
       if @deduction.save
         render :create
@@ -69,7 +69,8 @@ module FinancialAssistance
     def update
       format_date(params)
       @deduction = @applicant.deductions.find params[:id]
-      if @deduction.update_attributes permit_params(params[:financial_assistance_deduction])
+
+      if @deduction.update_attributes permit_params(params[:deduction])
         render :update
       else
         render head: 'ok'
@@ -87,9 +88,9 @@ module FinancialAssistance
     private
 
     def format_date(params)
-      return if params[:financial_assistance_deduction].blank?
-      params[:financial_assistance_deduction][:start_on] = Date.strptime(params[:financial_assistance_deduction][:start_on].to_s, "%m/%d/%Y")
-      params[:financial_assistance_deduction][:end_on] = Date.strptime(params[:financial_assistance_deduction][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_deduction][:end_on].present?
+      return if params[:deduction].blank?
+      params[:deduction][:start_on] = Date.strptime(params[:deduction][:start_on].to_s, "%m/%d/%Y")
+      params[:deduction][:end_on] = Date.strptime(params[:deduction][:end_on].to_s, "%m/%d/%Y") if params[:deduction][:end_on].present?
     end
 
     # this might not be needed anymore as forms (with dates) have come out of the YAML. Refactor and Replace with the method above.
