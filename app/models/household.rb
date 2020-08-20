@@ -103,7 +103,7 @@ class Household
       new_dependents << [primary_person, "self", [verified_primary_family_member.id]]
 
       verified_tax_household.tax_household_members.each do |tax_household_member|
-        build_tax_household_member(tax_household, tax_household_member, new_dependents)
+        build_tax_household_member(th, tax_household_member, new_dependents)
       end
 
       build_verified_determinations(th, verified_tax_household)
