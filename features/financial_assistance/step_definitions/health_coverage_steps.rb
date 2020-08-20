@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^they should be taken to the applicant's Tax Info page \(health coverage\)$/) do
   expect(page).to have_content("Tax Info for #{consumer.person.first_name}")
 end
@@ -59,7 +61,7 @@ Then(/^the user saves the health coverage information$/) do
 end
 
 Then(/^the health coverage should be saved on the page$/) do
- expect(page).to have_content '02/01/2018'
+  expect(page).to have_content '02/01/2018'
 end
 
 Then(/^the health coverage checkbox should be unchecked$/) do
