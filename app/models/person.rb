@@ -550,18 +550,16 @@ class Person
     end.map(&:relative)
   end
 
-  def find_relationship_with(other_person)
+  def find_relationship_with(other_person, family_id)
     if self.id == other_person.id
       "self"
     else
-      person_relationship_for(other_person).try(:kind)
+      person_relationship_for(other_person, family_id).try(:kind)
     end
   end
 
-  def person_relationship_for(other_person)
-    person_relationships.detect do |person_relationship|
-      person_relationship.successor_id == other_person.id
-    end
+  def person_relationship_for(other_person, family_id)
+    person_relationships.where(successor_id: other_person.id, predecessor_id: self.id, family_id: family_id).first
   end
 
   def ensure_relationship_with(person, relationship, family_id)

@@ -65,14 +65,13 @@ module BradysAfterAll
     end
 
     def create_mikes_family
-      mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
-      mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
-      brady_children.each do |child|
-        mike.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
-      end
-      mike.save
-
       family = FactoryBot.build(:family)
+
+      mike.ensure_relationship_with(carol, 'spouse', family.id)
+      brady_children.each do |child|
+        mike.ensure_relationship_with(child, 'parent', family.id)
+      end
+
       family.add_family_member(mike, is_primary_applicant: true)
       (bradys - [mike]).each do |brady|
         family.add_family_member(brady)
@@ -82,14 +81,13 @@ module BradysAfterAll
     end
 
     def create_carols_family
-      carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
-      carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
-      brady_children.each do |child|
-        carol.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
-      end
-      carol.save
-
       family = FactoryBot.build(:family)
+
+      carol.ensure_relationship_with(mike, 'spouse', family.id)
+      brady_children.each do |child|
+        carol.ensure_relationship_with(child, 'parent', family.id)
+      end
+
       family.add_family_member(carol, is_primary_applicant: true)
       (bradys - [carol]).each do |brady|
         family.add_family_member(brady)

@@ -52,9 +52,11 @@ FactoryBot.define do
         ]
       }
       before(:create)  do |family, evaluator|
+        primary_person = family.primary_applicant.person
         family.dependents.each do |dependent|
-          family.relate_new_member(dependent.person, "child")
+          primary_person.ensure_relationship_with(dependent.person, 'parent', family.id)
         end
+        # primary_person.save
       end
     end
 
@@ -68,8 +70,9 @@ FactoryBot.define do
       }
       before(:create)  do |family, evaluator|
         family.family_members.each(&:save!)
+        primary_person = family.primary_applicant.person
         family.dependents.each do |dependent|
-          family.relate_new_member(dependent.person, "child")
+          primary_person.ensure_relationship_with(dependent.person, 'parent', family.id)
         end
 
         family.households.first.add_household_coverage_member(family.family_members.first)
@@ -128,15 +131,15 @@ FactoryBot.define do
         spouse = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
                   is_active: true, person: evaluator.significant_other)
         f.active_household.add_household_coverage_member(spouse)
-        f.relate_new_member(spouse.person, "spouse")
+        evaluator.primary_person.ensure_relationship_with(spouse.person, 'spouse', f.id)
         child = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
                   is_active: true, person: evaluator.disabled_child)
         f.active_household.add_household_coverage_member(child)
-        f.relate_new_member(child.person, "child")
+        evaluator.primary_person.ensure_relationship_with(child.person, 'parent', f.id)
         second_child = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
                   is_active: true, person: evaluator.second_disabled_child)
         f.active_household.add_household_coverage_member(second_child)
-        f.relate_new_member(second_child.person, "child")
+        evaluator.primary_person.ensure_relationship_with(second_child.person, 'parent', f.id)
       end
     end
   end
