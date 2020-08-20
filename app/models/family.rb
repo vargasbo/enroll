@@ -715,6 +715,7 @@ class Family
         # Note: Forms::FamilyMember.rb calls the save on destroy!
         # here is_active is only set in memory
         family_member.is_active = false
+        person.remove_relationship(self.id) #delete family reltionships associated to deleted member
         active_household.remove_family_member(family_member)
       end
       [true, "Successfully removed family member"]

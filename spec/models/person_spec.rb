@@ -75,9 +75,10 @@ describe Person, :dbclean => :after_each do
           expect(person.valid?).to be_truthy
         end
 
-        it "should known its relationship is self" do
-          expect(person.find_relationship_with(person)).to eq "self"
-        end
+        # We are no more saving self relationship
+        # it "should known its relationship is self" do
+        #   expect(person.find_relationship_with(person)).to eq "self"
+        # end
 
         it "unread message count is accurate" do
           expect(person.inbox).to be nil
@@ -713,17 +714,17 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe '#person_relationships' do
-    it 'accepts associated addresses' do
-      family = FactoryBot.create(:family, :with_primary_family_member)
-      person = family.primary_applicant.person
-      relationship = person.person_relationships.build(family_id: family.id, predecessor_id: person.id, successor_id: person.id, kind: 'self')
-
-      expect(person.save).to eq true
-      expect(person.person_relationships.size).to eq 1
-      expect(relationship.invert_relationship.kind).to eq "self"
-    end
-  end
+  # describe '#person_relationships' do
+  #   it 'accepts associated addresses' do
+  #     family = FactoryBot.create(:family, :with_primary_family_member)
+  #     person = family.primary_applicant.person
+  #     relationship = person.person_relationships.build(family_id: family.id, predecessor_id: person.id, successor_id: person.id, kind: 'self')
+  #
+  #     expect(person.save).to eq true
+  #     expect(person.person_relationships.size).to eq 1
+  #     expect(relationship.invert_relationship.kind).to eq "self"
+  #   end
+  # end
 
   describe '#full_name' do
     it 'returns the concatenated name attributes' do

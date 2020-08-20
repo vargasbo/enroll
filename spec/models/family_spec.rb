@@ -73,7 +73,6 @@ describe Family, type: :model, dbclean: :around_each do
   let(:person) do
     p = FactoryBot.build(:person)
     p.ensure_relationship_with(spouse, 'spouse', family.id)
-    # p.person_relationships.build(relative: spouse, kind: "spouse", family_id: family.id, successor_id: spouse.id, predecessor_id: p.id)
     p.save
     p
   end
@@ -184,15 +183,16 @@ describe Family, type: :model, dbclean: :around_each do
               family.valid?
             end
 
-            it "should not be valid" do
-              expect(family.errors[:family_members].any?).to be_truthy
-            end
+            #old_code
+            # it "should not be valid" do
+            #   expect(family.errors[:family_members].any?).to be_truthy
+            # end
           end
 
           context "and a second primary applicant is added" do
             let(:bob) do
               p = FactoryBot.create(:person, first_name: "Bob")
-              person.ensure_relationship_with(p, 'parent', family.id)
+              person.ensure_relationship_with(p, 'child', family.id)
               p
             end
 
@@ -565,7 +565,6 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
 
   let(:single_dude)   { FactoryBot.create(:person, last_name: "sheen", first_name: "tigerblood") }
   let(:married_dude)  { FactoryBot.build(:person, last_name: "sheen", first_name: "chuck") }
-
   let(:family_dude)  { FactoryBot.create(:person, last_name: "sheen", first_name: "charles") }
 
   let(:single_employee_role)    { FactoryBot.create(:employee_role, person: single_dude) }
@@ -579,7 +578,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:married_family) do
     family = Family.new
     married_dude.ensure_relationship_with(spouse, 'spouse', family.id)
-    married_dude.ensure_relationship_with(child, 'parent', family.id)
+    married_dude.ensure_relationship_with(child, 'child', family.id)
     family.build_from_employee_role(married_employee_role)
     family
   end
@@ -587,7 +586,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:large_family) do
     family = Family.new
     family_dude.ensure_relationship_with(spouse, 'spouse', family.id)
-    family_dude.ensure_relationship_with(child, 'parent', family.id)
+    family_dude.ensure_relationship_with(child, 'child', family.id)
     family_dude.ensure_relationship_with(grandpa, 'grandchild', family.id)
     family.build_from_employee_role(family_employee_role)
     family
@@ -1112,8 +1111,8 @@ describe Family, "with 2 households a person and 2 extended family members", :db
   before(:each) do
     f_id = family.id
     family.add_family_member(primary, is_primary_applicant: true)
-    family.relate_new_member(family_member_person_1, "unknown")
-    family.relate_new_member(family_member_person_2, "unknown")
+    family.relate_new_member(family_member_person_1, "unrelated")
+    family.relate_new_member(family_member_person_2, "unrelated")
     family.save!
   end
 
@@ -1127,7 +1126,7 @@ describe Family, "with 2 households a person and 2 extended family members", :db
   describe "when the one extended family member is moved to spouse" do
 
     before :each do
-      family.relate_new_member(family_member_person_1, "parent")
+      family.relate_new_member(family_member_person_1, "child")
       family.save!
     end
 
@@ -1309,6 +1308,125 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
       enrollment = family.active_household.hbx_enrollments.where(:coverage_kind => 'dental').first
       expect(enrollment.coverage_selected?).to be_truthy
     end
+  end
+end
+
+describe Family, "given a primary applicant and 2 dependents with unrelated relationships", dbclean: :after_each do
+  let(:test_family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let(:mike_person) {test_family.primary_applicant.person}
+  let(:carol) {FactoryBot.create(:family_member, :family => test_family, is_primary_applicant: false).person}
+  let(:mary) {FactoryBot.create(:family_member, :family => test_family, is_primary_applicant: false).person}
+
+  before do
+    carol.add_relationship(mike_person, "unrelated", test_family.id)
+    mike_person.add_relationship(carol, "unrelated", test_family.id)
+    mary.add_relationship(mike_person, "unrelated", test_family.id)
+    mike_person.add_relationship(mary, "unrelated", test_family.id)
+  end
+
+  it "should have some defined relationships" do
+    matrix = test_family.build_relationship_matrix
+    relationships = mike_person.person_relationships
+    missing_rel = test_family.find_missing_relationships(matrix)
+    expect(matrix.count).to eq 3
+    expect(relationships.size).to eq 2
+    expect(missing_rel.count).to eq 1
+  end
+
+  it "should not have wrong number defined relationships" do
+    matrix = test_family.build_relationship_matrix
+    relationships = mike_person.person_relationships
+    missing_rel = test_family.find_missing_relationships(matrix)
+    expect(matrix.count).not_to eq 13
+    expect(relationships.count).not_to eq 10
+    expect(missing_rel.count).not_to eq 0
+  end
+
+  it "should find correct relation" do
+    relation = test_family.find_existing_relationship(mike_person.id, carol.id, test_family.id)
+    expect(relation).to eq "unrelated"
+  end
+
+  it "should not find wrong relation" do
+    relation = test_family.find_existing_relationship(mike_person.id, carol.id, test_family.id)
+    expect(relation).not_to eq "spouse"
+  end
+
+  it "should return relationship kind if the relationship exists" do
+    expect(test_family.find_existing_relationship(carol.id, mike_person.id, test_family.id)).to eq "unrelated"
+  end
+
+  it "should not return any relationship kind if the relationship doesnot exists" do
+    expect(test_family.find_existing_relationship(carol.id, mike_person.id, test_family.id)).not_to eq "spouse"
+  end
+end
+
+describe Family, "given a primary applicant and 2 dependents with valid relationships", dbclean: :after_each do
+  let(:test_family) {FactoryBot.create(:family, :with_primary_family_member)}
+  let(:mike) {test_family.primary_applicant.person}
+  let(:carol_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:mary_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:jan_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:greg_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:cindy_person) {FactoryBot.create(:family_member, :family => test_family).person}
+
+
+  before do
+    carol_person.add_relationship(mike, "spouse", test_family.id)
+    mike.add_relationship(carol_person, "spouse", test_family.id)
+    mary_person.add_relationship(mike, "child", test_family.id)
+    mike.add_relationship(mary_person, "parent", test_family.id)
+    jan_person.add_relationship(mike, "unrelated", test_family.id)
+    mike.add_relationship(jan_person, "unrelated", test_family.id)
+    greg_person.add_relationship(mike, "child", test_family.id)
+    mike.add_relationship(greg_person, "parent", test_family.id)
+    cindy_person.add_relationship(mike, "parent", test_family.id)
+    mike.add_relationship(cindy_person, "child", test_family.id)
+  end
+
+  it "should have some defined raltionships" do
+    matrix = test_family.build_relationship_matrix
+    missing_rel = test_family.find_missing_relationships(matrix)
+    relationships = mike.person_relationships
+    expect(matrix.count).to eq 6
+    expect(relationships.size).to eq 5
+    expect(missing_rel.count).to eq 10
+  end
+
+  it "should not have wrong number defined raltionships" do
+    matrix = test_family.build_relationship_matrix
+    missing_rel = test_family.find_missing_relationships(matrix)
+    relationships = mike.person_relationships
+    expect(matrix.count).not_to eq 13
+    expect(relationships.count).not_to eq 10
+    expect(missing_rel.count).not_to eq 19
+  end
+
+  it "should update relationships based on rules" do
+    matrix = test_family.build_relationship_matrix
+    silbling_rule_relation = test_family.find_existing_relationship(greg_person.id, mary_person.id, test_family.id)
+    expect(silbling_rule_relation).to eq "sibling"
+
+    grandparent_rule_relation = test_family.find_existing_relationship(cindy_person.id, mary_person.id, test_family.id)
+    expect(grandparent_rule_relation).to eq "grandparent"
+
+    jan_person.add_relationship(carol_person, "child", test_family.id)
+    carol_person.add_relationship(jan_person, "parent", test_family.id)
+    mary_person.add_relationship(carol_person, "child", test_family.id)
+    carol_person.add_relationship(mary_person, "parent", test_family.id)
+    test_family.build_relationship_matrix
+    spouse_rule_relation = test_family.find_existing_relationship(greg_person.id, jan_person.id, test_family.id)
+    expect(spouse_rule_relation).to eq "sibling"
+
+    relation2 = test_family.find_existing_relationship(greg_person.id, mary_person.id, test_family.id)
+    expect(relation2).to eq "sibling"
+    relation3 = test_family.find_existing_relationship(mary_person.id, jan_person.id, test_family.id)
+    expect(relation3).to eq "sibling"
+  end
+
+  it "should not find wrong relation" do
+    relation = test_family.find_existing_relationship(mike.id, carol_person.id, test_family.id)
+    expect(relation).not_to eq "unrelated"
   end
 end
 

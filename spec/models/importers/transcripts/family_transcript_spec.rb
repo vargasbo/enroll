@@ -4,28 +4,10 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
   describe "find_or_build_family" do
 
-    let!(:spouse) do
-      p = FactoryBot.create(:person)
-      p.person_relationships.build(relative: person, kind: "spouse")
-      p.save; p
-    end
-
-    let!(:child1) do
-      p = FactoryBot.create(:person)
-      p.person_relationships.build(relative: person, kind: "child")
-      p.save; p
-    end
-
-    let!(:child2) do
-      p = FactoryBot.create(:person)
-      p.person_relationships.build(relative: person, kind: "child")
-      p.save; p
-    end
-
-    let!(:person) do
-      p = FactoryBot.build(:person)
-      p.save; p
-    end
+    let(:spouse) { FactoryGirl.create(:person)}
+    let(:child1) { FactoryGirl.create(:person)}
+    let(:person) { FactoryGirl.create(:person)}
+    let(:child2) { FactoryGirl.create(:person)}
 
     context "Family already exists" do
 
@@ -35,6 +17,9 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
         family.family_members.build(is_primary_applicant: false, person: spouse)
         family.family_members.build(is_primary_applicant: false, person: child1)
         family.save(:validate => false)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
         family
       end
 
@@ -43,6 +28,8 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
           hbx_assigned_id: '24112',
           e_case_id: "6754632"
           })
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
         family.family_members.build(is_primary_applicant: true, person: person)
         family.family_members.build(is_primary_applicant: false, person: child1)
         family.family_members.build(is_primary_applicant: false, person: child2)

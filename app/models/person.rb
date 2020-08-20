@@ -241,7 +241,9 @@ class Person
   index({"hbx_staff_role.is_active" => 1})
 
   # PersonRelationship child model indexes
-  index({"person_relationship.relative_id" =>  1})
+  # index({"person_relationship.relative_id" =>  1})
+  index({"person_relationship.predecessor_id" =>  1})
+  index({"person_relationship.successor_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
 
@@ -545,9 +547,10 @@ class Person
   end
 
   def relatives
-    person_relationships.reject do |p_rel|
-      p_rel.relative_id.to_s == self.id.to_s
-    end.map(&:relative)
+    person_relationships.where(family_id: family_id).map(&:relative)
+    # person_relationships.reject do |p_rel|
+    #   p_rel.relative_id.to_s == self.id.to_s
+    # end.map(&:relative)
   end
 
   def find_relationship_with(other_person, family_id)
