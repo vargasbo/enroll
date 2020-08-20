@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 require 'set'
 
 module SicConcern
@@ -82,3 +84,6 @@ module SicConcern
 
   ### Deleted in favor of more efficient method -- brianweiner 8/15
 end
+
+# rubocop:enable all
+

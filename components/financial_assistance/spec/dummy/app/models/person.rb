@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class Person
   include Config::AcaModelConcern
   include Config::SiteModelConcern
@@ -1320,3 +1322,5 @@ class Person
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
 end
+
+# rubocop:enable all

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module Config::ContactCenterHelper
   def contact_center_address_one
     Settings.contact_center.mailing_address.address_1
@@ -125,3 +127,6 @@ module Config::ContactCenterHelper
     Settings.contact_center.non_discrimination.complaint_url
   end
 end
+
+# rubocop:enable all
+

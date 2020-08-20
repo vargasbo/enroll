@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class TaxHouseholdMember
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -89,3 +91,5 @@ class TaxHouseholdMember
     @age_on_effective_date = age
   end
 end
+
+# rubocop:enable all

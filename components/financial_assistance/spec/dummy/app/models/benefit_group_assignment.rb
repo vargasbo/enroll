@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BenefitGroupAssignment
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -217,13 +219,12 @@ class BenefitGroupAssignment
   end
 
   def update_status_from_enrollment(hbx_enrollment)
-    if hbx_enrollment.coverage_kind == 'health'
-      change_state_without_event(:coverage_selected) if HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state)
+    return unless hbx_enrollment.coverage_kind == 'health'
+    change_state_without_event(:coverage_selected) if HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state)
 
-      change_state_without_event(:coverage_renewing) if HbxEnrollment::RENEWAL_STATUSES.include?(hbx_enrollment.aasm_state)
+    change_state_without_event(:coverage_renewing) if HbxEnrollment::RENEWAL_STATUSES.include?(hbx_enrollment.aasm_state)
 
-      change_state_without_event(:coverage_waived) if HbxEnrollment::WAIVED_STATUSES.include?(hbx_enrollment.aasm_state)
-    end
+    change_state_without_event(:coverage_waived) if HbxEnrollment::WAIVED_STATUSES.include?(hbx_enrollment.aasm_state)
   end
 
   def change_state_without_event(new_state)
@@ -341,3 +342,6 @@ class BenefitGroupAssignment
     end
   end
 end
+
+# rubocop:enable all
+

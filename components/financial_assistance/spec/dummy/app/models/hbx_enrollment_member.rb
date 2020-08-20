@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class HbxEnrollmentMember
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -126,3 +128,5 @@ class HbxEnrollmentMember
     self.errors.add(:is_subscriber, "You must select the primary applicant to enroll in the healthcare plan.") if self.hbx_enrollment.subscriber.nil?
   end
 end
+
+# rubocop:enable all

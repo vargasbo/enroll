@@ -10,6 +10,8 @@
 #
 # Family is a top level physical MongoDB Collection.
 
+# rubocop:disable all
+
 class Family
   require 'autoinc'
 
@@ -1453,3 +1455,6 @@ class Family
     unset("e_case_id") if e_case_id.blank?
   end
 end
+
+# rubocop:enable all
+

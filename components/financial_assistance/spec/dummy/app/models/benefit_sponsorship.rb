@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BenefitSponsorship
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -79,5 +81,6 @@ class BenefitSponsorship
       end
     end
   end
-
 end
+
+# rubocop:enable all

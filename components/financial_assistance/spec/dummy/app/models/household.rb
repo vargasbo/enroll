@@ -1,20 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize
-
-# rubocop:disable Metrics/CyclomaticComplexity
-
-# rubocop:disable Lint/UnusedMethodArgument
-
-# rubocop:disable Metrics/ParameterLists
-
-# rubocop:disable ShadowingOuterLocalVariable
-
-# rubocop:disable Style/GuardClause
-
-# rubocop:disable Metrics/MethodLength
-
-# rubocop:disable Naming/ConstantName
+# rubocop:disable all
 
 class Household
   include Mongoid::Document
@@ -501,19 +487,4 @@ class Household
   end
 end
 
-# rubocop:enable Metrics/AbcSize
-
-# rubocop:enable Metrics/CyclomaticComplexity
-
-# rubocop:enable Lint/UnusedMethodArgument
-
-# rubocop:enable Metrics/ParameterLists
-
-# rubocop:enable ShadowingOuterLocalVariable
-
-# rubocop:enable Style/GuardClause
-
-# rubocop:enable Metrics/MethodLength
-
-# rubocop:enable Naming/ConstantName
-
+# rubocop:disable end

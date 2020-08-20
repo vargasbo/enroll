@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 require "financial_assistance/engine"
 require "mongoid"
 require "aasm"
@@ -86,3 +88,5 @@ module FinancialAssistance
     range.begin < range.end
   end
 end
+
+# rubocop:enable all

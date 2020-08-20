@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class GeneralAgencyStaffRole
   include Mongoid::Document
   include SetCurrentUser
@@ -165,3 +167,6 @@ class GeneralAgencyStaffRole
     )
   end
 end
+
+# rubocop:enable all
+

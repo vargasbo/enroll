@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module FinancialAssistance
   module EventsHelper
     def xml_iso8601_for(date_time)
@@ -83,3 +85,5 @@ module FinancialAssistance
     end
   end
 end
+
+# rubocop:enable all

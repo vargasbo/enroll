@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BenefitGroup
 
   include Mongoid::Document
@@ -276,3 +278,6 @@ class BenefitGroup
     1.0
   end
 end
+
+# rubocop:enable all
+

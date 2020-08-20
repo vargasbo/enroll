@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BrokerAgencyStaffRole
   include Mongoid::Document
   include SetCurrentUser
@@ -131,3 +133,6 @@ class BrokerAgencyStaffRole
                                                               event: aasm.current_event)
   end
 end
+
+# rubocop:enable all
+

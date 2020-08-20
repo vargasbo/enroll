@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module MongoidSupport
   module AssociationProxies
     def self.included(base)
@@ -34,3 +36,5 @@ module MongoidSupport
     end
   end
 end
+
+# rubocop:enable all

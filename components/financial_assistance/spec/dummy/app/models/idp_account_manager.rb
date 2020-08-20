@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class IdpAccountManager
   attr_accessor :provider
   include Singleton
@@ -9,3 +11,5 @@ class IdpAccountManager
 
   def self.create_account(email, username, password, personish, account_role, timeout = 15); end
 end
+
+# rubocop:enable all

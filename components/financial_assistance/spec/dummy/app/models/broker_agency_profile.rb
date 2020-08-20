@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BrokerAgencyProfile
 
   include Mongoid::Document
@@ -72,3 +74,5 @@ class BrokerAgencyProfile
     build_inbox if inbox.nil?
   end
 end
+
+# rubocop:enable all

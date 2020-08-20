@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module Config::ContactCenterModelConcern
   extend ActiveSupport::Concern
 
@@ -28,3 +30,5 @@ module Config::ContactCenterModelConcern
     end
   end
 end
+
+# rubocop:enable all

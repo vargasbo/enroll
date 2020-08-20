@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class Plan
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -341,3 +343,6 @@ class MetalLevel
     metal_level
   end
 end
+
+# rubocop:enable all
+

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module Config::AcaConcern
   def aca_qle_period
     Settings.aca.qle.with_in_sixty_days
@@ -35,3 +37,5 @@ module Config::AcaConcern
     end
   end
 end
+
+# rubocop:enable all

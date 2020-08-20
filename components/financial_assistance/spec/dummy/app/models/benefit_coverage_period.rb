@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BenefitCoveragePeriod
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -143,3 +145,5 @@ class BenefitCoveragePeriod
   end
 
 end
+
+# rubocop:enable all

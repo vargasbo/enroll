@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module Config::AcaModelConcern
   extend ActiveSupport::Concern
 
@@ -123,3 +125,5 @@ module Config::AcaModelConcern
     end
   end
 end
+
+# rubocop:enable all

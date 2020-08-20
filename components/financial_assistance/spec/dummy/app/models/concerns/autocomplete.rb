@@ -23,15 +23,15 @@ module Autocomplete
   end
 
   # turn strings into autocomplete keys
-  def self.normalize(s)
-    s = s.downcase
-    s = s.gsub("'", "")
-    s = s.gsub("&", " and ")
-    s = s.gsub(/[^a-z0-9 ]/, " ")
-    s = s.gsub(/ the /, "")
-    s = s.squish
-    s = " #{s}"
-    s
+  def self.normalize(string)
+    string = string.downcase
+    string = string.gsub("'", "")
+    string = string.gsub("&", " and ")
+    string = string.gsub(/[^a-z0-9 ]/, " ")
+    string = string.gsub(/ the /, "")
+    string = string.squish
+    string = " #{string}"
+    string
   end
 
   def self.search(query)

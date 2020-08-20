@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module Caches
   class SicCodesCache
 
     def self.load
       self.grouped_sic_codes
     end
-
-    private
 
     def self.grouped_sic_codes
       @@grouped_sic_codes ||= {}
@@ -20,3 +20,5 @@ module Caches
     end
   end
 end
+
+# rubocop:enable all

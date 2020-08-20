@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module Forms
   class PersonSignup
     include ActiveModel::Validations
@@ -64,3 +66,6 @@ module Forms
     end
   end
 end
+
+# rubocop:enable all
+

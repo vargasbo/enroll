@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class GeneralAgencyProfile
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -167,3 +169,6 @@ class GeneralAgencyProfile
     build_inbox if inbox.nil?
   end
 end
+
+# rubocop:enable all
+

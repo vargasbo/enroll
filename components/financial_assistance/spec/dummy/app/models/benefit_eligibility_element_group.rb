@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BenefitEligibilityElementGroup
   include Mongoid::Document
 
@@ -63,3 +65,6 @@ class BenefitEligibilityElementGroup
   field :active_individual_role, type: Boolean, default: false
 
 end
+
+# rubocop:enable all
+

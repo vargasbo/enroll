@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class BrokerRole
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -52,14 +54,12 @@ class BrokerRole
         self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
         @broker_agency_profile = new_broker_agency
       end
+    elsif new_broker_agency.nil?
+      self.broker_agency_profile_id = nil
     else
-      if new_broker_agency.nil?
-        self.broker_agency_profile_id = nil
-      else
-        raise ArgumentError, "expected BrokerAgencyProfile class" unless new_broker_agency.is_a? BrokerAgencyProfile
-        self.broker_agency_profile_id = new_broker_agency._id
-        @broker_agency_profile = new_broker_agency
-      end
+      raise ArgumentError, "expected BrokerAgencyProfile class" unless new_broker_agency.is_a? BrokerAgencyProfile
+      self.broker_agency_profile_id = new_broker_agency._id
+      @broker_agency_profile = new_broker_agency
     end
   end
 
@@ -84,3 +84,6 @@ class BrokerRole
     end
   end
 end
+
+# rubocop:enable all
+

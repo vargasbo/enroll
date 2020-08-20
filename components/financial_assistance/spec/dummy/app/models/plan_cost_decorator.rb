@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class PlanCostDecorator < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :reference_plan
 
@@ -136,3 +138,5 @@ class PlanCostDecorator < SimpleDelegator
     # end).round(2)
   end
 end
+
+# rubocop:enable all

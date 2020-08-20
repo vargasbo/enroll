@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 class ConsumerRole
   RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.residency.verification_request"
 
@@ -1167,5 +1169,7 @@ class ConsumerRole
     OpenStruct.new({:determined_at => Time.now,
                     :vlp_authority => authority})
   end
-
 end
+
+# rubocop:enable all
+

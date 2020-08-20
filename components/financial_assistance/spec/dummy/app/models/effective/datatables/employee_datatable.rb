@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable all
+
 module Effective
   module Datatables
     class EmployeeDatatable < Effective::MongoidDatatable
@@ -218,3 +220,5 @@ module Effective
     end
   end
 end
+
+# rubocop:enable all
