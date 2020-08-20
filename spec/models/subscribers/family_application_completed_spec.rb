@@ -509,7 +509,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "should has the following relations under primary family person" do
-          binding.pry
           expect(family_db.family_members.map(&:primary_relationship)).to eq ["self", "spouse", "parent", "parent"]
         end
 

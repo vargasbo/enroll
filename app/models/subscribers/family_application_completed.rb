@@ -79,6 +79,7 @@ module Subscribers
       end
 
       family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
+      family.primary_applicant.person.save
       family.save!
     end
 
