@@ -501,9 +501,9 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   end
 
   describe "update existing relationship" do
-    let(:dependent_person) {FactoryGirl.create(:family_member, family: test_family).person}
+    let(:dependent_person) {FactoryBot.create(:family_member, family: test_family).person}
     let(:primary_person) {test_family.primary_applicant.person}
-    let(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     it "should the old relationship from spouse to child" do
       primary_person.person_relationships.create(predecessor_id: primary_person.id, :successor_id => dependent_person.id, :kind => "spouse", family_id: test_family.id)

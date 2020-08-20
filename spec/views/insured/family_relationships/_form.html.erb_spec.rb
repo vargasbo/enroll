@@ -5,11 +5,11 @@ RSpec.describe "insured/family_relationships/_form.html.erb" do
   include ActionView::Context
 
   let(:person) { Person.new }
-  let(:current_user) {FactoryGirl.create(:user)}
-  let(:test_family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:current_user) {FactoryBot.create(:user)}
+  let(:test_family) {FactoryBot.create(:family, :with_primary_family_member)}
   let(:relationship_kinds) {PersonRelationship::Relationships}
-  let(:child) {FactoryGirl.create(:family_member, :family => test_family).person}
-  let(:unrelated_member) {FactoryGirl.create(:family_member, :family => test_family).person}
+  let(:child) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:unrelated_member) {FactoryBot.create(:family_member, :family => test_family).person}
   let(:missing_relationships){ [{child.id => unrelated_member.id}]}
   before :each do
     assign(:family, test_family)

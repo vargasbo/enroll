@@ -3,11 +3,11 @@
 require 'rails_helper'
 
 describe "insured/family_relationships/index.html.erb" do
-  let(:person) { FactoryGirl.create(:person) }
-  let(:user) { FactoryGirl.create(:user, person: person) }
+  let(:person) { FactoryBot.create(:person) }
+  let(:user) { FactoryBot.create(:user, person: person) }
   let(:family) { Family.new }
-  let(:test_family){FactoryGirl.create(:family, :with_primary)}
-  let(:family_member2) {FactoryGirl.create}
+  let(:test_family){FactoryBot.create(:family, :with_primary)}
+  let(:family_member2) {FactoryBot.create()}
 
   before :each do
     sign_in user

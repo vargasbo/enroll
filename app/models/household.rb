@@ -220,18 +220,7 @@ class Household
     end
   end
 
-  def add_tax_household_family_member(family_member, verified_tax_household_member)
-    th = latest_active_tax_household
-    th.tax_household_members.build(
-      family_member: family_member,
-      is_subscriber: false,
-      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
-    )
-    th.save!
-  end
-
   def effective_ending_on_gt_effective_starting_on
-
     return if effective_ending_on.nil?
     return if effective_starting_on.nil?
 
@@ -265,9 +254,8 @@ class Household
     coverage_households.sort_by(&:submitted_at).last.submitted_at
   end
 
-  def latest_active_tax_household
-    return tax_households.first if tax_households.length == 1
-    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+  def latest_active_tax_households
+    tax_households.where(effective_ending_on: nil, is_eligibility_determined: true)
   end
 
   def latest_active_tax_household_with_year(year)

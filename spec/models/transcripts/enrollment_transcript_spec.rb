@@ -7,7 +7,7 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
     let!(:spouse) { FactoryBot.create(:person) }
     let!(:child1) { FactoryBot.create(:person) }
     let!(:child2) { FactoryBot.create(:person) }
-    let!(:person)  { FactoryGirl.create(:person)}
+    let!(:person)  { FactoryBot.create(:person)}
 
     context "Family already exists" do
 

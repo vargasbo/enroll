@@ -72,7 +72,7 @@ describe Family, type: :model, dbclean: :around_each do
   let(:spouse)  { FactoryBot.create(:person)}
   let(:person) do
     p = FactoryBot.build(:person)
-    p.person_relationships.build(predecessor_id: p.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
+    p.ensure_relationship_with(spouse, 'spouse', family.id)
     p.save
     p
   end
@@ -192,7 +192,7 @@ describe Family, type: :model, dbclean: :around_each do
           context "and a second primary applicant is added" do
             let(:bob) do
               p = FactoryBot.create(:person, first_name: "Bob")
-              person.person_relationships << PersonRelationship.new(relative: p, kind: "parent")
+              person.ensure_relationship_with(p, 'child', family.id)
               p
             end
 
@@ -227,7 +227,7 @@ describe Family, type: :model, dbclean: :around_each do
               let(:second_family_member_person) { FamilyMember.new(person: person) }
 
               before do
-                spouse.person_relationships.build(predecessor_id: spouse.id, :successor_id => person.id, :kind => "spouse", family_id: second_family.id)
+                spouse.ensure_relationship_with(person, 'spouse', family.id)
                 second_family.family_members = [second_family_member_person, second_family_member_spouse]
               end
 
@@ -557,56 +557,14 @@ end
 
 
 describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :after_each do
-
-  let(:family1) { FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:family2) do
-    f = FactoryGirl.create(:family, :with_primary_family_member)
-    s_mem = f.add_family_member(spouse)
-    spouse.build_relationship(f.primary_applicant.person, "spouse", f.id)
-    f.primary_applicant.person.build_relationship(spouse, "spouse", f.id)
-    f.active_household.add_household_coverage_member(s_mem)
-    c_mem = f.add_family_member(child)
-    child.build_relationship(f.primary_applicant.person, "child", f.id)
-    f.primary_applicant.person.build_relationship(child, "parent", f.id)
-    f.active_household.add_household_coverage_member(c_mem)
-    f.save
-    f
-  end
-  let(:family3) do
-    f = FactoryGirl.create(:family, :with_primary_family_member)
-    s_mem = f.add_family_member(spouse)
-    spouse.build_relationship(f.primary_applicant.person, "spouse", f.id)
-    f.primary_applicant.person.build_relationship(spouse, "spouse", f.id)
-    f.active_household.add_household_coverage_member(s_mem)
-    c_mem = f.add_family_member(child)
-    child.build_relationship(f.primary_applicant.person, "child", f.id)
-    f.primary_applicant.person.build_relationship(child, "parent", f.id)
-    f.active_household.add_household_coverage_member(c_mem)
-    g_mem = f.add_family_member(grandpa)
-    grandpa.build_relationship(f.primary_applicant.person, "parent", f.id)
-    f.primary_applicant.person.build_relationship(grandpa, "child", f.id)
-    f.active_household.add_household_coverage_member(g_mem)
-    f.save
-    f
-  end
   let(:submitted_at)  { DateTime.current}
   let(:spouse)        { FactoryBot.create(:person, last_name: "richards", first_name: "denise") }
   let(:child)         { FactoryBot.create(:person, last_name: "sheen", first_name: "sam") }
   let(:grandpa)       { FactoryBot.create(:person, last_name: "sheen", first_name: "martin") }
 
-  # let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
-  #                                PersonRelationship.new(relative: child, kind: "child")] }
-  # let(:family_relationships)  {  married_relationships <<
-  #                                PersonRelationship.new(relative: grandpa, kind: "grandparent") }
-  #
-  # let(:single_dude)   { FactoryBot.create(:person, last_name: "sheen", first_name: "tigerblood") }
-  # let(:married_dude)  { FactoryBot.create(:person, last_name: "sheen", first_name: "chuck",
-  #                                          person_relationships: married_relationships ) }
-  # let(:family_dude)   { FactoryBot.create(:person, last_name: "sheen", first_name: "charles",
-  #                                          person_relationships: family_relationships ) }
-  let(:single_dude)   { family1.primary_applicant.person }
-  let(:married_dude)  { family2.primary_applicant.person }
-  let(:family_dude)   { family3.primary_applicant.person }
+  let(:single_dude)   { FactoryBot.create(:person, last_name: "sheen", first_name: "tigerblood") }
+  let(:married_dude)  { FactoryBot.build(:person, last_name: "sheen", first_name: "chuck") }
+  let(:family_dude)  { FactoryBot.create(:person, last_name: "sheen", first_name: "charles") }
 
   let(:single_employee_role)    { FactoryBot.create(:employee_role, person: single_dude) }
   let(:married_employee_role)   { FactoryBot.create(:employee_role, person: married_dude) }
@@ -616,6 +574,22 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:married_family)         { Family.find_or_build_from_employee_role(married_employee_role) }
   let(:large_family)           { Family.find_or_build_from_employee_role(family_employee_role) }
 
+  let(:married_family) do
+    family = Family.new
+    married_dude.ensure_relationship_with(spouse, 'spouse', family.id)
+    married_dude.ensure_relationship_with(child, 'child', family.id)
+    family.build_from_employee_role(married_employee_role)
+    family
+  end
+
+  let(:large_family) do
+    family = Family.new
+    family_dude.ensure_relationship_with(spouse, 'spouse', family.id)
+    family_dude.ensure_relationship_with(child, 'child', family.id)
+    family_dude.ensure_relationship_with(grandpa, 'grandchild', family.id)
+    family.build_from_employee_role(family_employee_role)
+    family
+  end
 
   context "when no families exist" do
     context "and employee is single" do
@@ -721,31 +695,31 @@ describe Family, "given an inactive member" do
   end
 end
 
-describe Family, "with a primary applicant" do
-  describe "given a new person and relationship to make to the primary applicant" do
-    let(:primary_person_id) { double }
-    let(:primary_applicant) { instance_double(Person, :person_relationships => [], :id => primary_person_id) }
-    let(:relationship) { double }
-    let(:employee_role) { double(:person => primary_applicant) }
-    let(:dependent_id) { double }
-    let(:dependent) { double(:id => dependent_id) }
+# describe Family, "with a primary applicant" do
+#   describe "given a new person and relationship to make to the primary applicant" do
+#     let(:primary_person_id) { double }
+#     let(:primary_applicant) { instance_double(Person, :person_relationships => [], :id => primary_person_id) }
+#     let(:relationship) { double }
+#     let(:employee_role) { double(:person => primary_applicant) }
+#     let(:dependent_id) { double }
+#     let(:dependent) { double(:id => dependent_id) }
 
-    subject {
-      fam = Family.new
-      fam.build_from_employee_role(employee_role)
-      fam
-    }
+#     subject {
+#       fam = Family.new
+#       fam.build_from_employee_role(employee_role)
+#       fam
+#     }
 
-    before(:each) do
-      allow(primary_applicant).to receive(:ensure_relationship_with).with(dependent, "spouse", subject.id)
-      allow(primary_applicant).to receive(:find_relationship_with).with(dependent, subject.id).and_return(nil)
-    end
+#     before(:each) do
+#       allow(primary_applicant).to receive(:ensure_relationship_with).with(dependent, "spouse")
+#       allow(primary_applicant).to receive(:find_relationship_with).with(dependent).and_return(nil)
+#     end
 
-    it "should relate the person and create the family member" do
-      # subject.relate_new_member(dependent, "spouse")
-    end
-  end
-end
+#     it "should relate the person and create the family member" do
+#       # subject.relate_new_member(dependent, "spouse")
+#     end
+#   end
+# end
 
 describe Family, "large family with multiple employees - The Brady Bunch", :dbclean => :after_all do
   include_context "BradyBunchAfterAll"
@@ -1337,10 +1311,10 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
 end
 
 describe Family, "given a primary applicant and 2 dependents with unrelated relationships", dbclean: :after_each do
-  let(:test_family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:test_family) {FactoryBot.create(:family, :with_primary_family_member)}
   let(:mike_person) {test_family.primary_applicant.person}
-  let(:carol) {FactoryGirl.create(:family_member, :family => test_family, is_primary_applicant: false).person}
-  let(:mary) {FactoryGirl.create(:family_member, :family => test_family, is_primary_applicant: false).person}
+  let(:carol) {FactoryBot.create(:family_member, :family => test_family, is_primary_applicant: false).person}
+  let(:mary) {FactoryBot.create(:family_member, :family => test_family, is_primary_applicant: false).person}
 
   before do
     carol.add_relationship(mike_person, "unrelated", test_family.id)
@@ -1387,13 +1361,13 @@ describe Family, "given a primary applicant and 2 dependents with unrelated rela
 end
 
 describe Family, "given a primary applicant and 2 dependents with valid relationships", dbclean: :after_each do
-  let(:test_family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:test_family) {FactoryBot.create(:family, :with_primary_family_member)}
   let(:mike) {test_family.primary_applicant.person}
-  let(:carol_person) {FactoryGirl.create(:family_member, :family => test_family).person}
-  let(:mary_person) {FactoryGirl.create(:family_member, :family => test_family).person}
-  let(:jan_person) {FactoryGirl.create(:family_member, :family => test_family).person}
-  let(:greg_person) {FactoryGirl.create(:family_member, :family => test_family).person}
-  let(:cindy_person) {FactoryGirl.create(:family_member, :family => test_family).person}
+  let(:carol_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:mary_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:jan_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:greg_person) {FactoryBot.create(:family_member, :family => test_family).person}
+  let(:cindy_person) {FactoryBot.create(:family_member, :family => test_family).person}
 
 
   before do
@@ -1531,7 +1505,10 @@ context "verifying employee_role is active?" do
 end
 
 describe "remove_family_member" do
-  let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+  let(:family) {
+    family = FactoryBot.create(:family, :with_primary_family_member_and_dependent)
+    family
+  }
   let(:dependent1) { family.family_members.where(is_primary_applicant: false).first }
   let(:dependent2) { family.family_members.where(is_primary_applicant: false).last }
 

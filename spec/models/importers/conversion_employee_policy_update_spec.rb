@@ -35,11 +35,11 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
     let(:spouse) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 30.years, ssn: '555532232') }
     let(:child)  { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 7.years, ssn: '555532230') }
     let(:child1) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 2.years, ssn: '555532229') }
-    let!(:person) { FactoryGirl.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on) }
+    let!(:person) { FactoryBot.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on) }
     let!(:family) do
-      family = FactoryGirl.build(:family, :with_family_members, person: person, people: family_members)
-      person.person_relationships.create(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
-      person.person_relationships.create(predecessor_id: person.id, successor_id: child.id, kind: "parent", family_id: family.id)
+      family = FactoryBot.build(:family, :with_family_members, person: person, people: family_members)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: child.id, kind: "parent", family_id: family.id)
       person.save
       family
     end

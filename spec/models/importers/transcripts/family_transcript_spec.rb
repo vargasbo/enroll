@@ -4,10 +4,10 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
   describe "find_or_build_family" do
 
-    let(:spouse) { FactoryGirl.create(:person)}
-    let(:child1) { FactoryGirl.create(:person)}
-    let(:person) { FactoryGirl.create(:person)}
-    let(:child2) { FactoryGirl.create(:person)}
+    let(:spouse) { FactoryBot.create(:person)}
+    let(:child1) { FactoryBot.create(:person)}
+    let(:person) { FactoryBot.create(:person)}
+    let(:child2) { FactoryBot.create(:person)}
 
     context "Family already exists" do
 

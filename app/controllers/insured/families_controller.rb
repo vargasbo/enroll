@@ -80,7 +80,7 @@ class Insured::FamiliesController < FamiliesController
     respond_to do |format|
       format.html
     end
-  endapp/controllers/insured/family_members_controller.rb
+  end
 
   def find_sep
     @hbx_enrollment_id = params[:hbx_enrollment_id]

@@ -3,8 +3,8 @@ require 'rails_helper'
 describe "shared/_dependents_list_modal.html.erb" do
 
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-  let(:family_member1) {FactoryGirl.create(:family_member, :family => family)}
-  let(:family_member2) {FactoryGirl.create(:family_member, :family => family)}
+  let(:family_member1) {FactoryBot.create(:family_member, :family => family)}
+  let(:family_member2) {FactoryBot.create(:family_member, :family => family)}
 
 
 

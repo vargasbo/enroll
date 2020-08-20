@@ -7,7 +7,7 @@ class TaxHouseholdMember
   PDC_TYPES = [['Assisted','is_ia_eligible'], ['Medicaid','is_medicaid_chip_eligible'], ['Totally Ineligible','is_totally_ineligible'], ['UQHP','is_uqhp_eligible']].freeze
 
   embedded_in :tax_household
-  embeds_many :financial_statements
+  # embeds_many :financial_statements
 
   field :applicant_id, type: BSON::ObjectId
   field :is_ia_eligible, type: Boolean, default: false
@@ -15,6 +15,8 @@ class TaxHouseholdMember
   field :is_totally_ineligible, type: Boolean, default: false
   field :is_uqhp_eligible, type: Boolean, default: false
   field :is_subscriber, type: Boolean, default: false
+  field :is_without_assistance, type: Boolean, default: false
+  field :is_totally_ineligible, type: Boolean, default: false
   field :reason, type: String
 
   validate :strictly_boolean
@@ -42,11 +44,15 @@ class TaxHouseholdMember
   end
 
   def is_ia_eligible?
-    is_ia_eligible && !is_medicaid_chip_eligible && !is_totally_ineligible && !is_uqhp_eligible
+    is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
+  end
+
+  def non_ia_eligible?
+    (is_medicaid_chip_eligible || is_without_assistance || is_totally_ineligible) && !is_ia_eligible
   end
 
   def is_medicaid_chip_eligible?
-    !is_ia_eligible && is_medicaid_chip_eligible && !is_totally_ineligible && !is_uqhp_eligible
+    is_medicaid_chip_eligible && !is_ia_eligible && !is_without_assistance && !is_totally_ineligibl
   end
 
   def is_subscriber?
