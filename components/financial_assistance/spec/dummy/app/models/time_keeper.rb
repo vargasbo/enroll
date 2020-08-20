@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Naming/AccessorMethodName
+
 class TimeKeeper
   include Config::AcaModelConcern
   include Mongoid::Document
@@ -37,16 +39,6 @@ class TimeKeeper
     instance.date_of_record
   end
 
-  # DO NOT EVER USE OUTSIDE OF TESTS
-  def self.set_date_of_record_unprotected!(new_date)
-    new_date = new_date.to_date
-    if instance.date_of_record != new_date
-      (new_date - instance.date_of_record).to_i
-      instance.set_date_of_record(new_date)
-    end
-    instance.date_of_record
-  end
-
   def self.date_of_record
     instance.date_of_record
   end
@@ -54,10 +46,6 @@ class TimeKeeper
   def self.datetime_of_record
     instant = Time.current
     instance.date_of_record.to_datetime + instant.hour.hours + instant.min.minutes + instant.sec.seconds
-  end
-
-  def set_date_of_record(new_date)
-    Rails.cache.write(CACHE_KEY, new_date.strftime("%Y-%m-%d"))
   end
 
   def date_of_record
@@ -89,3 +77,6 @@ class TimeKeeper
     Thread.current[:time_keeper_local_cached_date]
   end
 end
+
+# rubocop:enable Naming/AccessorMethodName
+

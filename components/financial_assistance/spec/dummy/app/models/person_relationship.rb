@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Naming/ConstantName
+
 class PersonRelationship
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -136,3 +138,5 @@ class PersonRelationship
     self
   end
 end
+
+# rubocop:enable Naming/ConstantName

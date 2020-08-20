@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Naming/ConstantName
+
 class HbxProfile
 
   include Mongoid::Document
@@ -141,3 +143,6 @@ class HbxProfile
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end
 end
+
+# rubocop:enable Naming/ConstantName
+

@@ -1,5 +1,21 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/AbcSize
+
+# rubocop:disable Metrics/CyclomaticComplexity
+
+# rubocop:disable Lint/UnusedMethodArgument
+
+# rubocop:disable Metrics/ParameterLists
+
+# rubocop:disable ShadowingOuterLocalVariable
+
+# rubocop:disable Style/GuardClause
+
+# rubocop:disable Metrics/MethodLength
+
+# rubocop:disable Naming/ConstantName
+
 class Household
   include Mongoid::Document
   include SetCurrentUser
@@ -67,13 +83,11 @@ class Household
   end
 
   def immediate_family_coverage_household
-    ch = coverage_households.detect { |hh| hh.is_immediate_family? }
-    ch ||= coverage_households.build(is_immediate_family: true)
+    coverage_households.detect { |hh| hh.is_immediate_family? } || coverage_households.build(is_immediate_family: true)
   end
 
   def extended_family_coverage_household
-    ch = coverage_households.detect { |hh| !hh.is_immediate_family? }
-    ch ||= coverage_households.build(is_immediate_family: false)
+    coverage_households.detect { |hh| !hh.is_immediate_family? } || coverage_households.build(is_immediate_family: false)
   end
 
   # def determination_split_coverage_household
@@ -138,7 +152,7 @@ class Household
   end
 
   def build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, _primary_person, active_verified_household, application_in_context)
-    verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
+    verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
     verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
     if verified_tax_households.present? # && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
       if latest_active_tax_households.present?
@@ -369,7 +383,7 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil, enrollment_kind: nil, external_enrollment: false, opt_effective_on: nil)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, coverage_start: nil, enrollment_kind: nil, external_enrollment: false, opt_effective_on: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
@@ -486,3 +500,20 @@ class Household
     end_multiple_thh
   end
 end
+
+# rubocop:enable Metrics/AbcSize
+
+# rubocop:enable Metrics/CyclomaticComplexity
+
+# rubocop:enable Lint/UnusedMethodArgument
+
+# rubocop:enable Metrics/ParameterLists
+
+# rubocop:enable ShadowingOuterLocalVariable
+
+# rubocop:enable Style/GuardClause
+
+# rubocop:enable Metrics/MethodLength
+
+# rubocop:enable Naming/ConstantName
+

@@ -18,7 +18,6 @@ class User
 
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
-  validate :password_complexity
   validate :oim_id_rules
   validates_uniqueness_of :email,:case_sensitive => false
   validates_presence_of     :password, if: :password_required?
@@ -33,20 +32,6 @@ class User
       errors.add :oim_id, "must be at least #{MIN_USERNAME_LENGTH} characters"
     elsif oim_id.present? && oim_id.length > MAX_USERNAME_LENGTH
       errors.add :oim_id, "can NOT exceed #{MAX_USERNAME_LENGTH} characters"
-    end
-  end
-
-  def password_complexity
-    if password.present? && !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
-      errors.add :password, "must include at least one lowercase letter, one uppercase letter, one digit, and one character that is not a digit or letter or space"
-    elsif password.present? && password.match(/#{::Regexp.escape(oim_id)}/i)
-      errors.add :password, "cannot contain username"
-    elsif password.present? && password_repeated_chars_limit(password)
-      errors.add :password, "cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
-    elsif password.present? && password.match(/(.)\1\1/)
-      errors.add :password, "must not repeat consecutive characters more than once"
-    elsif password.present? && !password.match(/(.*?[a-zA-Z]){4,}/)
-      errors.add :password, "must have at least 4 alphabetical characters"
     end
   end
 

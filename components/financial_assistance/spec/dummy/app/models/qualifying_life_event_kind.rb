@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Naming/ConstantName
+
 class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -83,69 +85,7 @@ class QualifyingLifeEventKind
                         :post_event_sep_in_days
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
-
-
-  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, _consumer_coverage_effective_on = nil)
-    coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month.day)
-    coverage_effective_on = if coverage_end_on == coverage_end_last_day_of_month
-                              if TimeKeeper.date_of_record <= coverage_end_on
-                                coverage_end_last_day_of_month + 1.day
-                              else
-                                TimeKeeper.date_of_record.end_of_month + 1.day
-                                                      end
-                            else
-                              if TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
-                                if selected_effective_on.blank?
-                                  [coverage_end_on.beginning_of_month, coverage_end_last_day_of_month + 1.day]
-                                else
-                                  selected_effective_on
-                                                        end
-                              else
-                                TimeKeeper.date_of_record.end_of_month + 1.day
-                                                      end
-                            end
-    coverage_effective_on
-  end
-
-  def is_dependent_loss_of_coverage?
-    %w[employee_gaining_medicare employer_sponsored_coverage_termination].include? reason
-  end
-
-  def is_moved_to_dc?
-    #title == "I'm moving to the District of Columbia"
-    reason == 'relocate'
-  end
-
-  def shop?
-    market_kind == "shop"
-  end
-
-  def family_structure_changed?
-    #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
-    %w[birth adoption marriage divorce domestic_partnership].include? reason
-  end
-
-  def is_loss_of_other_coverage?
-    reason == "lost_access_to_mec"
-  end
-
-  class << self
-    def shop_market_events
-      where(:market_kind => "shop").and(:is_self_attested.ne => false).active.to_a
-    end
-
-    def shop_market_events_admin
-      where(:market_kind => "shop").active.to_a
-    end
-
-    def shop_market_non_self_attested_events
-      where(:market_kind => "shop").and(:is_self_attested.ne => true).active.to_a
-    end
-  end
-
-  def date_hint
-    start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
-    end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
-    "(must fall between #{start_date.strftime('%B %d')} and #{end_date.strftime('%B %d')})"
-  end
 end
+
+# rubocop:enable Naming/ConstantName
+

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Lint/UselessAssignment
+
 FactoryBot.define do
   factory :benefit_sponsors_benefit_sponsorship, class: 'BenefitSponsorship' do
 
@@ -173,3 +175,6 @@ FactoryBot.define do
 
   end
 end
+
+# rubocop:enable Lint/UselessAssignment
+
