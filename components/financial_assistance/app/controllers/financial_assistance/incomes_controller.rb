@@ -4,31 +4,30 @@ module FinancialAssistance
   class IncomesController < ::ApplicationController
 
     before_action :set_current_person
+    before_action :find_application_and_applicant
+    before_action :load_support_texts, only: [:index, :other]
 
     include ::UIHelpers::WorkflowController
     include NavigationHelper
     include ApplicationHelper
 
-    before_action :find_application_and_applicant
-    before_action :load_support_texts, only: [:index, :other]
+    layout "financial_assistance", only: [:index, :other, :new, :step]
 
     def index
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
-      render html: '', layout: 'financial_assistance'
     end
 
     def other
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
     end
 
     def new
       @model = @applicant.incomes.build
       load_steps
       current_step
-      render 'workflow/step', layout: 'financial_assistance'
+      render 'workflow/step'
     end
 
     def edit
@@ -57,15 +56,15 @@ module FinancialAssistance
             redirect_to application_applicant_incomes_path(@application, @applicant)
           else
             @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-            render 'workflow/step', layout: 'financial_assistance'
+            render 'workflow/step'
           end
         else
           @model.workflow = { current_step: @current_step.to_i }
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance'
+          render 'workflow/step'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance'
+        render 'workflow/step'
       end
     end
 
