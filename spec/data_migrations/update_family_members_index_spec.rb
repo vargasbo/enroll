@@ -32,8 +32,7 @@ describe UpdateFamilyMembersIndex do
     let(:husband) {FactoryBot.create(:person, first_name: 'hubby')}
     let(:family) {FactoryBot.build(:family)}
     let!(:husbands_family) do
-      husband.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: 'self')
-      husband.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: 'spouse')
+      husband.ensure_relationship_with(wife, 'spouse', family.id)
       husband.save
 
       family.add_family_member(wife)

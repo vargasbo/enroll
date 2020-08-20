@@ -23,7 +23,7 @@ describe AddFamilyMemberToCoverageHousehold, dbclean: :after_each do
     before do
       @dependent = FactoryBot.create(:person)
       @dep_member = FactoryBot.create(:family_member, family: family, person: @dependent)
-      person.person_relationships << PersonRelationship.new(relative_id: @dependent.id, kind: 'child')
+      person.ensure_relationship_with(@dependent, 'child', family.id)
       person.save!
     end
 

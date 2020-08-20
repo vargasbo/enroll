@@ -20,7 +20,10 @@ FactoryBot.define do
     end
 
     after(:create) do |f, evaluator|
-      f.households.first.add_household_coverage_member(f.family_members.first)
+      household = f.households.first
+      f.family_members.each do |fm|
+        household.add_household_coverage_member(fm)
+      end
       f.save
     end
 
@@ -56,7 +59,7 @@ FactoryBot.define do
         family.dependents.each do |dependent|
           primary_person.ensure_relationship_with(dependent.person, 'child', family.id)
         end
-        # primary_person.save
+        primary_person.save
       end
     end
 
@@ -74,7 +77,7 @@ FactoryBot.define do
         family.dependents.each do |dependent|
           primary_person.ensure_relationship_with(dependent.person, 'child', family.id)
         end
-
+        primary_person.save
         family.households.first.add_household_coverage_member(family.family_members.first)
         family.save
       end
@@ -128,18 +131,21 @@ FactoryBot.define do
 
     factory :individual_market_family_with_spouse_and_two_disabled_children do
       after(:create) do |f, evaluator|
+        primary_person = evaluator.primary_person
         spouse = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
                   is_active: true, person: evaluator.significant_other)
         f.active_household.add_household_coverage_member(spouse)
-        evaluator.primary_person.ensure_relationship_with(spouse.person, 'spouse', f.id)
+        primary_person.ensure_relationship_with(spouse.person, 'spouse', f.id)
         child = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
                   is_active: true, person: evaluator.disabled_child)
         f.active_household.add_household_coverage_member(child)
-        evaluator.primary_person.ensure_relationship_with(child.person, 'child', f.id)
+        primary_person.ensure_relationship_with(child.person, 'child', f.id)
         second_child = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
                   is_active: true, person: evaluator.second_disabled_child)
         f.active_household.add_household_coverage_member(second_child)
-        evaluator.primary_person.ensure_relationship_with(second_child.person, 'child', f.id)
+        primary_person.ensure_relationship_with(second_child.person, 'child', f.id)
+
+        primary_person.save
       end
     end
   end
