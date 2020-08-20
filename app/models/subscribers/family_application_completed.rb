@@ -68,7 +68,7 @@ module Subscribers
 
       begin
         active_household.build_or_update_tax_households_and_eligibility_determinations(verified_family, primary_person, active_verified_household, new_dependents)
-      rescue
+      rescue StandardError
         throw(:processing_issue, "Failure to update tax household")
       end
 
@@ -77,7 +77,7 @@ module Subscribers
           log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"}) unless thh.eligibility_determinations.present?
         end
       end
-      
+
       family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
       family.save!
     end

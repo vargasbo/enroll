@@ -571,7 +571,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
     f.active_household.add_household_coverage_member(c_mem)
     f.save
     f
-    end
+  end
   let(:family3) do
     f = FactoryGirl.create(:family, :with_primary_family_member)
     s_mem = f.add_family_member(spouse)
@@ -588,7 +588,7 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
     f.active_household.add_household_coverage_member(g_mem)
     f.save
     f
-    end
+  end
   let(:submitted_at)  { DateTime.current}
   let(:spouse)        { FactoryBot.create(:person, last_name: "richards", first_name: "denise") }
   let(:child)         { FactoryBot.create(:person, last_name: "sheen", first_name: "sam") }
@@ -1428,7 +1428,7 @@ describe Family, "given a primary applicant and 2 dependents with valid relation
   end
 
   it "should update relationships based on rules" do
-    matrix = test_family.build_relationship_matrix
+    test_family.build_relationship_matrix
     silbling_rule_relation = test_family.find_existing_relationship(greg_person.id, mary_person.id, test_family.id)
     expect(silbling_rule_relation).to eq "sibling"
 

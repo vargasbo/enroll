@@ -1390,7 +1390,7 @@ class Family
     # other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
     # undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? }
     primary_member = primary_family_member
-    other_family_members = family_members.where(is_active: true).select { |fm| (fm.id.to_s != primary_member.id.to_s) }
+    other_family_members = family_members.where(is_active: true).reject { |fm| (fm.id.to_s == primary_member.id.to_s) }
     undefined_relations = other_family_members.any? { |fm| find_relationship_between(primary_member.person, fm.person).blank? }
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end

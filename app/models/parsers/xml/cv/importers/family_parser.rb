@@ -22,7 +22,7 @@ module Parsers::Xml::Cv::Importers
             id: fm.id,
             # hbx_id: fm.id,
             former_family_id: fm.primary_family_id,
-            is_primary_applicant: is_primary_applicant, # did not see the real xml  
+            is_primary_applicant: is_primary_applicant, # did not see the real xml
             is_coverage_applicant: fm.is_coverage_applicant.to_s == 'true', # need to confirm the case sensetive
             person: get_person_object_by_family_member_xml(fm),
           )
@@ -111,7 +111,7 @@ module Parsers::Xml::Cv::Importers
 
       # relationships = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
       # primary_applicant_person.person_relationships = relationships.reject{ |relation| relation.relative_id == primary_applicant_person.id }
-      temp_relation = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
+      temp_relation = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact
 
       temp_relation.each do |relation|
         primary_applicant_person.ensure_relationship_with(relation.person, relation.kind, family.id)

@@ -21,15 +21,22 @@ module Parsers::Xml::Cv::Importers
       )
       person_relationships.each do |relationship|
         relation = relationship.relationship_uri.strip.split("#").last rescue ''
-        person_object.person_relationships.build({
-          # relative_id: relationship.object_individual, #use subject_individual or object_individual
-          # kind: relation,
-          successor_id: relationship.object_individual, #use subject_individual or object_individual
-          predecessor_id: person_object.id,
-          family_id: family_id,
-          kind: PersonRelationship::InverseMap[relation]
-        }) if relationship.subject_individual != relationship.object_individual
+        person_object.person_relationships.build({successor_id: relationship.object_individual, #use subject_individual or object_individual
+                                                  predecessor_id: person_object.id,
+                                                  family_id: family_id,
+                                                  kind: PersonRelationship::InverseMap[relation]}) if relationship.subject_individual != relationship.object_individual
+                                                  # relative_id: relationship.object_individual, #use subject_individual or object_individual
+                                                  # kind: relation
       end
+
+      build_addresses(person, person_object)
+      build_phones(person, person_object)
+      build_emails(person, person_object)
+
+      person_object
+    end
+
+    def build_addresses(person, person_object)
       person.addresses.each do |address|
         kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'
         person_object.addresses.build({
@@ -41,6 +48,9 @@ module Parsers::Xml::Cv::Importers
           kind: kind,
         })
       end
+    end
+
+    def build_phones(person, person_object)
       person.phones.each do |phone|
         phone_type = phone.type
         phone_type_for_enroll = phone_type.blank? ? nil : phone_type.strip.split("#").last
@@ -51,6 +61,9 @@ module Parsers::Xml::Cv::Importers
           })
         end
       end
+    end
+
+    def build_emails(person, person_object)
       person.emails.each do |email|
         email_type = email.type
         email_type_for_enroll = email_type.blank? ? nil : email_type.strip.split("#").last
@@ -59,10 +72,9 @@ module Parsers::Xml::Cv::Importers
             :kind => email_type_for_enroll,
             :address => email.email_address
           })
-        end 
+        end
       end
-
-      person_object
     end
+
   end
 end

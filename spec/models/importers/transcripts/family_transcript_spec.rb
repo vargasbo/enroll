@@ -17,9 +17,9 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
         family.family_members.build(is_primary_applicant: false, person: spouse)
         family.family_members.build(is_primary_applicant: false, person: child1)
         family.save(:validate => false)
-        person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
-        person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
-        person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id, successor_id: child1.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id, successor_id: child2.id, kind: "parent", family_id: family.id)
         family
       end
 
@@ -28,8 +28,8 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
           hbx_assigned_id: '24112',
           e_case_id: "6754632"
           })
-        person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
-        person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id, successor_id: child1.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id, successor_id: child2.id, kind: "parent", family_id: family.id)
         family.family_members.build(is_primary_applicant: true, person: person)
         family.family_members.build(is_primary_applicant: false, person: child1)
         family.family_members.build(is_primary_applicant: false, person: child2)

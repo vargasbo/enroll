@@ -44,22 +44,22 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
       enrollment
     end
 
-    let!(:source_family) {
+    let!(:source_family) do
       family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
       family.family_members.build(is_primary_applicant: true, person: person)
       family.family_members.build(is_primary_applicant: false, person: spouse)
       family.family_members.build(is_primary_applicant: false, person: child1)
       family.family_members.build(is_primary_applicant: false, person: child2)
 
-      person.person_relationships.build(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
-      person.person_relationships.build(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
-      person.person_relationships.build(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
+      person.person_relationships.build(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
+      person.person_relationships.build(predecessor_id: person.id, successor_id: child1.id, kind: "parent", family_id: family.id)
+      person.person_relationships.build(predecessor_id: person.id, successor_id: child2.id, kind: "parent", family_id: family.id)
 
       person.save
       # person.person_relationships.update_all(family_id: family.id)
       family.save
       family.reload
-    }
+    end
 
     let(:primary) { source_family.primary_applicant }
     let(:dependent) { source_family.family_members.detect { |fm| !fm.is_primary_applicant } }
@@ -382,4 +382,3 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
     end
   end
 end
-
