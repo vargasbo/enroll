@@ -466,7 +466,7 @@ module FinancialAssistance
 
     def incomplete_applicants?
       active_applicants.each do |applicant|
-        return true if applicant.applicant_validation_complete? == false
+        return true if !applicant.applicant_validation_complete?
       end
       false
     end

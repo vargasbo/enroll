@@ -115,3 +115,15 @@ end
 Then(/^the are you a spouse of such a veteran question should display$/) do
   expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
 end
+
+And(/^all applicants Other Questions are completed$/) do
+  click_link 'EDIT INCOME & COVERAGE INFO'
+  click_link 'Other Questions'
+  find("#is_pregnant_no").click
+  find("#is_post_partum_period_no").click
+  find("#is_self_attested_blind_no").click
+  find("#has_daily_living_no").click
+  find("#need_help_paying_bills_no").click
+  find("#radio_physically_disabled_no").click
+  find('[name=commit]').click
+end

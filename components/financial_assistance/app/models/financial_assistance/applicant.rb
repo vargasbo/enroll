@@ -410,11 +410,12 @@ module FinancialAssistance
     end
 
     def applicant_validation_complete?
-      valid?(:submission) &&
-        incomes.all? { |income| income.valid? :submission } &&
-        benefits.all? { |benefit| benefit.valid? :submission } &&
-        deductions.all? { |deduction| deduction.valid? :submission } &&
-        other_questions_complete?
+      # TODO: What is valid?(:submission) &&
+      valid? &&
+      incomes.all? { |income| income.valid? :submission } &&
+      benefits.all? { |benefit| benefit.valid? :submission } &&
+      deductions.all? { |deduction| deduction.valid? :submission } &&
+      other_questions_complete?
     end
 
     def clean_conditional_params(model_params)
@@ -430,6 +431,8 @@ module FinancialAssistance
     end
 
     def foster_age_satisfied?
+      # TODO: Look into this. Seems like this is only relevant if pregnant?
+      return true if is_pregnant == true
       # Age greater than 18 and less than 26
       (19..25).cover? age_of_applicant
     end
