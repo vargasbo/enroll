@@ -59,7 +59,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     it "should assign applications", dbclean: :after_each do
       get :other_questions, params: { application_id: application.id, id: applicant.id }
       expect(assigns(:applicant).id).to eq applicant.id
-      expect(response).to render_template(:financial_assistance)
+      expect(response).to render_template(:financial_assistance_nav)
     end
   end
 

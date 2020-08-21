@@ -149,7 +149,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(assigns(:family)).to eq person.primary_family
       expect(assigns(:application)).to eq application
       expect(assigns(:missing_relationships)).to eq family.find_missing_relationships(family.build_relationship_matrix)
-      expect(response).to render_template(:financial_assistance)
+      expect(response).to render_template(:financial_assistance_nav)
     end
   end
 
@@ -294,7 +294,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       expect(assigns(:consumer_role)).to eq person.consumer_role
       expect(assigns(:application)).to eq person.primary_family.applications.last
       expect(assigns(:application).aasm_state).to eq("draft")
-      expect(response).to render_template(:financial_assistance)
+      expect(response).to render_template(:financial_assistance_nav)
     end
   end
 
@@ -324,7 +324,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       get :eligibility_results, params: {:id => application.id, :cur => 1}
       expect(assigns(:family)).to eq family
       expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance)
+      expect(response).to render_template(:financial_assistance_nav)
     end
   end
 
@@ -333,7 +333,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       get :application_publish_error, params: { id: application.id }
       expect(assigns(:family)).to eq family
       expect(assigns(:application)).to eq application
-      expect(response).to render_template(:financial_assistance)
+      expect(response).to render_template(:financial_assistance_nav)
     end
   end
 
