@@ -27,7 +27,6 @@ Feature: A dedicated page that gives the user access to household member creatio
     And the primary member exists
     And at least one other household members exist
     When all applicants are in Info Completed state
-    And all applicants Other Questions are completed
     And user clicks CONTINUE
     # TODO: This family relationships stuff not moved in yet
     # Then the user will navigate to Family Relationships page
