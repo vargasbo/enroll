@@ -21,9 +21,9 @@ module FinancialAssistance
     end
 
     def save_questions
-      format_date_params params[:financial_assistance_applicant] if params[:financial_assistance_applicant].present?
+      format_date_params params[:applicant] if params[:applicant].present?
       @applicant = @application.active_applicants.find(params[:id])
-      @applicant.assign_attributes(permit_params(params[:financial_assistance_applicant])) if params[:financial_assistance_applicant].present?
+      @applicant.assign_attributes(permit_params(params[:applicant])) if params[:applicant].present?
       if @applicant.save(context: :other_qns)
         redirect_to edit_application_path(@application)
       else

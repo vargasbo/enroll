@@ -410,7 +410,11 @@ module FinancialAssistance
     end
 
     def applicant_validation_complete?
-      valid?(:submission) &&
+      # TODO: Reevaluate the valid?(:submission)
+      # Possible that some of the validations expected there conflict with when we
+      # expect the "Continue" button to be available, which is dependent on these
+      # validations passing
+      valid? &&
         incomes.all? { |income| income.valid? :submission } &&
         benefits.all? { |benefit| benefit.valid? :submission } &&
         deductions.all? { |deduction| deduction.valid? :submission } &&
@@ -430,6 +434,8 @@ module FinancialAssistance
     end
 
     def foster_age_satisfied?
+      # TODO: Look into this. Seems like this is only relevant if pregnant?
+      return true if is_pregnant == true
       # Age greater than 18 and less than 26
       (19..25).cover? age_of_applicant
     end
