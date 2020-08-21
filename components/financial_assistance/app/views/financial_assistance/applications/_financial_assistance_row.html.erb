@@ -8,8 +8,8 @@
       <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
       EDIT INCOME & COVERAGE INFO
     <% end %>
-  <% else %>
-    <%= link_to go_to_step_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-default add" do %>
+  <% elsif applicant && applicant.application %>
+    <%= link_to go_to_step_application_applicant_path(application_id: applicant.application.id, applicant_id: applicant.id, step: 1), class: "btn btn-default add" do %>
       <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
       ADD INCOME & COVERAGE INFO
     <% end %>

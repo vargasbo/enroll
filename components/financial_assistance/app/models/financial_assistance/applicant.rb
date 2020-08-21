@@ -154,9 +154,9 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
+    embeds_many :incomes,     class_name: "FinancialAssistance::Income"
+    embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
+    embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
 
@@ -703,6 +703,10 @@ module FinancialAssistance
       end
 
       errors.add(:is_student, "' Is this person a student?' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
+      # TODO: Decide if these validations should be ended?
+      # errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
+
+      # errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank") if is_required_to_file_taxes.nil?
     end
 
     def age_of_applicant

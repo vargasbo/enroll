@@ -144,7 +144,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
+                    <%= link_to application_applicant_incomes_path(@application, applicant) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
@@ -216,7 +216,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME ADJUSTMENTS</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
+                    <%= link_to application_applicant_deductions_path(@application, applicant) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
@@ -232,7 +232,7 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                 <div class="col-md-11">HEALTH COVERAGE</div>
                 <div class="col-md-1">
-                  <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
+                  <%= link_to application_applicant_benefits_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
                   <% end %>
                 </div>

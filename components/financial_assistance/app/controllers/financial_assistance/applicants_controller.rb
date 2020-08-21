@@ -2,18 +2,15 @@
 
 module FinancialAssistance
   class ApplicantsController < ::ApplicationController
+    include ::UIHelpers::WorkflowController
 
     before_action :set_current_person
-
-    include ::UIHelpers::WorkflowController
-    include ApplicationHelper
-
     before_action :find, :find_application, :except => [:age_of_applicant, :primary_applicant_has_spouse] #except the ajax requests
     before_action :load_support_texts, only: [:other_questions, :step]
 
     def edit
-      @applicant = @application.active_applicants.find(params[:id])
-      render layout: 'financial_assistance_nav'
+      @applicant = find
+      render html: '', layout: 'financial_assistance_nav'
     end
 
     def other_questions
@@ -58,6 +55,7 @@ module FinancialAssistance
             render 'workflow/step', layout: 'financial_assistance_nav'
           end
         else
+          # page.current_path
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
           flash[:error] = build_error_messages(@model)
@@ -86,8 +84,9 @@ module FinancialAssistance
     private
 
     def load_support_texts
-      raw_support_text = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
-      @support_texts = support_text_placeholders raw_support_text
+      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
+      @support_texts = helpers.support_text_placeholders raw_support_text
     end
 
     def format_date_params(model_params)
@@ -109,7 +108,9 @@ module FinancialAssistance
     end
 
     def find
-      @applicant = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:id])
+      # TODO: Not sure about this, added the @model definition because it wasn't defined
+      @applicant = find_application.active_applicants.where(id: params[:id]).last || find_application.applicants.last || nil
+      @model = @applicant
     end
 
     def permit_params(attributes)
