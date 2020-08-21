@@ -410,7 +410,10 @@ module FinancialAssistance
     end
 
     def applicant_validation_complete?
-      # TODO: What is valid?(:submission) &&
+      # TODO: Reevaluate the valid?(:submission)
+      # Possible that some of the validations expected there conflict with when we
+      # expect the "Continue" button to be available, which is dependent on these
+      # validations passing
       valid? &&
       incomes.all? { |income| income.valid? :submission } &&
       benefits.all? { |benefit| benefit.valid? :submission } &&
