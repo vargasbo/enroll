@@ -27,14 +27,14 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   context "GET index" do
     it "should render template financial assistance" do
       get :index, params: { application_id: application.id, applicant_id: applicant.id }
-      expect(response).to render_template(:financial_assistance)
+      expect(response).to render_template(:financial_assistance_nav)
     end
   end
 
   context "POST new" do
     it "should load template work flow steps" do
       post :new, params: { application_id: application.id, applicant_id: applicant.id }
-      expect(response).to render_template(:financial_assistance)
+      expect(response).to render_template(:financial_assistance_nav)
       expect(response).to render_template 'workflow/step'
     end
   end
