@@ -27,8 +27,10 @@ module IvlAssistanceWorld
     tax_household.eligibility_determinations << EligibilityDetermination.new(
       source: 'Admin',
       max_aptc: 100.00,
+      csr_eligibility_kind: 'csr_100',
       csr_percent_as_integer: 100,
-      determined_at: TimeKeeper.date_of_record
+      determined_at: TimeKeeper.date_of_record,
+      determined_on: TimeKeeper.date_of_record
       )
     tax_household.eligibility_determinations.each { |ed| ed.save!}
     tax_household.save!
@@ -38,6 +40,11 @@ module IvlAssistanceWorld
 
   def create_aptc_only_eligibilty_for_the_family
     family = Family.all.first
+    person1 = family.family_members[0].person
+    person2 = family.family_members[1].person
+    person1.person_relationships.build(family_id: family.id, predecessor_id: person1.id, successor_id: person2.id, kind: "spouse")
+    person2.person_relationships.build(family_id: family.id, predecessor_id: person2.id, successor_id: person1.id, kind: "spouse")
+    family.save
     tax_household = create_tax_household_and_eligibility_determination(family)
     tax_household.tax_household_members << TaxHouseholdMember.new(
       applicant_id: family.family_members[0].id,
@@ -57,6 +64,7 @@ module IvlAssistanceWorld
   end
 
   def create_mixed_eligibilty_for_the_family
+    binding.pry
     family = Family.all.first
     tax_household = create_tax_household_and_eligibility_determination(family)
     tax_household.tax_household_members << TaxHouseholdMember.new(
