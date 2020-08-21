@@ -415,10 +415,10 @@ module FinancialAssistance
       # expect the "Continue" button to be available, which is dependent on these
       # validations passing
       valid? &&
-      incomes.all? { |income| income.valid? :submission } &&
-      benefits.all? { |benefit| benefit.valid? :submission } &&
-      deductions.all? { |deduction| deduction.valid? :submission } &&
-      other_questions_complete?
+        incomes.all? { |income| income.valid? :submission } &&
+        benefits.all? { |benefit| benefit.valid? :submission } &&
+        deductions.all? { |deduction| deduction.valid? :submission } &&
+        other_questions_complete?
     end
 
     def clean_conditional_params(model_params)
