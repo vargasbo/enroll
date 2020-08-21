@@ -11,7 +11,7 @@ module FinancialAssistance
     include NavigationHelper
     include ApplicationHelper
 
-    layout "financial_assistance", only: [:index, :other, :new, :step]
+    layout "financial_assistance_nav", only: [:index, :other, :new, :step]
 
     def index
       save_faa_bookmark(@person, request.original_url)

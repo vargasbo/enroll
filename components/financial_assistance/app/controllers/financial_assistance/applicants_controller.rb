@@ -10,14 +10,14 @@ module FinancialAssistance
 
     def edit
       @applicant = find
-      render html: '', layout: 'financial_assistance'
+      render html: '', layout: 'financial_assistance_nav'
     end
 
     def other_questions
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
       @applicant = @application.active_applicants.find(params[:id])
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
     def save_questions
@@ -52,17 +52,17 @@ module FinancialAssistance
             redirect_to application_applicant_incomes_path(@application, @applicant)
           else
             @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-            render 'workflow/step', layout: 'financial_assistance'
+            render 'workflow/step', layout: 'financial_assistance_nav'
           end
         else
           # page.current_path
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance'
+          render 'workflow/step', layout: 'financial_assistance_nav'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance'
+        render 'workflow/step', layout: 'financial_assistance_nav'
       end
     end
 
