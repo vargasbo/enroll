@@ -54,7 +54,6 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
   end
 
   context 'recurring:dependent_age_off_termination_notification_manual' do
-    
     it "should trigger dependent age off notice for next month" do
       person2.update_attributes(dob: TimeKeeper.date_of_record.next_month - 26.years)
       person3.update_attributes(dob: TimeKeeper.date_of_record.next_month - 25.years)
@@ -66,4 +65,3 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
     end
   end
 end
-

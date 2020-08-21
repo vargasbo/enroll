@@ -20,13 +20,15 @@ module Parsers::Xml::Cv::Importers
         race: person_demographics.race,
       )
       person_relationships.each do |relationship|
-        relation = relationship.relationship_uri.strip.split("#").last rescue ''
-        person_object.person_relationships.build({successor_id: relationship.object_individual, #use subject_individual or object_individual
-                                                  predecessor_id: person_object.id,
-                                                  family_id: family_id,
-                                                  kind: PersonRelationship::InverseMap[relation]}) if relationship.subject_individual != relationship.object_individual
-                                                  # relative_id: relationship.object_individual, #use subject_individual or object_individual
-                                                  # kind: relation
+        if relationship.subject_individual != relationship.object_individual
+          relation = relationship.relationship_uri.strip.split("#").last rescue ''
+          person_object.person_relationships.build({successor_id: relationship.object_individual, #use subject_individual or object_individual
+                                                    predecessor_id: person_object.id,
+                                                    family_id: family_id,
+                                                    kind: PersonRelationship::InverseMap[relation]})
+                                                    # relative_id: relationship.object_individual, #use subject_individual or object_individual
+                                                    # kind: relation
+        end
       end
 
       build_addresses(person, person_object)
@@ -39,14 +41,12 @@ module Parsers::Xml::Cv::Importers
     def build_addresses(person, person_object)
       person.addresses.each do |address|
         kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'
-        person_object.addresses.build({
-          address_1: address.address_line_1,
-          address_2: address.address_line_2,
-          city: address.location_city_name,
-          state: address.location_state_code,
-          zip: address.postal_code,
-          kind: kind,
-        })
+        person_object.addresses.build({address_1: address.address_line_1,
+                                       address_2: address.address_line_2,
+                                       city: address.location_city_name,
+                                       state: address.location_state_code,
+                                       zip: address.postal_code,
+                                       kind: kind})
       end
     end
 
@@ -75,6 +75,5 @@ module Parsers::Xml::Cv::Importers
         end
       end
     end
-
   end
 end
