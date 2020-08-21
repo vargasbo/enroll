@@ -9,7 +9,7 @@
       EDIT INCOME & COVERAGE INFO
     <% end %>
   <% elsif applicant && applicant.application %>
-    <%= link_to go_to_step_application_applicant_path(application_id: applicant.application.id, id: applicant.id, step: 1), class: "btn btn-default add" do %>
+    <%= link_to go_to_step_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-default add" do %>
       <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
       ADD INCOME & COVERAGE INFO
     <% end %>
