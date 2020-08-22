@@ -59,12 +59,12 @@ module FinancialAssistance
 
     def create
       format_date(params)
-      @benefit = @applicant.benefits.build permit_params(params[:financial_assistance_benefit])
+      @benefit = @applicant.benefits.build permit_params(params[:benefit])
       @benefit_kind = @benefit.kind
       @benefit_insurance_kind = @benefit.insurance_kind
 
       if @benefit.save
-        render :create, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
+        render :create, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
       else
         render head: 'ok'
       end
@@ -73,8 +73,8 @@ module FinancialAssistance
     def update
       format_date(params)
       @benefit = @applicant.benefits.find params[:id]
-      if @benefit.update_attributes permit_params(params[:financial_assistance_benefit])
-        render :update, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
+      if @benefit.update_attributes permit_params(params[:benefit])
+        render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
       else
         render head: 'ok'
       end
@@ -92,8 +92,8 @@ module FinancialAssistance
     private
 
     def format_date(params)
-      params[:financial_assistance_benefit][:start_on] = Date.strptime(params[:financial_assistance_benefit][:start_on].to_s, "%m/%d/%Y")
-      params[:financial_assistance_benefit][:end_on] = Date.strptime(params[:financial_assistance_benefit][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_benefit][:end_on].present?
+      params[:benefit][:start_on] = Date.strptime(params[:benefit][:start_on].to_s, "%m/%d/%Y")
+      params[:benefit][:end_on] = Date.strptime(params[:benefit][:end_on].to_s, "%m/%d/%Y") if params[:benefit][:end_on].present?
     end
 
     def update_employer_contact(_model, params)

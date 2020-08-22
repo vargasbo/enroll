@@ -71,7 +71,7 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
     end
 
     it "should render step if no key present in params with modal_name" do
-      post :step, params: { application_id: application.id, applicant_id: applicant.id, financial_assistance_benefit: {start_on: "09/04/2017", end_on: "09/20/2017"} }
+      post :step, params: { application_id: application.id, applicant_id: applicant.id, benefit: {start_on: "09/04/2017", end_on: "09/20/2017"} }
       expect(response).to render_template "financial_assistance/benefits/create"
     end
 
@@ -111,11 +111,11 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
 
   context "create" do
     it "should create a benefit instance" do
-      post :create, params: { application_id: application.id, applicant_id: applicant.id, financial_assistance_benefit: {start_on: "09/04/2017", end_on: "09/20/2017"}}, format: :js
+      post :create, params: { application_id: application.id, applicant_id: applicant.id, benefit: {start_on: "09/04/2017", end_on: "09/20/2017"}}, format: :js
       expect(applicant.benefits.count).to eq 1
     end
     it "should able to save an benefit instance with the 'to' field blank " do
-      post :create, params: { application_id: application.id, applicant_id: applicant.id, financial_assistance_benefit: {start_on: "09/04/2017", end_on: " "}}, format: :js
+      post :create, params: { application_id: application.id, applicant_id: applicant.id, benefit: {start_on: "09/04/2017", end_on: " "}}, format: :js
       expect(applicant.benefits.count).to eq 1
     end
   end
