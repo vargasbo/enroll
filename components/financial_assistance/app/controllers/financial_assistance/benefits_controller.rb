@@ -123,15 +123,12 @@ module FinancialAssistance
     end
 
     def find
-      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.find(params[:id])
-    rescue StandardError
-      ''
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.where(id: params[:id]).last || nil
     end
 
     def load_support_texts
       file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
 
-      # file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
       @support_texts = support_text_placeholders raw_support_text
     end
