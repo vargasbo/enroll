@@ -146,7 +146,9 @@ module FinancialAssistance
     end
 
     def find
-      @model = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.where(id: params[:id]).last || nil
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
+    rescue StandardError
+      ''
     end
   end
 end

@@ -179,6 +179,42 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
       end
     end
 
+    context 'if insurance_kind is a employer_sponsored_insurance' do
+      context 'if any of 6 fields are blank' do
+        it 'should be invalid on step_1' do
+          benefit.insurance_kind = "employer_sponsored_insurance"
+          benefit.employer_id = nil
+          benefit.valid?(:step_1)
+          expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+
+        end
+
+        it 'should be invalid on submission' do
+          benefit.insurance_kind = "employer_sponsored_insurance"
+          benefit.employer_id = nil
+          benefit.valid?(:submission)
+          expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+        end
+      end
+
+      context 'if fields are not blank' do
+        it 'should be valid on step_1' do
+          benefit.insurance_kind = "employer_sponsored_insurance"
+          benefit.employer_id = 1234
+          benefit.valid?(:step_1)
+          expect(benefit.errors["employer_id"]).to be_empty
+
+        end
+
+        it 'should be valid on submission' do
+          benefit.insurance_kind = "employer_sponsored_insurance"
+          benefit.employer_id = nil
+          benefit.valid?(:submission)
+          expect(benefit.errors["employer_id"]).to include("' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ")
+        end
+      end
+    end
+
     context 'if step_1 and submit employer_sponsored_insurance kind validations' do
       it 'with a missing employee_cost_frequency' do
         benefit.kind = 'employer_sponsored_insurance'

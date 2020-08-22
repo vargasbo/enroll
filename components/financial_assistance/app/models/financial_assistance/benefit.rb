@@ -91,7 +91,7 @@ module FinancialAssistance
     field :workflow, type: Hash, default: { }
 
     field :employer_name, type: String
-    field :employer_id, type: String, default: ""
+    field :employer_id, type: String, default: ''
 
     scope :eligible, -> { where(kind: 'is_eligible')}
     scope :enrolled, -> { where(kind: 'is_enrolled')}

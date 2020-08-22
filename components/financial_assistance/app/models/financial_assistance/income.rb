@@ -75,6 +75,7 @@ module FinancialAssistance
     field :is_projected, type: Boolean, default: false
     field :tax_form, type: String
     field :employer_name, type: String
+    field :employer_id, type: Integer
     field :has_property_usage_rights, type: Boolean
     field :submitted_at, type: DateTime
     field :workflow, type: Hash, default: { }
