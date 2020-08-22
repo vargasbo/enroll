@@ -1502,10 +1502,7 @@ context "verifying employee_role is active?" do
 end
 
 describe "remove_family_member" do
-  let(:family) {
-    family = FactoryBot.create(:family, :with_primary_family_member_and_dependent)
-    family
-  }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
   let(:dependent1) { family.family_members.where(is_primary_applicant: false).first }
   let(:dependent2) { family.family_members.where(is_primary_applicant: false).last }
 

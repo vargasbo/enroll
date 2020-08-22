@@ -17,13 +17,13 @@ describe RemoveIncorrectPersonRelationship, dbclean: :after_each do
     let(:person) { FactoryBot.create(:person)}
     let(:dep_person) { FactoryBot.create(:person, first_name: 'mem1', last_name: 'one') }
 
-    let!(:family) {
+    let!(:family) do
       family = FactoryBot.build(:family, :with_primary_family_member, person: person)
       family.relate_new_member(dep_person, 'child')
       family.save
       person.save
       family
-    }
+    end
 
     it "should destroy the person relationship" do
       ClimateControl.modify hbx_id: person.hbx_id, _id: person.person_relationships.first.id do

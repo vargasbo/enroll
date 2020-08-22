@@ -127,22 +127,22 @@ RSpec.describe TaxHousehold, type: :model do
     let(:dependent_1) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 25.years) }
     let(:person) { FactoryBot.create(:person,dob: TimeKeeper.date_of_record - 30.years) }
 
-    let(:family)  {
+    let(:family) do
       family = FactoryBot.build(:family, :with_primary_family_member, person: person)
       family.relate_new_member(dependent_1, 'spouse')
       family.save
       family
-    }
+    end
     let(:household) { family.active_household }
     let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
     let(:current_hbx) { double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period])) }
     let(:benefit_coverage_period) { double(contains?: true, second_lowest_cost_silver_plan: plan) }
-    let(:tax_household) {
+    let(:tax_household) do
       tax_household = FactoryBot.create(:tax_household, effective_starting_on: TimeKeeper.date_of_record.beginning_of_year, household: household)
       tax_household.tax_household_members.create(applicant_id: family.family_members[0].id, is_ia_eligible: true)
       tax_household.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
       tax_household
-    }
+    end
 
     before :each do
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)

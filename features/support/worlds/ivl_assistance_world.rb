@@ -64,7 +64,6 @@ module IvlAssistanceWorld
   end
 
   def create_mixed_eligibilty_for_the_family
-    binding.pry
     family = Family.all.first
     tax_household = create_tax_household_and_eligibility_determination(family)
     tax_household.tax_household_members << TaxHouseholdMember.new(
