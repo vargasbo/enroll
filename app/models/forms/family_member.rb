@@ -107,6 +107,7 @@ module Forms
       assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
+      family.primary_person.save
       family.build_relationship_matrix
       self.id = family_member.id
       true

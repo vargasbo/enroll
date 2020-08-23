@@ -42,8 +42,7 @@ module IvlAssistanceWorld
     family = Family.all.first
     person1 = family.family_members[0].person
     person2 = family.family_members[1].person
-    person1.person_relationships.build(family_id: family.id, predecessor_id: person1.id, successor_id: person2.id, kind: "spouse")
-    person2.person_relationships.build(family_id: family.id, predecessor_id: person2.id, successor_id: person1.id, kind: "spouse")
+    person1.ensure_relationship_with(person2, 'spouse', family)
     family.save
     tax_household = create_tax_household_and_eligibility_determination(family)
     tax_household.tax_household_members << TaxHouseholdMember.new(
