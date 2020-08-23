@@ -371,7 +371,7 @@ end
 
 And(/user did not apply coverage for child as ivl/) do
   family = Family.all.first
-  family.family_members.detect { |fm| fm.primary_relationship == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
+  family.family_members.detect { |fm| PersonRelationship::InverseMap[fm.primary_relationship] == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
 end
 
 And(/employee has a valid "(.*)" qle/) do |qle|
