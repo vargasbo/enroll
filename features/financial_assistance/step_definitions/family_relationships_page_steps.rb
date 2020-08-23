@@ -37,7 +37,6 @@ Given(/^that the user is on the FAA Family Relationships page$/) do
   page.should have_xpath('//*[@id="family-matrix"]/h1')
 end
 
-
 Then(/^View My Applications left section WILL display$/) do
   expect(page).to have_content('View My Applications')
 end
