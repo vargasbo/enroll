@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class User
+  INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
   MIN_USERNAME_LENGTH = 8
   MAX_USERNAME_LENGTH = 60
   MAX_SAME_CHAR_LIMIT = 4
@@ -117,6 +118,11 @@ class User
 
   def has_csr_role?
     has_role?(:csr)
+  end
+
+  def identity_verified?
+    return false if identity_final_decision_code.blank?
+    identity_final_decision_code.to_s.downcase == INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
   end
 
   def has_broker_agency_staff_role?
