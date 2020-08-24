@@ -2,7 +2,7 @@
   <ul class="nav nav-stacked" id="left-navigation">
     <% if @applicant.present? %>
       <li class="activer list-box step-tabs no-hover global-nav">
-        <a href="<%= financial_assistance.edit_application_applicant_path(id: @application.id) %>">
+        <a href="<%= edit_application_path(@application) %>">
           <i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i>
           My Household</a>
       </li>

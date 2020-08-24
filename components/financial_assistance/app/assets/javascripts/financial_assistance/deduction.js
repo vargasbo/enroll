@@ -16,7 +16,7 @@ function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
 };
 
-$(document).ready(function() {
+$(document).on('turbolinks:load', function () {
   if ($('.deduction-kinds').length) {
     $(window).bind('beforeunload', function(e) {
       if (!currentlyEditing() || $('#unsavedDeductionChangesWarning:visible').length)
