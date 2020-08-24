@@ -31,7 +31,7 @@ module Insured
       @all_relationships = @family.find_all_relationships(@matrix)
       @relationship_kinds = PersonRelationship::Relationships_UI
 
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
     # rubocop:enable Metrics/AbcSize
     # rubocop:enable Metrics/CyclomaticComplexity

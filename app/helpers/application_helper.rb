@@ -862,4 +862,8 @@ module ApplicationHelper
       csr_options << [ui_display, csr]
     end
   end
+
+  def humanize_relationships
+    PersonRelationship::Relationships_UI.map{|r| [r.to_s.humanize, r.to_s] }
+  end
 end
