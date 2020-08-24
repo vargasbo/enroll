@@ -128,7 +128,7 @@ class FamilyMember
     if is_primary_applicant?
       "self"
     else
-      family.primary_applicant_person.find_relationship_with(person) unless family.primary_applicant_person.blank? || person.blank?
+      family.primary_applicant_person.find_relationship_with(person, family.id) unless family.primary_applicant_person.blank? || person.blank?
     end
   end
 
@@ -137,7 +137,7 @@ class FamilyMember
   end
 
   def reactivate!(relationship)
-    family.primary_applicant_person.ensure_relationship_with(person, relationship)
+    family.primary_applicant_person.ensure_relationship_with(person, relationship, family.id)
     family.add_family_member(person)
   end
 

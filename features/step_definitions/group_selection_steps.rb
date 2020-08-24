@@ -68,7 +68,7 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
               end
   fm = FactoryBot.create :family_member, family: family, person: dependent
   final_person = @person || user.person
-  final_person.ensure_relationship_with(dependent, kind)
+  final_person.ensure_relationship_with(dependent, kind, family.id)
   ch = family.active_household.immediate_family_coverage_household
   ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
   ch.save
@@ -371,7 +371,7 @@ end
 
 And(/user did not apply coverage for child as ivl/) do
   family = Family.all.first
-  family.family_members.detect { |fm| fm.primary_relationship == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
+  family.family_members.detect { |fm| PersonRelationship::InverseMap[fm.primary_relationship] == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
 end
 
 And(/employee has a valid "(.*)" qle/) do |qle|
@@ -634,13 +634,13 @@ And(/the family has an active tax household/) do
 end
 
 And(/the tax household has at least one member that is APTC eligible/) do
-  tax_household = @family.active_household.latest_active_tax_household || FactoryBot.create(:tax_household, household: @family.active_household)
+  tax_household = @family.active_household.latest_active_tax_households.first || FactoryBot.create(:tax_household, household: @family.active_household)
   tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
   FactoryBot.create(:eligibility_determination, max_aptc: 500, tax_household: tax_household)
 end
 
 And(/the tax household has no members that are APTC eligible/) do
-  tax_household = @family.active_household.latest_active_tax_household || FactoryBot.create(:tax_household, household: @family.active_household)
+  tax_household = @family.active_household.latest_active_tax_households.first || FactoryBot.create(:tax_household, household: @family.active_household)
   tax_household.tax_household_members.each do |thhm|
     thhm.update_attributes(is_ia_eligible: false, applicant_id: @family.enrollments.first.hbx_enrollment_members.first.applicant_id)
   end

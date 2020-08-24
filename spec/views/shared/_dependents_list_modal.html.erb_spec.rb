@@ -1,17 +1,15 @@
 require 'rails_helper'
 
 describe "shared/_dependents_list_modal.html.erb" do
-  let(:user) { FactoryBot.create(:user, person: subscriber) }
-  let(:user_two) { FactoryBot.create(:user, person: dependent_one) }
-  let(:user_three) { FactoryBot.create(:user, person: dependent_two) }
-  let(:subscriber) { FactoryBot.create(:person) }
-  let(:dependent_one) { FactoryBot.create(:person) }
-  let(:dependent_two) { FactoryBot.create(:person) }
+
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:family_member1) {FactoryBot.create(:family_member, :family => family)}
+  let(:family_member2) {FactoryBot.create(:family_member, :family => family)}
+
+
 
   before :each do
-    allow(subscriber).to receive(:find_relationship_with).and_return('self')
-    render partial: "shared/dependents_list_modal", locals: { subscriber: [user], dependents: [user_two, user_three]}
+    render partial: "shared/dependents_list_modal", locals: { subscriber: [family.primary_applicant], dependents: [family_member1, family_member2]}
   end
 
   it "shoud have a table with rows" do

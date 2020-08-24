@@ -18,16 +18,14 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
   let!(:benefit_group_assignment)  { census_employee.active_benefit_group_assignment }
   let!(:person2) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 30.years) }
   let!(:person3) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 30.years) }
-  let!(:family) {
-                family = FactoryBot.build(:family, :with_primary_family_member, person: person)
-                FactoryBot.create(:family_member, family: family, person: person2)
-                FactoryBot.create(:family_member, family: family, person: person3)
-                person.person_relationships.create(relative_id: person2.id, kind: "child")
-                person.person_relationships.create(relative_id: person3.id, kind: "child")
-                person.save!
-                family.save!
-                family
-              }
+  let!(:family) do
+    family = FactoryBot.build(:family, :with_primary_family_member, person: person)
+    family.relate_new_member(person2, 'child')
+    family.relate_new_member(person3, 'child')
+    family.save
+    person.save
+    family
+  end
 
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: family.households.first, kind: "employer_sponsored", family: family, aasm_state: "coverage_selected", benefit_group_assignment_id: benefit_group_assignment.id) }
   let!(:hbx_enrollment_member1){ FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members[0].id, eligibility_date: TimeKeeper.date_of_record.prev_month) }
@@ -61,6 +59,7 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
       person2.update_attributes(dob: TimeKeeper.date_of_record.next_month - 26.years)
       person3.update_attributes(dob: TimeKeeper.date_of_record.next_month - 25.years)
       allow(TimeKeeper).to receive(:date_of_record).and_return TimeKeeper.date_of_record.next_month.beginning_of_month
+
       expect_any_instance_of(BenefitSponsors::Observers::NoticeObserver).to receive(:deliver)
       person.employee_roles.first.update_attributes(census_employee_id: census_employee.id)
       Rake::Task["recurring:dependent_age_off_termination_notification_manual"].reenable
@@ -68,4 +67,3 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
     end
   end
 end
-

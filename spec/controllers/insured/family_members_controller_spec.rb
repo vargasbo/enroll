@@ -152,6 +152,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
+      allow(dependent).to receive(:family).and_return(test_family)
+      allow(test_family).to receive(:build_relationship_matrix).and_return([])
+      allow(test_family).to receive(:find_missing_relationships).and_return([])
       sign_in(user)
       get :show, params: {id: family_member.id}
     end
@@ -189,7 +192,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { ActionController::Parameters.new(:family_id => "saldjfalkdjf").permit(:family_id) }
     let(:save_result) { false }
-    # let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
+    let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
 
     before :each do
       sign_in(user)

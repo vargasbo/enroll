@@ -2,10 +2,10 @@ require 'autoinc'
 
 class TaxHousehold
   include Mongoid::Document
-  include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
   include Acapi::Notifiers
+  include SetCurrentUser
   include Mongoid::Autoinc
   include ApplicationHelper
 
@@ -30,8 +30,11 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations, cascade_callbacks: true
 
-  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
-  scope :active_tax_household, ->{ where(effective_ending_on: nil) }
+  before_create :set_effective_starting_on
+
+  scope :tax_household_with_year, ->(year) { where(effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), is_eligibility_determined: true) }
+  scope :active_tax_household, ->{ where(effective_ending_on: nil, is_eligibility_determined: true) }
+
 
   def latest_eligibility_determination
     preferred_eligibility_determination
@@ -65,7 +68,13 @@ class TaxHousehold
   end
 
   def aptc_members
-    tax_household_members.find_all(&:is_ia_eligible?)
+    # tax_household_members.find_all(&:is_ia_eligible?)
+    #Review split brain
+    if application_id.present?
+      active_applicants.find_all(&:is_ia_eligible?)
+    else
+      tax_household_members.find_all(&:is_ia_eligible?)
+    end
   end
 
   def applicant_ids
@@ -93,7 +102,7 @@ class TaxHousehold
       #TODO use which date to calculate premiums by slcp
       product = product_factory.new({product_id: slcsp.id})
       premium = product.cost_for(effective_starting_on, member.age_on_effective_date)
-      benchmark_member_cost_hash[member.applicant_id.to_s] = premium
+      benchmark_member_cost_hash[member.family_member.id.to_s] = premium
     end
 
     # Sum premium total for aptc_members
@@ -258,9 +267,7 @@ class TaxHousehold
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    tax_household_members.detect do |tax_household_member|
-      tax_household_member.is_subscriber == true
-    end
+    application_id.present? ? application.applicants.detect{ |applicant| applicant.family_member.is_primary_applicant?} : tax_household_members.detect { |tax_household_member| tax_household_member.is_subscriber }
   end
 
   def active_applicants
@@ -277,6 +284,11 @@ class TaxHousehold
     application.applicants.where(tax_household_id: self.id) if application.applicants.present?
   end
 
+  def any_applicant_ia_eligible?
+    return nil unless active_applicants.present?
+    active_applicants.map(&:is_ia_eligible).include?(true)
+  end
+
   # TODO: Refactor this to return Applicants vs TaxHouseholdMembers after FAA merge.
   def tax_members
     tax_household_members
@@ -289,8 +301,14 @@ class TaxHousehold
       curam_ed = eligibility_determinations.where(source: "Curam").first
       return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
       return curam_ed if curam_ed.present?
+      eligibility_determinations.max_by(&:determined_at)
+    else
+      eligibility_determinations.max {|a, b| a.determined_on <=> b.determined_on}
     end
-    eligibility_determinations.max_by(&:determined_at)
+  end
+
+  def set_effective_starting_on
+    write_attributes(effective_starting_on: TimeKeeper.date_of_record) if effective_starting_on.blank?
   end
 
   private

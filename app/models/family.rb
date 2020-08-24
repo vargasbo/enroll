@@ -657,7 +657,7 @@ class Family
   end
 
   def relate_new_member(person, relationship)
-    primary_applicant_person.ensure_relationship_with(person, relationship)
+    primary_applicant_person.ensure_relationship_with(person, relationship, self.id)
     add_family_member(person)
   end
 
@@ -688,7 +688,6 @@ class Family
       is_coverage_applicant: is_coverage_applicant,
       is_consent_applicant: is_consent_applicant
     )
-
     active_household.add_household_coverage_member(family_member)
     family_member
   end
@@ -716,6 +715,7 @@ class Family
         # Note: Forms::FamilyMember.rb calls the save on destroy!
         # here is_active is only set in memory
         family_member.is_active = false
+        person.remove_relationship(self.id) #delete family reltionships associated to deleted member
         active_household.remove_family_member(family_member)
       end
       [true, "Successfully removed family member"]
@@ -1382,13 +1382,19 @@ class Family
     self.errors.add(:family_members, "may not have more than one primary family member") if list.size > 1
   end
 
+  #new_code Checks only in context of primary person.
   def all_family_member_relations_defined
     return unless primary_family_member.present? && primary_family_member.person.present?
-    primary_member_id = primary_family_member.id
-    primary_person = primary_family_member.person
-    other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
-    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? }
+
+    primary_member = primary_family_member
+    other_family_members = family_members.where(is_active: true).reject { |fm| (fm.id.to_s == primary_member.id.to_s) }
+    undefined_relations = other_family_members.any? { |fm| find_relationship_between(primary_member.person, fm.person).blank? }
+
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
+  end
+
+  def find_relationship_between(predecessor, successor)
+    predecessor.person_relationships.where(predecessor_id: predecessor.id, successor_id: successor.id, family_id: self.id).first
   end
 
   def single_active_household
@@ -1437,7 +1443,7 @@ class Family
     return true if primary_applicant.nil? #responsible party case
     return true if primary_applicant.person.id == family_member.person.id
 
-    if IMMEDIATE_FAMILY.include? primary_applicant.person.find_relationship_with(family_member.person)
+    if IMMEDIATE_FAMILY.include? primary_applicant.person.find_relationship_with(family_member.person, self.id)
       true
     else
       false

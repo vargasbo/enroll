@@ -75,9 +75,10 @@ describe Person, :dbclean => :after_each do
           expect(person.valid?).to be_truthy
         end
 
-        it "should known its relationship is self" do
-          expect(person.find_relationship_with(person)).to eq "self"
-        end
+        # We are no more saving self relationship
+        # it "should known its relationship is self" do
+        #   expect(person.find_relationship_with(person)).to eq "self"
+        # end
 
         it "unread message count is accurate" do
           expect(person.inbox).to be nil
@@ -713,17 +714,17 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe '#person_relationships' do
-    it 'accepts associated addresses' do
-      # setup
-      person = FactoryBot.build(:person)
-      relationship = person.person_relationships.build({kind: "self", relative: person})
-
-      expect(person.save).to eq true
-      expect(person.person_relationships.size).to eq 1
-      expect(relationship.invert_relationship.kind).to eq "self"
-    end
-  end
+  # describe '#person_relationships' do
+  #   it 'accepts associated addresses' do
+  #     family = FactoryBot.create(:family, :with_primary_family_member)
+  #     person = family.primary_applicant.person
+  #     relationship = person.person_relationships.build(family_id: family.id, predecessor_id: person.id, successor_id: person.id, kind: 'self')
+  #
+  #     expect(person.save).to eq true
+  #     expect(person.person_relationships.size).to eq 1
+  #     expect(relationship.invert_relationship.kind).to eq "self"
+  #   end
+  # end
 
   describe '#full_name' do
     it 'returns the concatenated name attributes' do
@@ -763,18 +764,19 @@ describe Person, :dbclean => :after_each do
 
   describe 'ensure_relationship_with' do
     let(:person10) { FactoryBot.create(:person) }
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person10)}
 
     describe 'with no relationship to a dependent' do
       context 'after ensure_relationship_with' do
-        let(:person11) { FactoryBot.create(:person) }
-
-        before do
-          person10.ensure_relationship_with(person11, 'child')
-          person10.save!
+        let(:person11) do
+          human = FactoryBot.create(:person)
+          human.ensure_relationship_with(person10, 'child', family.id)
+          human
         end
 
-        it 'should have the new relationship' do
-          expect(person10.person_relationships.first.relative_id).to eq(person11.id)
+        before do
+          person10.ensure_relationship_with(person11, 'child', family.id)
+          person10.save!
         end
 
         it 'should have fixed number of relationships' do
@@ -787,13 +789,12 @@ describe Person, :dbclean => :after_each do
       context 'after ensure_relationship_with a different type of relationship' do
         let(:person11) do
           human = FactoryBot.create(:person)
-          person10.person_relationships << PersonRelationship.new(relative_id: human.id, kind: 'child')
-          person10.save!
+          human.ensure_relationship_with(person10, 'child', family.id)
           human
         end
 
         before do
-          person10.ensure_relationship_with(person11, 'spouse')
+          person10.ensure_relationship_with(person11, 'spouse', family.id)
           person10.save!
         end
 
@@ -809,7 +810,7 @@ describe Person, :dbclean => :after_each do
 
     context 'should not create a relationship from self to self' do
       before do
-        person10.ensure_relationship_with(person10, 'unrelated')
+        person10.ensure_relationship_with(person10, 'unrelated', family.id)
         person10.save!
       end
 
