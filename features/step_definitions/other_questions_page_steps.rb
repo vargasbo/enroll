@@ -118,10 +118,10 @@ Then(/^the military veteran question should display$/) do
   expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
 end
 
-Given(/^user answers yes to the military veteran question$/) do
-  choose('is_resident_post_092296_yes')
+Given(/^user answers no to the military veteran question$/) do
+  choose('is_veteran_or_active_military_no')
 end
 
 Then(/^the are you a spouse of such a veteran question should display$/) do
-  expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
+  expect(page).to have_content('Are you the spouse or dependent child of such a veteran or individual in active duty status?')
 end
