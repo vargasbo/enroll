@@ -20,15 +20,15 @@ module Parsers::Xml::Cv::Importers
         race: person_demographics.race,
       )
       person_relationships.each do |relationship|
-        if relationship.subject_individual != relationship.object_individual
-          relation = relationship.relationship_uri.strip.split("#").last rescue ''
-          person_object.person_relationships.build({successor_id: relationship.object_individual, #use subject_individual or object_individual
-                                                    predecessor_id: person_object.id,
-                                                    family_id: family_id,
-                                                    kind: PersonRelationship::InverseMap[relation]})
-                                                    # relative_id: relationship.object_individual, #use subject_individual or object_individual
-                                                    # kind: relation
-        end
+        next if relationship.subject_individual == relationship.object_individual
+
+        relation = relationship&.relationship_uri&.strip.split("#").last
+        person_object.person_relationships.build({successor_id: relationship.object_individual, #use subject_individual or object_individual
+                                                  predecessor_id: person_object.id,
+                                                  family_id: family_id,
+                                                  kind: PersonRelationship::InverseMap[relation]})
+                                                  # relative_id: relationship.object_individual, #use subject_individual or object_individual
+                                                  # kind: relation
       end
 
       build_addresses(person, person_object)
