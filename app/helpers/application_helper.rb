@@ -134,6 +134,16 @@ module ApplicationHelper
     timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
   end
 
+  def human_boolean(boolean)
+    if boolean
+      'Yes'
+    elsif boolean == false
+      'No'
+    else
+      'N/A'
+    end
+  end
+
   # Builds a Dropdown button
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
@@ -745,16 +755,6 @@ module ApplicationHelper
     # fix me compare with total enrollments
     # fix me once new model enrollment and benefit group assignments got fixed
     non_owner_participation_rule_for_plan_year(employer.show_plan_year)
-  end
-
-  def human_boolean(boolean)
-    if boolean
-      'Yes'
-    elsif boolean == false
-      'No'
-    else
-      'N/A'
-    end
   end
 
   def is_new_paper_application?(current_user, app_type)

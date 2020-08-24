@@ -222,13 +222,10 @@ describe Family, type: :model, dbclean: :around_each do
             end
 
             context "and the primary applicant is not the same person" do
-              let(:second_family) { Family.new }
-              let(:second_family_member_spouse) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: spouse) }
-              let(:second_family_member_person) { FamilyMember.new(person: person) }
+              let(:second_family) {FactoryBot.create(:family, :with_primary_family_member, person: spouse)}
 
               before do
-                spouse.ensure_relationship_with(person, 'spouse', family.id)
-                second_family.family_members = [second_family_member_person, second_family_member_spouse]
+                family.relate_new_member(person, 'spouse')
               end
 
               it "should be valid" do
