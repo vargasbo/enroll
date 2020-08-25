@@ -701,13 +701,13 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
 end
 
 Then("Employee should see the relationship selection") do
-  expect(page).to have_content("Household Relationships")
+  expect(page).to have_content("Family Relationships")
 end
 
 When(/^Employee selects relationship and clicks Add Relationship$/) do
   find('.button').click
   @relationship = find(".selectric-items").find(:xpath, 'div/ul/li[5]').click
-  expect(find(".selectric-wrapper").find(:xpath, 'div[2]/span').text).to eq("parent")
+  expect(find(".selectric-wrapper").find(:xpath, 'div[2]/span').text).to eq("Parent")
   click_button("Add Relationship")
 end
 

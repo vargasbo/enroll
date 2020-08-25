@@ -17,6 +17,8 @@ When(/^the user clicks the Family Relationships link$/) do
 end
 
 Then(/^the user will navigate to the Family relationships page$/) do
+  # binding.pry
+  # expect(page).to have_content('Household Relationships')
   expect(page).to have_content('Family Relationships')
   expect(page).to have_content('HOUSEHOLD MEMBER')
 end

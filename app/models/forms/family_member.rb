@@ -312,6 +312,11 @@ module Forms
       self.errors.add(:base, "can not have multiple spouse or life partner") if relationships.values.count{|rs| ['spouse', 'life_partner'].include?(rs)} > 1
     end
 
+    def copy_finanacial_assistances_application
+      service = application_service.new(family)
+      service.process_application unless service.code == :no_app
+    end
+
     def age_on(date)
       age = date.year - dob.year
       if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
@@ -319,6 +324,12 @@ module Forms
       else
         age
       end
+    end
+
+    private
+
+    def application_service
+      FinancialAssistance::Services::ApplicationService
     end
   end
 end

@@ -1,4 +1,3 @@
-@wip
 Feature: Conditional Display of Family Relationships link in the left nav of the FAA Household Info page.
 
   Background: Household Info page

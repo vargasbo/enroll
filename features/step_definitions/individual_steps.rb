@@ -210,7 +210,7 @@ And(/should find alien number/) do
 end
 
 And(/Individual edits dependent/) do
-  find('.fa-edit').click
+  find(:xpath, './html/body/div[3]/div[2]/div/div/div[2]/div[4]/ul/li/div/div[2]/div[4]/div/div/a').click
   wait_for_ajax
 end
 

@@ -60,17 +60,20 @@ Given(/^at least one other household members exist$/) do
   find(".btn", text: "CONFIRM MEMBER").click
 
 
-  # expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
+  expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
 end
 
 Then(/^Family Relationships left section WILL display$/) do
+  sleep 2
   expect(page).to have_content('Family Relationships')
 end
 
 When(/^all applicants are in Info Completed state$/) do
   until find_all(".btn", text: "ADD INCOME & COVERAGE INFO").empty?
     find_all(".btn", text: "ADD INCOME & COVERAGE INFO")[0].click
-    find("#is_required_to_file_taxes_yes").click
+    # find("#is_required_to_file_taxes_yes").click
+    sleep 1
+    find("#is_required_to_file_taxes_no").click
     sleep 1
     find("#is_claimed_as_tax_dependent_no").click
     find("#is_joint_tax_filing_no").click if page.all("#is_joint_tax_filing_no").present?
@@ -82,7 +85,6 @@ When(/^all applicants are in Info Completed state$/) do
 
     find("#has_other_income_false").click
     find(:xpath, '//*[@id="btn-continue"]').click
-
     find("#has_deductions_false").click
     find(:xpath, '//*[@id="btn-continue"]').click
 
