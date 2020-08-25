@@ -60,7 +60,7 @@ Given(/^at least one other household members exist$/) do
   find(".btn", text: "CONFIRM MEMBER").click
 
 
-  # expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
+  expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
 end
 
 Then(/^Family Relationships left section WILL display$/) do
