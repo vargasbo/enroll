@@ -36,4 +36,6 @@ And(/^the user fills out the review and submit details$/) do
   choose("mailed_no")
   continue_button = page.all('input').detect { |input| input[:type] == 'submit' }
   continue_button.click
+  # Submit Application
+  find("#application_medicaid_terms").click
 end

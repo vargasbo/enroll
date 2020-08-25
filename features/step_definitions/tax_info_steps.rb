@@ -87,3 +87,10 @@ And(/^the user navigates to the Back to All Household Members page$/) do
   click_link 'BACK TO ALL HOUSEHOLD MEMBERS'
   click_button 'BACK TO ALL HOUSEHOLD MEMBERS'
 end
+
+
+And(/^the user indicates that the dependent will be claimed as a tax dependent by primary applicant$/) do
+  choose('is_required_to_file_taxes_no')
+  choose('is_claimed_as_tax_dependent_yes')
+  binding.pry
+end

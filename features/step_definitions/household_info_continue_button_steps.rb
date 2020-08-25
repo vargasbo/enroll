@@ -102,7 +102,7 @@ When(/^all applicants are in Info Completed state$/) do
   end
 end
 
-And(/^primary applicant complets application and marks they are required to file taxes$/) do
+And(/^primary applicant completes application and marks they are required to file taxes$/) do
   find("#is_required_to_file_taxes_yes").click
   sleep 1
   find("#is_claimed_as_tax_dependent_no").click
