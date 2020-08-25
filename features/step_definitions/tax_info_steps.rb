@@ -66,6 +66,8 @@ end
 
 Given(/^the user is on the Tax Info page for a dependent applicant$/) do
   # TODO: Remove this when applicants are properly created
+  # Applicants will be properly created when a family member is added by this PR
+
   dependent_applicant = application.applicants.create!(family_member_id: application.family.family_members.last.id)
   application.reload
   dependent_applicant = application.applicants.last
@@ -92,5 +94,15 @@ end
 And(/^the user indicates that the dependent will be claimed as a tax dependent by primary applicant$/) do
   choose('is_required_to_file_taxes_no')
   choose('is_claimed_as_tax_dependent_yes')
-  binding.pry
+  # Click dropdown
+  page.all('.selectric-claimed-dependent-dropdown')[0].click
+  # Click primary member
+  page.all('li').detect { |li| li.text == 'John Smith1' }.click
+end
+
+And(/^the dependent should now be claimed by the primary dependent$/) do
+  application.reload
+  primary_applicant = application.applicants.first
+  dependent = application.applicants.last
+  expect(dependent.claimed_as_tax_dependent_by.to_s).to eq(primary_applicant.id.to_s)
 end

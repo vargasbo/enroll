@@ -54,5 +54,7 @@ Scenario: Can choose primary applicant claiming dependent from dropdown
   Given the user is on the Tax Info page for a dependent applicant
   And the user indicates that the dependent will be claimed as a tax dependent by primary applicant
   Then the CONTINUE will be visibly enabled
-  And should be actionable
+  And should be actionable.
+  When the user clicks on the CONTINUE button
+  And the dependent should now be claimed by the primary dependent
   
