@@ -119,7 +119,6 @@ class Insured::FamiliesController < FamiliesController
 
   def personal
     @tab = params['tab']
-
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
     @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
@@ -127,6 +126,7 @@ class Insured::FamiliesController < FamiliesController
     @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
+      format.js
     end
   end
 
