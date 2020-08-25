@@ -22,7 +22,8 @@
         <% elsif @type == "employee" %>
           <%= render  partial: 'shared/signup_progress', locals: {
               step: '4',
-              url: @missing_relationships.present? ? insured_family_relationships_path(:employee_role_id => @employee_role.id) : group_selection_url
+              # url: @missing_relationships.present? ? insured_family_relationships_path(:employee_role_id => @employee_role.id) : group_selection_url
+              url: group_selection_url
           } %>
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
