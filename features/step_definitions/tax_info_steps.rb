@@ -44,6 +44,10 @@ When(/^Will this person file taxes for <system year>\? does not have a nil value
   choose('is_required_to_file_taxes_no')
 end
 
+And(/^question will this person file taxes for year is marked as yes for primary applicant$/) do
+  choose('is_required_to_file_taxes_yes')
+end
+
 When(/^Will this person be claimed as a tax dependent for <system year>\? does not have a nil value stored$/) do
   choose('is_claimed_as_tax_dependent_no')
 end
@@ -60,11 +64,26 @@ Given(/^the user is on the Tax Info page for a given applicant$/) do
   visit financial_assistance.go_to_step_application_applicant_path(application, application.primary_applicant, 1)
 end
 
+Given(/^the user is on the Tax Info page for a dependent applicant$/) do
+  # TODO: Remove this when applicants are properly created
+  dependent_applicant = application.applicants.create!(family_member_id: application.family.family_members.last.id)
+  application.reload
+  dependent_applicant = application.applicants.last
+  visit financial_assistance.go_to_step_application_applicant_path(application, dependent_applicant, 1)
+end
+
+
 When(/^the user clicks on the CONTINUE button$/) do
+  sleep 1
   continue_button = page.all('input').detect { |input| input[:type] == 'submit' }
   continue_button.click
 end
 
 Then(/^the user will navigate to the Job Income page for the same applicant\.$/) do
   click_link 'Job Income'
+end
+
+And(/^the user navigates to the Back to All Household Members page$/) do
+  click_link 'BACK TO ALL HOUSEHOLD MEMBERS'
+  click_button 'BACK TO ALL HOUSEHOLD MEMBERS'
 end

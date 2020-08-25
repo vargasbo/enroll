@@ -2,6 +2,9 @@
   <h2 class="darkblue"><%= personalize_heading_text(heading) %></h2>
 <% end %>
 
+Eligible dependents are <%= claim_eligible_tax_dependents %>
+
+
 <% lines.each do |line| %>
   <div class="row row-form-wrapper radio-align no-buffer row-height yml-row">
   <% line.cells.each do |cell| %>

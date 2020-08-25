@@ -103,10 +103,13 @@ module FinancialAssistance
     end
 
     def claim_eligible_tax_dependents
-      @application.active_applicants.inject({}) do |memo, applicant|
-        memo.merge! applicant.person.full_name => applicant.id.to_s if applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id
-        memo
+      return if @application.blank? || @applicant.blank?
+      eligible_applicants = @application.active_applicants.map! do |applicant|
+        if applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id
+          [applicant.person.full_name, applicant.id.to_s]
+        end
       end
+      eligible_applicants
     end
 
     def frequency_kind_options
