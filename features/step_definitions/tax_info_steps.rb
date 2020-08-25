@@ -65,10 +65,8 @@ Given(/^the user is on the Tax Info page for a given applicant$/) do
 end
 
 Given(/^the user is on the Tax Info page for a dependent applicant$/) do
-  # TODO: Remove this when applicants are properly created
-  # Applicants will be properly created when a family member is added by this PR
-
-  dependent_applicant = application.applicants.create!(family_member_id: application.family.family_members.last.id)
+  # TODO: Remove this when step for duplican tapplicant is quickly created
+  application.applicants.create!(family_member_id: application.family.family_members.last.id)
   application.reload
   dependent_applicant = application.applicants.last
   visit financial_assistance.go_to_step_application_applicant_path(application, dependent_applicant, 1)
