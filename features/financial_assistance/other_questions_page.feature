@@ -65,5 +65,5 @@ Feature: Start a new Financial Assistance Application and answers questions on O
 
   Scenario: Answered yes to military question
     Given the user answers yes to having an eligible immigration status
-    And user answers yes to the military veteran question
+    And user answers no to the military veteran question
     Then the are you a spouse of such a veteran question should display

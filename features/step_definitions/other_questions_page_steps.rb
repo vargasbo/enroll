@@ -97,7 +97,17 @@ Then(/^the was this person enrolled in medicare when they left foster care shoul
 end
 
 And(/^the user answers yes to having an eligible immigration status$/) do
-  consumer.person.eligible_immigration_status == true
+  str1_markerstring = "applications/"
+  str2_markerstring = "/applicants"
+
+  application_id = page.current_path[/#{str1_markerstring}(.*?)#{str2_markerstring}/m, 1]
+  str1_markerstring = "applicants/"
+  str2_markerstring = "/other_questions"
+
+  applicant_id = page.current_path[/#{str1_markerstring}(.*?)#{str2_markerstring}/m, 1]
+  application = FinancialAssistance::Application.where(id: application_id).first
+  current_applicant = application.applicants.find(applicant_id)
+  expect(current_applicant.person.eligible_immigration_status).to eq(true)
 end
 
 Then(/^the did you move to the US question should display$/) do
@@ -108,10 +118,10 @@ Then(/^the military veteran question should display$/) do
   expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
 end
 
-Given(/^user answers yes to the military veteran question$/) do
-  choose('is_resident_post_092296_yes')
+Given(/^user answers no to the military veteran question$/) do
+  choose('is_veteran_or_active_military_no')
 end
 
 Then(/^the are you a spouse of such a veteran question should display$/) do
-  expect(page).to have_content('Are you an honorably discharged veteran or active duty member of the military?')
+  expect(page).to have_content('Are you the spouse or dependent child of such a veteran or individual in active duty status?')
 end

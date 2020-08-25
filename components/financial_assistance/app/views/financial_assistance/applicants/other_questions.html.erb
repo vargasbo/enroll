@@ -279,7 +279,7 @@
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %>
           </div>
         </div>
-        <% if @person.eligible_immigration_status.present? %>
+        <% if @applicant.person.eligible_immigration_status.present? %>
         <div class="row row-form-wrapper no-buffer row-height">
           <div class='col-md-6'>
             <span class="fa-text-color">Did you move to the U.S. on or after August 22, 1996?</span>
