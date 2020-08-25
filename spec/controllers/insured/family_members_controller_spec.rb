@@ -187,9 +187,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
   describe "POST create" do
     let(:address) { double }
-    let(:family_member) { double("FamilyMember")}
+    let(:family_member) { double("FamilyMember") }
     let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: true) }
-    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { ActionController::Parameters.new(:family_id => "saldjfalkdjf").permit(:family_id) }
     let(:save_result) { false }
     let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
