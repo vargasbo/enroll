@@ -28,3 +28,14 @@ end
 Then(/^the user will navigate to the Review Application page$/) do
   expect(page).to have_content("Review Your Application")
 end
+
+And(/^the user fills out the review and submit details$/) do
+  sleep 1
+  find(".btn", text: "CONTINUE").click
+  sleep 1
+  choose("mailed_no")
+  continue_button = page.all('input').detect { |input| input[:type] == 'submit' }
+  continue_button.click
+  # Submit Application
+  find("#application_medicaid_terms").click
+end
