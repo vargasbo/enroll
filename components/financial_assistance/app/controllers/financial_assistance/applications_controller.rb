@@ -10,6 +10,8 @@ module FinancialAssistance
     before_action :init_cfl_service, only: :review_and_submit
     before_action :family_relationships, only: :review_and_submit
 
+    layout "financial_assistance_nav", only: %i[edit]
+
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
     require 'securerandom'
@@ -41,7 +43,6 @@ module FinancialAssistance
       load_support_texts
       matrix = @family.build_relationship_matrix
       @missing_relationships = @family.find_missing_relationships(matrix)
-      render layout: 'financial_assistance_nav'
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity
