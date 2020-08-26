@@ -151,7 +151,3 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
     end
   end
 end
-
-
-
-
