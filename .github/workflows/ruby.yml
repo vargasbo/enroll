@@ -15,21 +15,20 @@ jobs:
         with:
           ruby-version: "2.5.1"
       - name: Cache Gems
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+            v2-${{ runner.os }}-gems-
       - name: bundle install
         run: |
           gem update --system
-          gem install bundler -v '2.0.1'
           bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
+          bundle install
       - name: Run rubocop
         run: |
-          git fetch --no-tags origin
+          git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
   testing_matrix:
     name: ${{matrix.command_configs.name}}
@@ -196,12 +195,12 @@ jobs:
         if: matrix.command_configs.needs_chromedriver
         uses: nanasess/setup-chromedriver@master
       - name: Cache Gems
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+            v2-${{ runner.os }}-gems-
       - name: Cache Node Modules
         id: npm-cache
         if: matrix.command_configs.skip_js != 'true'
