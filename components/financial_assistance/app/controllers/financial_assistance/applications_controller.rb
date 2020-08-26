@@ -10,6 +10,8 @@ module FinancialAssistance
     before_action :init_cfl_service, only: :review_and_submit
     before_action :family_relationships, only: :review_and_submit
 
+    layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
+
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
     require 'securerandom'
@@ -41,7 +43,6 @@ module FinancialAssistance
       load_support_texts
       matrix = @family.build_relationship_matrix
       @missing_relationships = @family.find_missing_relationships(matrix)
-      render layout: 'financial_assistance_nav'
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity
@@ -71,16 +72,16 @@ module FinancialAssistance
             end
 
           else
-            render 'workflow/step', layout: 'financial_assistance_nav'
+            render 'workflow/step'
           end
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance_nav'
+          render 'workflow/step'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance_nav'
+        render 'workflow/step'
       end
       # rubocop:enable Metrics/BlockNesting
     end
@@ -145,11 +146,7 @@ module FinancialAssistance
       @consumer_role = @person.consumer_role
       @application = @person.primary_family.application_in_progress
       @applicants = @application.active_applicants if @application.present?
-      if @application.blank?
-        redirect_to applications_path
-      else
-        render layout: 'financial_assistance_nav'
-      end
+      redirect_to applications_path if @application.blank?
     end
 
     def review
@@ -180,8 +177,6 @@ module FinancialAssistance
       set_admin_bookmark_url
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
-
-      render layout: 'financial_assistance_nav'
     end
 
     def eligibility_response_error
@@ -191,8 +186,6 @@ module FinancialAssistance
       @application = @person.primary_family.applications.find(params[:id])
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
-
-      render layout: 'financial_assistance_nav'
     end
 
     def check_eligibility_results_received
