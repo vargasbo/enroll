@@ -87,6 +87,7 @@ module FinancialAssistance
       end
 
       def is_enrolled_on_medicaid
+        binding.pry
         @instance.is_post_partum_period
       end
 

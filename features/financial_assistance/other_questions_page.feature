@@ -19,10 +19,21 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the user answers no to the have you applied for an SSN question
     Then the reason why question is displayed
 
-  Scenario: Pregnancy question - yes
+  Scenario: Currently pregnant response with Yes with information filled and submitted
     Given the user answers yes to being pregnant
     Then the due date question should display
+    And the user enters a pregnancy due date of one month from today
     And how many children question should display
+    And the user answers two for how many children
+    And the user fills out the rest of the other questions form and submits it
+    Then the user should see text that the info is complete
+
+  Scenario: Pregnancy response within 60 days Yes with information filled and submitted
+    Given the user answers no to being pregnant
+    And they answer yes to was this person pregnant in the last 60 days question
+    And the user enters a pregnancy end date of one month ago
+    And the user fills out the rest of the other questions form and submits it
+    Then the user should see text that the info is complete
 
   Scenario: Pregnancy question - no
     Given the user answers no to being pregnant
