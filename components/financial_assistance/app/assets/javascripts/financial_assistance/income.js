@@ -335,7 +335,7 @@ document.addEventListener("turbolinks:load", function() {
 });
 
 // otherincome checkbox fuctionality
-$(document).ready(function() {
+$(document).on('turbolinks:load', function () {
   function disableSave(form){
     form.find('.interaction-click-control-save').addClass("disabled");
   }

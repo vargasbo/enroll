@@ -51,12 +51,12 @@
       <br>
 
       <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
-        <div id="<%= other_income_kind %>" class="other-income-kind run-glossary">
+        <div id="<%= other_income_kind %>" class="other-income-kind">
           <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
             <div class="col-md-1 checkbox-mr">
               <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
             </div>
-            <div class="col-md-9 no-pd">
+            <div class="col-md-9 no-pd run-glossary">
               <%= label %>
             </div>
           </div>
