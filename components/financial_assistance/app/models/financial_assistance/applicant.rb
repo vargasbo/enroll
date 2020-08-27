@@ -684,9 +684,9 @@ module FinancialAssistance
       if is_pregnant
         errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank?
         errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
-      else
+      elsif is_post_partum_period.blank?
         # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
-        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.blank?
+        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered")
       end
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?

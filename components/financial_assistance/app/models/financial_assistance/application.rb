@@ -690,7 +690,7 @@ module FinancialAssistance
       delete_verification_documents
     end
 
-    def create_tax_households # rubocop:todo Metrics/CyclomaticComplexity
+    def create_tax_households
       ## Remove  when copy method is fixed to exclude copying Tax Household
       active_applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
 
