@@ -65,8 +65,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
 
   context "GET save questions" do
     it "should save questions and redirects to edit_financial_assistance_application_path", dbclean: :after_each do
-      get :save_questions, params: { application_id: application.id, id: applicant.id, financial_assistance_applicant: financial_assistance_applicant_valid }
-      expect(response).to have_http_status(302)
+      get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_valid }
+      expect(response).to have_http_status(302)      
       expect(response.headers['Location']).to have_content 'edit'
       expect(response).to redirect_to(edit_application_path(application))
     end
@@ -74,7 +74,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     # is_claimed_as_tax_dependent, which are passed as nil here as "invalid params."
     # Should they be added to the presence_of_attr_other_qns method?
     xit "should not save and redirects to other_questions_financial_assistance_application_applicant_path", dbclean: :after_each do
-      get :save_questions, params: { application_id: application.id, id: applicant.id, financial_assistance_applicant: financial_assistance_applicant_invalid }
+      get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: financial_assistance_applicant_invalid }
       expect(response).to have_http_status(302)
       expect(response.headers['Location']).to have_content 'other_questions'
       expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))

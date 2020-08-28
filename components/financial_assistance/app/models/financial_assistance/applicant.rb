@@ -684,8 +684,8 @@ module FinancialAssistance
       if is_pregnant
         errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank?
         errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
-      # Nil means unanswered, true/or false boolean will be passed through
-      elsif is_post_partum_period.nil?
+      # Nil or "" means unanswered, true/or false boolean will be passed through
+      elsif is_post_partum_period.nil? || is_post_partum_period == ""
         # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
         errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered")
       end
