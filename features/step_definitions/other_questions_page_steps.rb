@@ -66,6 +66,26 @@ And(/^the user fills out the rest of the other questions form and submits it$/) 
   find('[name=commit]').click
 end
 
+And(/^the user fills out the rest of form with medicaid during pregnancy as yes and submits it$/) do
+  choose('is_ssn_applied_no')
+  find("#has_daily_living_no").click
+  find("#need_help_paying_bills_no").click
+  find("#radio_physically_disabled_no").click
+  choose('is_former_foster_care_no')
+  choose('is_student_no')
+  choose('is_self_attested_blind_no')
+  choose('is_veteran_or_active_military_no')
+  choose("is_resident_post_092296_no")
+  choose("medicaid_pregnancy_yes") if page.all("#medicaid_pregnancy_yes").present?
+  find('[name=commit]').click
+end
+
+And(/^the info complete applicant has an attribute is_enrolled_on_medicaid that is set to true$/) do
+  last_application = FinancialAssistance::Application.last
+  complete_applicant = last_application.applicants.detect { |applicant| applicant.applicant_validation_complete? }
+  expect(complete_applicant.is_enrolled_on_medicaid).to eq(true)
+end
+
 Then(/^the user should see text that the info is complete$/) do
   expect(page).to have_content("Info Complete")
 end

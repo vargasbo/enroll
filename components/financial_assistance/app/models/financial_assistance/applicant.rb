@@ -691,11 +691,8 @@ module FinancialAssistance
       end
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?
-        # Enrolled on medica must check if nil
-        # TODO: Solve the issue of enrolled on medicaid.
-        # we're asking the question of whether they're enrolled on medicaid in other_questions.html.erb, but it doesn't appear this is being
-        # mapped to a database attribute here and saved.
-        # errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_medicare_eligible.nil?
+        # Enrolled on medicaid must check if nil
+        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 

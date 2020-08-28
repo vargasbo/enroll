@@ -87,7 +87,7 @@ module FinancialAssistance
       end
 
       def is_enrolled_on_medicaid
-        @instance.is_post_partum_period
+        @instance.is_enrolled_on_medicaid
       end
 
       def is_former_foster_care

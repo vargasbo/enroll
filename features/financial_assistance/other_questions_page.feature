@@ -46,6 +46,14 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And they answer yes to was this person pregnant in the last 60 days question
     Then the has this person ever been in foster care question should display
 
+  Scenario: If they were pregnant, were they on medicaid? Answer "Yes" with form submitted.
+    Given the user answers no to being pregnant
+    And they answer yes to was this person pregnant in the last 60 days question
+    And the user enters a pregnancy end date of one month ago
+    And the user fills out the rest of form with medicaid during pregnancy as yes and submits it
+    And the info complete applicant has an attribute is_enrolled_on_medicaid that is set to true
+    Then the user should see text that the info is complete
+
   Scenario: Foster care questions
     Given the user has an age between 18 and 26 years old
     Then the has this person ever been in foster care question should display
