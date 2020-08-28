@@ -2,12 +2,13 @@
 
 module FinancialAssistance
   class ApplicationsController < ApplicationController
-    include ::UIHelpers::WorkflowController
-    include Acapi::Notifiers
-    require 'securerandom'
 
     before_action :set_current_person
     before_action :set_primary_family
+
+    include ::UIHelpers::WorkflowController
+    include Acapi::Notifiers
+    require 'securerandom'
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
     before_action :init_cfl_service, only: :review_and_submit
