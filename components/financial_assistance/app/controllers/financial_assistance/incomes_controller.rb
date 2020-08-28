@@ -89,7 +89,8 @@ module FinancialAssistance
     end
 
     def destroy
-      @income = @applicant.incomes.find(params[:id])
+      income_id = params['id'].split('_').last
+      @income = @applicant.incomes.find(income_id)
       @income.destroy!
 
       head :ok
