@@ -2,6 +2,9 @@
 
 module FinancialAssistance
   class ApplicationsController < ApplicationController
+    include ::UIHelpers::WorkflowController
+    include Acapi::Notifiers
+    require 'securerandom'
 
     before_action :set_current_person
     before_action :set_primary_family
@@ -11,10 +14,6 @@ module FinancialAssistance
     before_action :family_relationships, only: :review_and_submit
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
-
-    include ::UIHelpers::WorkflowController
-    include Acapi::Notifiers
-    require 'securerandom'
 
     def index
       @family = @person.primary_family
