@@ -682,15 +682,18 @@ module FinancialAssistance
 
     def presence_of_attr_other_qns # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       if is_pregnant
-        errors.add(:pregnancy_due_on, "' Pregnency Due date' should be answered if you are pregnant") if pregnancy_due_on.nil?
-        errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.nil?
-
-        if is_post_partum_period
-          errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnency?' should be answered") if is_enrolled_on_medicaid.nil?
-        end
-      else
-        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.present?
-        errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.present? && pregnancy_end_on.blank?
+        errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank?
+        errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
+      # Nil or "" means unanswered, true/or false boolean will be passed through
+      elsif is_post_partum_period.nil? || is_post_partum_period == ""
+        # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
+        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered")
+      end
+      # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
+      if is_post_partum_period.present?
+        # Enrolled on medicaid must check if nil
+        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
+        errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
 
       if age_of_applicant > 18 && age_of_applicant < 26

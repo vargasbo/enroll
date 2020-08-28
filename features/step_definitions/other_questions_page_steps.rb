@@ -36,6 +36,61 @@ Then(/^the due date question should display$/) do
   expect(page).to have_content('Pregnancy due date')
 end
 
+And(/^the user enters a pregnancy due date of one month from today$/) do
+  fill_in "applicant_pregnancy_due_on", with: (TimeKeeper.date_of_record + 1.month).to_s
+  # Click off datepicker to close
+  find('.fa-darkblue', match: :first).click
+end
+
+And(/^the user enters a pregnancy end date of one month ago$/) do
+  fill_in "applicant_pregnancy_end_on", with: (TimeKeeper.date_of_record - 1.month).to_s
+end
+
+And(/^the user answers two for how many children$/) do
+  find(".selectric-interaction-choice-control-children-expected-count").click
+  sleep 1
+  find('.interaction-choice-control-children-expected-count-2', match: :first).click
+end
+
+And(/^the user fills out the rest of the other questions form and submits it$/) do
+  choose('is_ssn_applied_no')
+  find("#has_daily_living_no").click
+  find("#need_help_paying_bills_no").click
+  find("#radio_physically_disabled_no").click
+  choose('is_former_foster_care_no')
+  choose('is_student_no')
+  choose('is_self_attested_blind_no')
+  choose('is_veteran_or_active_military_no')
+  choose("is_resident_post_092296_no")
+  choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
+  find('[name=commit]').click
+end
+
+And(/^the user fills out the rest of form with medicaid during pregnancy as yes and submits it$/) do
+  choose('is_ssn_applied_no')
+  find("#has_daily_living_no").click
+  find("#need_help_paying_bills_no").click
+  find("#radio_physically_disabled_no").click
+  choose('is_former_foster_care_no')
+  choose('is_student_no')
+  choose('is_self_attested_blind_no')
+  choose('is_veteran_or_active_military_no')
+  choose("is_resident_post_092296_no")
+  choose("medicaid_pregnancy_yes") if page.all("#medicaid_pregnancy_yes").present?
+  find('[name=commit]').click
+end
+
+And(/^the info complete applicant has an attribute is_enrolled_on_medicaid that is set to true$/) do
+  last_application = FinancialAssistance::Application.last
+  complete_applicant = last_application.applicants.detect { |applicant| applicant.applicant_validation_complete? }
+  expect(complete_applicant.is_enrolled_on_medicaid).to eq(true)
+end
+
+Then(/^the user should see text that the info is complete$/) do
+  expect(page).to have_content("Info Complete")
+end
+
+
 And(/^how many children question should display$/) do
   expect(page).to have_content('How many children is this person expecting?')
 end

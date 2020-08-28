@@ -148,7 +148,7 @@
 #             - cells:
 #                 - gutter: 6
 #                   type: text
-#                   text: Pregnency Due date
+#                   text: Pregnancy Due date
 #                 - gutter: 2
 #                   type: input_date
 #                   placeholder: Due date
@@ -193,7 +193,7 @@
 #             - cells:
 #                 - gutter: 6
 #                   type: text
-#                   text: Pregnency End on date
+#                   text: Pregnancy End on date
 #                 - gutter: 2
 #                   type: input_date
 #                   placeholder: End on date
@@ -203,12 +203,12 @@
 #             - cells:
 #                 - gutter: 6
 #                   type: text
-#                   text: Was this person on Medicaid during pregnency?
+#                   text: Was this person on Medicaid during pregnancy?
 #                   classNames: 'span-text'
 #                 - gutter: 2
 #                   type: label_radio
 #                   value: true
-#                   id: 'medicaid_pregnency_yes'
+#                   id: 'medicaid_pregnancy_yes'
 #                   label: 'Yes'
 #                   classNames: 'span-text'
 #                   model: applicant
@@ -216,7 +216,7 @@
 #                 - gutter: 2
 #                   type: label_radio
 #                   value: false
-#                   id: 'medicaid_pregnency_no'
+#                   id: 'medicaid_pregnancy_no'
 #                   label: 'No'
 #                   classNames: 'span-text'
 #                   model: applicant
