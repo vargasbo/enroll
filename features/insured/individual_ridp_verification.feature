@@ -1,5 +1,6 @@
 Feature: Consumer RIDP verification process
 
+  @flaky
   Background: Individual RIDP Verification process
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal outside of open enrollment
@@ -13,6 +14,7 @@ Feature: Consumer RIDP verification process
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
+    # seems to be flaky here, individual steps were altered to account for flake, but maybe not enough
     And Individual click on sign in existing account
     And I signed in
 
@@ -212,4 +214,4 @@ Feature: Consumer RIDP verification process
     And Individual click on sign in existing account
     And I signed in
     Then I should land on home page
-    
+
