@@ -7,7 +7,6 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 40.years)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
-  let!(:plan) { FactoryBot.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
   let!(:application) { FactoryBot.create(:application,family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryBot.create(:applicant, application: application, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,need_help_paying_bills: false, family_member_id: family.primary_applicant.id) }
