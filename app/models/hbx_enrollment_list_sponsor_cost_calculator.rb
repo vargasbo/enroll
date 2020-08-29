@@ -100,7 +100,7 @@ class HbxEnrollmentListSponsorCostCalculator
       member_enrollments = []
       if sub_person["person_relationships"]
         sub_person["person_relationships"].each do |pr|
-          rel_map[pr["relative_id"]] = pr["kind"]
+          rel_map[pr["relative_id"]] = PersonRelationship::InverseMap[pr["kind"]]
         end
       end
       member_entries << EnrollmentMemberAdapter.new(
