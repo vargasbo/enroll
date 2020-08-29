@@ -47,6 +47,15 @@ class HbxEnrollmentMember
     @primary_relationship = family_member.primary_relationship
   end
 
+  def fetch_relationship_kind
+    return @primary_relationship unless @primary_relationship.blank?
+    @primary_relationship = if family_member.is_primary_applicant?
+                              "self"
+                            else
+                              family_member.dependent_relationship_with_primary
+                            end
+  end
+
   def hbx_id
     person.hbx_id
   end
