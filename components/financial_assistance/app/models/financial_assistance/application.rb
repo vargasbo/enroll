@@ -68,7 +68,7 @@ module FinancialAssistance
     field :is_requesting_voter_registration_application_in_mail, type: Boolean
 
     field :us_state, type: String
-    field :benchmark_plan_id, type: BSON::ObjectId
+    field :benchmark_product_id, type: BSON::ObjectId
 
     field :medicaid_terms, type: Boolean
     field :medicaid_insurance_collection_terms, type: Boolean
@@ -91,7 +91,7 @@ module FinancialAssistance
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions
 
-    # validates_presence_of :hbx_id, :applicant_kind, :request_kind, :benchmark_plan_id
+    # validates_presence_of :hbx_id, :applicant_kind, :request_kind, :benchmark_product_id
 
     # User must agree with terms of service check boxes
     # validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms
@@ -123,20 +123,20 @@ module FinancialAssistance
     alias is_renewal_authorized? is_renewal_authorized
 
 
-    # Set the benchmark plan for this financial assistance application.
-    # @param benchmark_plan_id [ {Plan} ] The benchmark plan for this application.
-    # def benchmark_plan=(new_benchmark_plan)
-    #   raise ArgumentError.new("expected Plan") unless new_benchmark_plan.is_a?(Plan)
-    #   write_attribute(:benchmark_plan_id, new_benchmark_plan._id)
-    #   @benchmark_plan = new_benchmark_plan
-    # end
+    # Set the benchmark product for this financial assistance application.
+    # @param benchmark_product_id [ {Plan} ] The benchmark product for this application.
+    def benchmark_product=(new_benchmark_product)
+      raise ArgumentError.new("expected Product") unless new_benchmark_product.is_a?(BenefitMarkets::Products::Product)
+      write_attribute(:benchmark_plan_id, new_benchmark_product._id)
+      @benchmark_product = new_benchmark_product
+    end
 
-    # Get the benchmark plan for this application.
-    # @return [ {Plan} ] benchmark plan
-    # def benchmark_plan
-    #   return @benchmark_plan if defined? @benchmark_plan
-    #   @benchmark_plan = Plan.find(benchmark_plan_id) unless benchmark_plan_id.blank?
-    # end
+    # Get the benchmark product for this application.
+    # @return [ {Product} ] benchmark product
+    def benchmark_product
+      return @benchmark_product if defined? @benchmark_product
+      @benchmark_product = BenefitMarkets::Products::Product.find(benchmark_product_id) unless benchmark_product_id.blank?
+    end
 
     # Virtual attribute that indicates whether Primary Applicant accepts the Medicaid terms
     # of service presented at the time of application submission
@@ -598,9 +598,9 @@ module FinancialAssistance
       update_attribute(:effective_date, effective_date)
     end
 
-    # def set_benchmark_plan_id
-    #   benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
-    #   write_attribute(:benchmark_plan_id, benchmark_plan_id)
+    # def set_benchmark_product_id
+    #   benchmark_product_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+    #   write_attribute(:benchmark_product_id, benchmark_product_id)
     # end
 
     def set_external_identifiers
