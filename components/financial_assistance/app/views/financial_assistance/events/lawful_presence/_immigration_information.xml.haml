@@ -24,16 +24,16 @@
       %document_I551_receipt_number= person.consumer_role.i551.receipt_number
     - if person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_.present? }.size > 0
       %document_I766
-      = render :partial => "events/lawful_presence/receipt_document", :collection => person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-7Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }, as: :receipt_document
+      = render :partial => 'financial_assistance/events/lawful_presence/receipt_document', :collection => person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-7Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }, as: :receipt_document
     - if person.consumer_role.mac_read_i551
       %document_mac_read_I551
-      = render :partial => "financial_assistance/events//passport_information", :object => person.consumer_role.mac_read_i551, as: :passport_information
+      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', :object => person.consumer_role.mac_read_i551, as: :passport_information
     - if person.consumer_role.foreign_passport_i94
       %document_foreign_passport_I94
-      = render :partial => "financial_assistance/events//passport_information", :object => person.consumer_role.foreign_passport_i94, as: :passport_information
+      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', :object => person.consumer_role.foreign_passport_i94, as: :passport_information
     - if person.consumer_role.foreign_passport
       %document_foreign_passport
-      = render :partial => "financial_assistance/events/passport_information", :object => person.consumer_role.foreign_passport, as: :passport_information
+      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', :object => person.consumer_role.foreign_passport, as: :passport_information
     - if person.consumer_role.case1
       %other_case_1_document_description= person.consumer_role.case1.alien_number
     - if person.consumer_role.case2

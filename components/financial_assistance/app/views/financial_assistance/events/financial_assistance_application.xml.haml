@@ -32,5 +32,4 @@
     %request_full_determination= financial_assistance_application.request_full_determination
   - if financial_assistance_application.tax_households.present?
     %assistance_tax_households
-      = render :partial => "financial_assistance/events/assistance_tax_household", :collection => financial_assistance_application.tax_households, as: :assistance_tax_household, :locals=> {:financial_assistance_application => financial_assistance_application}
-
+      = render :partial => 'financial_assistance/events/assistance_tax_household', :collection => financial_assistance_application.tax_households, as: :assistance_tax_household, :locals=> {:financial_assistance_application => financial_assistance_application}

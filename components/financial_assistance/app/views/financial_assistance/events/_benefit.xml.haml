@@ -14,9 +14,9 @@
     %employer_id
       %id= benefit.employer_id
   - unless benefit.employer_address.blank?
-    = render :partial => "financial_assistance/events/employer_address", :object => benefit.employer_address, as: :address
+    = render :partial => 'financial_assistance/events/employer_address', :object => benefit.employer_address, as: :address
   - unless benefit.employer_phone.blank?
-    = render :partial => "financial_assistance/events/employer_phone", :object => benefit.employer_phone, as: :phone
+    = render :partial => 'financial_assistance/events/employer_phone', :object => benefit.employer_phone, as: :phone
   - unless benefit.is_esi_waiting_period.nil?
     %is_esi_waiting_period= benefit.is_esi_waiting_period
   - unless benefit.is_esi_mec_met.nil?
