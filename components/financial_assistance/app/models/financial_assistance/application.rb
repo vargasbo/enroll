@@ -125,18 +125,18 @@ module FinancialAssistance
 
     # Set the benchmark product for this financial assistance application.
     # @param benchmark_product_id [ {Plan} ] The benchmark product for this application.
-    def benchmark_product=(new_benchmark_product)
-      raise ArgumentError.new("expected Product") unless new_benchmark_product.is_a?(BenefitMarkets::Products::Product)
-      write_attribute(:benchmark_plan_id, new_benchmark_product._id)
-      @benchmark_product = new_benchmark_product
-    end
+    # def benchmark_product=(new_benchmark_product)
+    #   raise ArgumentError.new("expected Product") unless new_benchmark_product.is_a?(BenefitMarkets::Products::Product)
+    #   write_attribute(:benchmark_plan_id, new_benchmark_product._id)
+    #   @benchmark_product = new_benchmark_product
+    # end
 
     # Get the benchmark product for this application.
     # @return [ {Product} ] benchmark product
-    def benchmark_product
-      return @benchmark_product if defined? @benchmark_product
-      @benchmark_product = BenefitMarkets::Products::Product.find(benchmark_product_id) unless benchmark_product_id.blank?
-    end
+    # def benchmark_product
+    #   return @benchmark_product if defined? @benchmark_product
+    #   @benchmark_product = BenefitMarkets::Products::Product.find(benchmark_product_id) unless benchmark_product_id.blank?
+    # end
 
     # Virtual attribute that indicates whether Primary Applicant accepts the Medicaid terms
     # of service presented at the time of application submission

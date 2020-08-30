@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^the user is on FAA Household Info: Family Members page$/) do
   login_as consumer, scope: :user
   visit financial_assistance.applications_path
@@ -7,7 +9,7 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
 end
 
 Given(/^all applicants are in Info Completed state with all types of income$/) do
-  while find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').length > 0 do
+  until find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').empty?
     find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
     find('#is_required_to_file_taxes_no').click
     find('#is_claimed_as_tax_dependent_no').click
