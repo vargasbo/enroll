@@ -6,15 +6,15 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_primary_family
 
+    include ::UIHelpers::WorkflowController
+    include Acapi::Notifiers
+    require 'securerandom'
+
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
     before_action :init_cfl_service, only: :review_and_submit
     before_action :family_relationships, only: :review_and_submit
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
-
-    include ::UIHelpers::WorkflowController
-    include Acapi::Notifiers
-    require 'securerandom'
 
     def index
       @family = @person.primary_family

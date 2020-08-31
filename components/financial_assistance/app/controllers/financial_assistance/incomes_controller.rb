@@ -2,14 +2,13 @@
 
 module FinancialAssistance
   class IncomesController < ::ApplicationController
+    include ::UIHelpers::WorkflowController
+    include NavigationHelper
+    include ApplicationHelper
 
     before_action :set_current_person
     before_action :find_application_and_applicant
     before_action :load_support_texts, only: [:index, :other]
-
-    include ::UIHelpers::WorkflowController
-    include NavigationHelper
-    include ApplicationHelper
 
     layout "financial_assistance_nav", only: [:index, :other, :new, :step]
 
