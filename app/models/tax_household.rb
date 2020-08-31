@@ -68,7 +68,6 @@ class TaxHousehold
   end
 
   def aptc_members
-    # tax_household_members.find_all(&:is_ia_eligible?)
     #Review split brain
     if application_id.present?
       active_applicants.find_all(&:is_ia_eligible?)
@@ -250,11 +249,6 @@ class TaxHousehold
   def family
     return nil unless household
     household.family
-  end
-
-  #usage: filtering through group_by criteria
-  def group_by_year
-    effective_starting_on.year
   end
 
   def is_eligibility_determined?
