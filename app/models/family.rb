@@ -1383,16 +1383,15 @@ class Family
   end
 
   # new_code Checks only in context of primary person.
-  # rubocop:disable Style/InverseMethods
   def all_family_member_relations_defined
     return unless primary_family_member.present? && primary_family_member.person.present?
-    primary_member_id = primary_family_member.id
-    primary_person = primary_family_member.person
-    other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
-    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? }
+
+    primary_member = primary_family_member
+    other_family_members = family_members.where(is_active: true).reject { |fm| (fm.id.to_s == primary_member.id.to_s) }
+    undefined_relations = other_family_members.any? { |fm| find_relationship_between(primary_member.person, fm.person).blank? }
+
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end
-  # rubocop:enable Style/InverseMethods
 
   def find_relationship_between(predecessor, successor)
     predecessor.person_relationships.where(predecessor_id: predecessor.id, successor_id: successor.id, family_id: self.id).first
