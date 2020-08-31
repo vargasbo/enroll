@@ -19,8 +19,6 @@ gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.g
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'master'
 gem 'ui_helpers', path: '../ui_helpers'
 
-gem 'pry'
-
 group :development, :test do
   gem 'rails-controller-testing'
 end
