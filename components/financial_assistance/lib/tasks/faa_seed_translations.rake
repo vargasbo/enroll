@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rake'
 require 'i18n'
 
@@ -14,7 +16,7 @@ namespace :seed do
     }.freeze
     puts "Loading en FAA translation...."
 
-    ASSISTANCE_TRANSLATIONS.keys.each do |key|
+    ASSISTANCE_TRANSLATIONS.each_key do |key|
       value = ASSISTANCE_TRANSLATIONS[key]
       Translation.create(key: key, value: "\"#{value}\"")
     end
