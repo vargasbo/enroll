@@ -7,6 +7,8 @@ require 'config'
 require 'dry-types'
 require 'dry-validation'
 require 'font-awesome-rails'
+require 'haml-rails'
+require 'money-rails'
 
 module FinancialAssistance
   # Isolate the namespace portion of the passed class
