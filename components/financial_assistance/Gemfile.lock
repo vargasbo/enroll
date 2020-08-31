@@ -45,7 +45,6 @@ PATH
       devise (~> 4.5)
       font-awesome-rails (~> 4.6)
       haml-rails
-      i18n
       money-rails (~> 1.13.3)
       mongoid (~> 7.0.2)
       mongoid-autoinc (~> 6.0)

@@ -7,7 +7,6 @@ require 'config'
 require 'dry-types'
 require 'dry-validation'
 require 'font-awesome-rails'
-require 'i18n'
 require 'haml-rails'
 require 'money-rails'
 

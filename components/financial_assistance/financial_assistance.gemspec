@@ -31,8 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'pundit',                    '~> 2.0'
   spec.add_dependency "haml-rails"
   spec.add_dependency 'font-awesome-rails',        '~> 4.6'
-  spec.add_dependency 'i18n'
-
 
   spec.add_development_dependency 'capybara',                  '~> 3.12'
   spec.add_development_dependency 'database_cleaner'

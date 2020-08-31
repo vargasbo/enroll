@@ -1,7 +1,7 @@
 # frozen_string_literal: true
+# Run it with this: bundle exec rake app:seed:load_faa_translations
 
 require 'rake'
-require 'i18n'
 
 namespace :seed do
   desc "load translations from faa engine translations file"
