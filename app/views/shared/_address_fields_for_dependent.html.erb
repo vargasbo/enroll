@@ -58,7 +58,7 @@
           </div>
         </div>
 
-        <% if kind == 'home' %>
+        <% if kind == 'home' && show_no_dc_address %>
           <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
             <% style="display:none;" %>
           <% end %>
