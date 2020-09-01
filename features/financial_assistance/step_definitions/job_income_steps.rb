@@ -134,3 +134,38 @@ end
 When(/^the user saves the self employment information$/) do
   find('.interaction-click-control-save').click
 end
+
+Given(/^the user is on the Job Income page$/) do
+  expect(page).to have_content("Job Income for")
+end
+
+When(/^the user clicks the Not Sure link next to the (.*) income question$/) do |income_type|
+  sleep 2
+  links = page.all('a')
+  case income_type
+  when 'employer'
+    popup_link = links.detect { |link| link[:href].include?("#has_job_income") unless link[:href].blank? }
+  when 'self employment'
+    popup_link = links.detect { |link| link[:href].include?("#has_self_employment_income") unless link[:href].blank? }
+  end
+  popup_link.click
+  sleep 2
+end
+
+And(/^the user closes the open income question modal$/) do
+  close_button = page.all('button').detect { |button| button[:class] == 'close interaction-click-control-×' }
+  close_button.click
+end
+
+Then(/^the user should see the popup for the (.*) income question$/) do |income_type|
+  case income_type
+  when 'job'
+    # stuff
+    popup_text = "Select ‘yes’ if this person is considered an employee of a business, or receives a W-2 federal form from any employer. " \
+    "We need to know about all income this person receives from an employer, including wages, tips, salaries, and bonuses."
+  when 'self employment'
+    popup_text = "Select 'yes' if this person owns a business or receives a federal form 1099 from any employer. " \
+    "We need to know about any income this person receives as an independent contractor or from a business they own." 
+  end
+  expect(page).to have_content(popup_text)
+end
