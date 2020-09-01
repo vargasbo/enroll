@@ -132,7 +132,6 @@ And(/^primary applicant completes application and marks they are required to fil
 end
 
 Then(/^the CONTINUE button will be ENABLED$/) do
-  binding.pry
   expect(page.find('#btn-continue')[:class]).not_to include("disabled")
 end
 
