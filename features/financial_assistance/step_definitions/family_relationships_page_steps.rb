@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^at least two other household members exist$/) do
   click_link "Add New Person"
 
