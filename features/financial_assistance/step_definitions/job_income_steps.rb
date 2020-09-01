@@ -169,3 +169,8 @@ Then(/^the user should see the popup for the (.*) income question$/) do |income_
   end
   expect(page).to have_content(popup_text)
 end
+
+Then(/^the user will be on the Other Income page$/) do
+  expect(page).to have_content("Other Income for")
+end
+

@@ -23,6 +23,15 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     Given the user answers yes to having and income from an employer
     Then the job income form should show
 
+  Scenario: "Continue" button should be enabled after selecting "No" on both income questions
+    Given the user answers no to having an income from an employer
+    Then the job income form should not show
+    Given the user answers no to having self employment income
+    Then self employment form should not show
+    Then the CONTINUE button will be ENABLED
+    When the user clicks CONTINUE
+    Then the user will be on the Other Income page
+
   Scenario: User answers yes to having self employment income
     Given the user answers yes to having self employment income
     Then self employment form should show
@@ -72,5 +81,4 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user closes the open income question modal
     When the user clicks the Not Sure link next to the self employment income question
     Then the user should see the popup for the self employment income question
-
 
