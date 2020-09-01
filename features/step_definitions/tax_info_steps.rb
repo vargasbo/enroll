@@ -93,9 +93,10 @@ And(/^the user indicates that the dependent will be claimed as a tax dependent b
   choose('is_required_to_file_taxes_no')
   choose('is_claimed_as_tax_dependent_yes')
   # Click dropdown
+  page.find('.selectric-claimed-dependent-dropdown')
   page.all('.selectric-claimed-dependent-dropdown')[0].click
   # Click primary member
-  page.all('li').detect { |li| li.text == 'John Smith1' }.click
+  page.all('li').detect { |li| li.text == application.applicants.first.person.full_name }.click
 end
 
 And(/^the dependent should now be claimed by the primary dependent$/) do

@@ -1,23 +1,48 @@
-Feature: User is not applying for financial assistance
-  Background:
-    Given the user is applying for a CONSUMER role
-    And the primary member has filled mandatory information required
-    And the primary member authorizes system to call EXPERIAN
-    And system receives a positive response from the EXPERIAN
-    And the user answers all the VERIFY IDENTITY  questions
-    When the user clicks on submit button
-    And the Experian returns a VERIFIED response
-    Then the user will navigate to the Help Paying for Coverage page
+Feature: A dedicated page that visit the eligibility determination page
 
-  Scenario: Consumer is not applying for financial assistance
-    Given the user navigates to the "Household Info" page with "no" selected
-    When the user clicks on add member button
-    And the user fills the the add member form
-    And the user clicks the PREVIOUS link1
-    Then the user navigates to Help Paying for Coverage page
+	Scenario: View Elibility link will be disabled in draft state
+		Given that a user with a family has a Financial Assistance application in the "draft" state
+		And the user navigates to the "Help Paying For Coverage" portal
+		When the user clicks the "Action" dropdown corresponding to the "draft" application
+		Then the "View Eligibility Determination" link will be disabled
 
-  Scenario: Consumer is applying for financial assistance
-    Given the user navigates to the "Household Info" page with "yes" selected
-    And the user is navigated to Application checklist page
-    When the user clicks on CONTINUE button
-    Then the user will navigate to FAA Household Info: Family Members page
+	Scenario: View Elibility link will be disabled in "submitted" state
+		Given that a user with a family has a Financial Assistance application in the "submitted" state
+		And the user navigates to the "Help Paying For Coverage" portal
+		When clicks the "Action" dropdown corresponding to the "submitted" application
+		Then the "View Eligibility Determination" link will be disabled
+
+	Scenario: View Elibility link will be disabled in "determination_response_error" state
+		Given that a user with a family has a Financial Assistance application in the "determination_response_error" state
+		And the user navigates to the "Help Paying For Coverage" portal
+		When the user clicks the "Action" dropdown corresponding to the "determination_response_error" application
+		Then the "View Eligibility Determination" link will be disabled
+
+	Scenario: View Eligibility Determination link will be actionable in the "determined" state
+		Given that a user with a family has a Financial Assistance application in the "determined" state
+		And the user navigates to the "Help Paying For Coverage" portal
+		When clicks the "Action" dropdown corresponding to the "determined" application
+		Then the "View Eligibility Determination" link will be actionable
+
+	Scenario: View Eligibility Determination link will be actionable and will navigate to the Eligibility Determination page
+		Given that a user with a family has a Financial Assistance application in the "determined" state
+		And the user navigates to the "Help Paying For Coverage" portal
+		And clicks the "Action" dropdown corresponding to the "determined" application
+		And clicks the "View Eligibility Determination" link
+		Then the user will navigate to the Eligibility Determination page for that specific application
+
+	Scenario: CSR Text should not display on the Eligibility Determination page if a family member is APTC eligible and has 0% CSR
+		Given that a user with a family has a Financial Assistance application with tax households
+		And the user has 0% CSR
+		And the user navigates to the "Help Paying For Coverage" portal
+		And clicks the "Action" dropdown corresponding to the "determined" application
+		And clicks the "View Eligibility Determination" link
+		Then the user will navigate to the Eligibility Determination page and will not find CSR text present
+
+	Scenario: CSR Text should display on the Eligibility Determination page if a family member is APTC eligible and has 73% CSR
+		Given that a user with a family has a Financial Assistance application with tax households
+		And the user has a 73% CSR
+		And the user navigates to the "Help Paying For Coverage" portal
+		And clicks the "Action" dropdown corresponding to the "determined" application
+		And clicks the "View Eligibility Determination" link
+		Then the user will navigate to the Eligibility Determination page and will find CSR text present

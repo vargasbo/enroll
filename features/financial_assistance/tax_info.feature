@@ -57,4 +57,3 @@ Scenario: Can choose primary applicant claiming dependent from dropdown
   And should be actionable.
   When the user clicks on the CONTINUE button
   And the dependent should now be claimed by the primary dependent
-  
