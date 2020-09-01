@@ -165,7 +165,7 @@ Then(/^the user should see the popup for the (.*) income question$/) do |income_
     "We need to know about all income this person receives from an employer, including wages, tips, salaries, and bonuses."
   when 'self employment'
     popup_text = "Select 'yes' if this person owns a business or receives a federal form 1099 from any employer. " \
-    "We need to know about any income this person receives as an independent contractor or from a business they own." 
+    "We need to know about any income this person receives as an independent contractor or from a business they own."
   end
   expect(page).to have_content(popup_text)
 end
