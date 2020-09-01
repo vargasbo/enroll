@@ -79,17 +79,23 @@ Given(/^that a user with a family has a Financial Assistance application with ta
   visit financial_assistance.applications_path
   create_plan
   allow(application).to receive(:is_application_valid?).and_return(true)
+end
+
+Given(/^the user has 0% CSR$/) do
+  create_dummy_ineligibility(application)
+end
+
+Given(/^the user has a 73% CSR$/) do
   create_dummy_eligibility(application)
 end
 
 Then(/^the user will navigate to the Eligibility Determination page and will not find CSR text present$/) do
   expect(page).to have_content('Eligibility Results')
-  expect(page).to have_content('These people are eligible for savings of')
+  expect(page).not_to have_content('These people are eligible for savings of')
   expect(page).not_to have_content('They also qualify for extra savings called')
 end
 
 Then(/^the user will navigate to the Eligibility Determination page and will find CSR text present$/) do
-  application.tax_households.first.eligibility_determinations.first.update_attributes!(csr_percent_as_integer: 73)
   expect(page).to have_content('Eligibility Results')
   expect(page).to have_content('These people are eligible for savings of')
   expect(page).to have_content('They also qualify for extra savings called')
