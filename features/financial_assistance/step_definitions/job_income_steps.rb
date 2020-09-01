@@ -174,3 +174,8 @@ Then(/^the user will be on the Other Income page$/) do
   expect(page).to have_content("Other Income for")
 end
 
+And(/^there will be a checkmark next to the completed Job Income page link$/) do
+  checkmark = page.all('span').detect { |span| span[:class] == "fa fa-check applicant-check" }
+  expect(checkmark.present).to eq(true)
+end
+

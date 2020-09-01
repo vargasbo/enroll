@@ -31,6 +31,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     Then the CONTINUE button will be ENABLED
     When the user clicks CONTINUE
     Then the user will be on the Other Income page
+    And there will be a checkmark next to the completed Job Income page link
 
   Scenario: User answers yes to having self employment income
     Given the user answers yes to having self employment income
