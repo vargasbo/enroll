@@ -52,6 +52,12 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     And the user saves the health coverage information
     Then the health coverage should be saved on the page
 
+  Scenario: User enters employer sponsored health coverage information (currently have access to coverage)
+    Given the user answers yes to currently having access to other health coverage
+    And the user checks a employer sponsored health coverage checkbox
+    And the user not sure link next to minimum standard value question
+    Then the user should be see proper text in the modal popup
+
   Scenario: Cancel button functionality (currently have coverage)
     Given the user answers yes to currently having health coverage
     And the user checks a health coverage checkbox

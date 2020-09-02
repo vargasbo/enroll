@@ -44,6 +44,18 @@ Given(/^the user checks a health coverage checkbox$/) do
   find(:css, "#insurance_kind[value='acf_refugee_medical_assistance']").set(true)
 end
 
+And(/^the user checks a employer sponsored health coverage checkbox$/) do
+  find(:css, "#insurance_kind[value='employer_sponsored_insurance']").set(true)
+end
+
+And(/^the user not sure link next to minimum standard value question$/) do
+  find("#is_esi_mec_met_not_sure").click
+end
+
+Then(/^the user should be see proper text in the modal popup$/) do
+  expect(page).to have_content('The minimum value is a standard used to see if a health plan offered by your employer meets the basic requirements of the Affordable Care Act.')
+end
+
 Then(/^the health coverage form should show$/) do
   expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]/div")
 end
