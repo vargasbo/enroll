@@ -3,10 +3,10 @@ Feature: Review your application page functionality
   Background: Review your application page
     Given a consumer exists
     And is logged in
-    And all applicants are in Info Completed state with all types of income
     And the user will navigate to the FAA Household Info page
-    And the user does not see Info Needed
-    Then the user visits the Review Your Application page
+    And all applicants are in Info Completed state with all types of income
+    And the user clicks CONTINUE
+    Then the user is on the Review Your Application page
 
   Scenario: Editing Income Adjustments
     Given the pencil icon displays for each instance of income adjustments
