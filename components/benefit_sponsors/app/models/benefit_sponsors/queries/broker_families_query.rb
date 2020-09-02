@@ -55,11 +55,7 @@ module BenefitSponsors
           :broker_agency_accounts => {"$elemMatch" => {:benefit_sponsors_broker_agency_profile_id => @broker_agency_profile_id, is_active: true}}
         )
 
-<<<<<<< HEAD
-        @census_employee_ids ||= benefit_sponsorships.flat_map(&:census_employees).pluck(:id)
-=======
         @census_employee_ids ||= benefit_sponsorships.map { |bs| bs.census_employees.distinct(:_id) }.flatten
->>>>>>> origin/bug_89153
 
         employee_person_ids ||= Person.unscoped.where("employee_roles.census_employee_id" => {"$in" => @census_employee_ids}).pluck(:_id)
       end
