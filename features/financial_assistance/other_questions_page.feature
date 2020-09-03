@@ -7,8 +7,7 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the user has an eligible immigration status
     And the user has an age between 18 and 19 years old
     And the user will navigate to the FAA Household Info page
-    When they click ADD INCOME & COVERAGE INFO for an applicant
-    Then they should be taken to the applicant's Tax Info page
+    And all applicants fill all pages except other questions
     And the user clicks Other Questions section on the left navigation
     And the user will navigate to the Other Questions page for the corresponding applicant
 

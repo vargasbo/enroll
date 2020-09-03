@@ -1,5 +1,60 @@
 # frozen_string_literal: true
 
+Given(/^all applicants fill all pages except other questions$/) do
+  until find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').empty?
+    find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
+    find('#is_required_to_file_taxes_no').click
+    find('#is_claimed_as_tax_dependent_no').click
+    find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
+
+    find('#has_job_income_true').click
+    sleep 1
+    fill_in 'income[employer_name]', with: 'GloboGym'
+    fill_in 'income[amount]', with: '100'
+    fill_in 'income[start_on]', with: '1/1/2018'
+    find(:xpath, '//*[@id="new_income"]/div[1]/div[2]/div[2]/div/div[2]/b').click
+    find(:xpath, '//*[@id="new_income"]/div[1]/div[2]/div[2]/div/div[3]/div/ul/li[2]').click
+    fill_in 'income[employer_address][address_1]', with: '1 K Street'
+    fill_in 'income[employer_address][city]', with: 'Washington'
+    fill_in 'income[employer_address][zip]', with: '20000'
+    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[2]/b').click
+    find(:xpath, '//*[@id="new_income"]/div[1]/div[4]/div[2]/div/div[3]/div/ul/li[10]').click
+    fill_in 'income[employer_phone][full_phone_number]', with: '7898765676'
+    click_button('Save')
+    find('#has_self_employment_income_true').click
+    fill_in 'income[amount]', with: '100.00'
+    find(:xpath, '//*[@id="new_income"]/div[1]/div/div[2]/div/div[2]/b').click
+    find(:xpath, '//*[@id="new_income"]/div[1]/div/div[2]/div/div[3]/div/ul/li[3]').click
+    fill_in 'income[start_on]', with: '01/01/2018'
+    click_button('Save')
+    find(:xpath, '//*[@id="btn-continue"]').click
+
+    find('#has_other_income_true').click
+    sleep 1
+    find(:css, "#other_income_kind[value='interest']").set(true)
+    fill_in 'income[amount]', with: '100'
+    fill_in 'income[start_on]', with: '1/1/2018'
+    find(:xpath, '//*[@id="new_income"]/div/div[1]/div[2]/div/div[2]/b').click
+    find(:xpath, '//*[@id="new_income"]/div/div[1]/div[2]/div/div[3]/div/ul/li[3]').click
+    click_button('Save')
+    find(:xpath, '//*[@id="btn-continue"]').click
+
+    find('#has_deductions_true').click
+    find(:css, "#deduction_kind[value='moving_expenses']").set(true)
+    fill_in 'deduction[amount]', with: '50'
+    fill_in 'deduction[start_on]', with: '1/1/2018'
+    find(:xpath, '//*[@id="new_deduction"]/div/div[1]/div[2]/div/div[2]/b').click
+    find(:xpath, '//*[@id="new_deduction"]/div/div[1]/div[2]/div/div[3]/div/ul/li[5]').click
+    click_button('Save')
+    find(:xpath, '//*[@id="btn-continue"]').click
+
+    find('#has_enrolled_health_coverage_false').click
+    find('#has_eligible_health_coverage_false').click
+
+    find(:xpath, '//*[@id="btn-continue"]').click
+  end
+end
+
 Given(/^the user will navigate to the FAA Household Info page$/) do
   visit financial_assistance.edit_application_path(application({aasm_state: 'draft'}).id.to_s)
 end
