@@ -15,6 +15,7 @@ module FinancialAssistance
     before_action :family_relationships, only: :review_and_submit
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
+    layout 'financial_assistance', only: %i[help_paying_coverage]
 
     def index
       @family = @person.primary_family
