@@ -121,9 +121,15 @@ class Exchanges::ResidentsController < ApplicationController
         format.html {redirect_to destroy_user_session_path}
       end
     else
-      @resident_role.build_nested_models_for_person
-      @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
-      redirect_to ridp_bypass_exchanges_residents_path
+      if @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+        redirect_to ridp_bypass_exchanges_residents_path
+      else
+        @resident_role.build_nested_models_for_person
+        bubble_address_errors_by_person(@resident_role.person)
+        respond_to do |format|
+          format.html { render "edit" }
+        end
+      end
     end
   end
 
@@ -174,9 +180,9 @@ class Exchanges::ResidentsController < ApplicationController
 
   def person_parameters_list
     [
-      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
-      { :phones_attributes => [:kind, :full_phone_number] },
-      { :emails_attributes => [:kind, :address] },
+      { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :_destroy] },
+      { :phones_attributes => [:kind, :full_phone_number, :_destroy] },
+      { :emails_attributes => [:kind, :address, :_destroy] },
       { :consumer_role_attributes => [:contact_method, :language_preference]},
       :first_name,
       :last_name,
