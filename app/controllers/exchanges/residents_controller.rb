@@ -120,15 +120,13 @@ class Exchanges::ResidentsController < ApplicationController
       respond_to do |format|
         format.html {redirect_to destroy_user_session_path}
       end
+    elsif @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+      redirect_to ridp_bypass_exchanges_residents_path
     else
-      if @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
-        redirect_to ridp_bypass_exchanges_residents_path
-      else
-        @resident_role.build_nested_models_for_person
-        bubble_address_errors_by_person(@resident_role.person)
-        respond_to do |format|
-          format.html { render "edit" }
-        end
+      @resident_role.build_nested_models_for_person
+      bubble_address_errors_by_person(@resident_role.person)
+      respond_to do |format|
+        format.html { render "edit" }
       end
     end
   end

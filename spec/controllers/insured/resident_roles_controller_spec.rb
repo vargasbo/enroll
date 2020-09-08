@@ -55,9 +55,9 @@ RSpec.describe Exchanges::ResidentsController, :type => :controller do
   end
 
   context "PUT update" do
-    let(:invalid_phones_attributes) {{"0"=>{"kind"=>"home", "_destroy"=>"false", "full_phone_number"=>"(848) 484-84"}, "1"=>{"kind"=>"mobile", "_destroy"=>"false", "full_phone_number"=>""}}}
-    let(:valid_phones_attributes) {{"0"=>{"kind"=>"home", "_destroy"=>"false", "full_phone_number"=>"(848) 484-8499"}, "1"=>{"kind"=>"mobile", "_destroy"=>"false", "full_phone_number"=>""}}}
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"Nikola","gender"=>"male","last_name"=>"Rasevic","middle_name"=>"Veljko", "gender"=>"male", "is_incarcerated"=>"false"}}
+    let(:invalid_phones_attributes) {{"0" => {"kind" => "home", "_destroy" => "false", "full_phone_number" => "(848) 484-84"}, "1" => {"kind" => "mobile", "_destroy" => "false", "full_phone_number" => ""}}}
+    let(:valid_phones_attributes) {{"0" => {"kind" => "home", "_destroy" => "false", "full_phone_number" => "(848) 484-8499"}, "1" => {"kind" => "mobile", "_destroy" => "false", "full_phone_number" => ""}}}
+    let(:person_params){{"dob" => "1985-10-01", "first_name" => "Nikola","gender" => "male","last_name" => "Rasevic","middle_name" => "Veljko", "is_incarcerated" => "false"}}
     before(:each) do
       allow(ResidentRole).to receive(:find).and_return(resident_role)
       allow(resident_role).to receive(:build_nested_models_for_person).and_return(true)
