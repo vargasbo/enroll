@@ -178,7 +178,8 @@ class Family
   }
 
   scope :outstanding_verification_datatable,   ->{ where(
-    :"_id".in => HbxEnrollment.by_kind('individual').enrolled_and_renewing.by_unverified.distinct(:family_id))
+    :_id.in => HbxEnrollment.by_kind('individual').enrolled_and_renewing.by_unverified.distinct(:family_id)
+  )
   }
 
   scope :monthly_reports_scope, lambda { |start_date, end_date|
@@ -1065,7 +1066,7 @@ class Family
   end
 
   def self.min_verification_due_date_range(start_date, end_date)
-    self.or(:"min_verification_due_date" => { :"$gte" => start_date, :"$lte" => end_date})
+    self.or(:min_verification_due_date => { :"$gte" => start_date, :"$lte" => end_date})
   end
 
   def all_persons_vlp_documents_status
