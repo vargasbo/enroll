@@ -634,7 +634,7 @@ module FinancialAssistance
     end
 
     def other_questions_answers
-      [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+      [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied, :is_post_partum_period].inject([]) do |array, question|
         array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && consumer_role.no_ssn == '1')
         array
       end
