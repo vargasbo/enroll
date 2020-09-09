@@ -46,11 +46,11 @@ RSpec.describe "app/views/events/v2/employers/_broker_agency_account.xml.haml", 
       let!(:general_agency_account) {plan_design_organization.general_agency_accounts.unscoped.first}
       let!(:update_general_agency_account) {general_agency_account.update_attributes(broker_role_id: broker_role.id)}
       let(:pdo) { SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_owner_and_sponsor(broker_agency_account.broker_agency_profile.id, employer_profile.id) }
-      let(:valid_gac) { pdo.general_agency_accounts.detect { |gac| gac.general_agency_profile } }
+      let(:valid_gac) { pdo.general_agency_accounts.map(&:general_agency_profile).first }
       let!(:old_general_agency_account) do
         FactoryBot.create(:sponsored_benefits_accounts_general_agency_account,
                           aasm_state: :inactive,
-                          benefit_sponsrship_general_agency_profile_id: valid_gac.general_agency_profile.id,
+                          benefit_sponsrship_general_agency_profile_id: general_agency_profile.id,
                           plan_design_organization: plan_design_organization_with_assigned_ga)
       end
 
