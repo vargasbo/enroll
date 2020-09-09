@@ -577,7 +577,7 @@ class HbxEnrollment
       #     end
       #   end
       # end
-      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.begin_of_month
+      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.beginning_of_month
       HbxEnrollment.terminate_scheduled_enrollments
     end
 
