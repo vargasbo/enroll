@@ -30,9 +30,18 @@ Then(/^the other income form should show$/) do
 end
 
 Given(/^the user fills out the required other income information$/) do
-  fill_in 'financial_assistance_income[amount]', with: '100'
-  fill_in 'financial_assistance_income[start_on]', with: '1/01/2018'
-  find(:xpath, '//*[@id="financial_assistance_income_frequency_kind"]/option[2]').select_option
+  fill_in 'income[amount]', with: '100'
+  fill_in 'income[start_on]', with: '1/01/2018'
+  find(:label, 'HOW OFTEN *').click
+  find('li', :text => 'Bi Weekly').click
+end
+
+And(/^the user fills out the required other income with incorrect information$/) do
+  fill_in 'income[amount]', with: '100'
+  fill_in 'income[start_on]', with: '1/01/2018'
+  fill_in 'income[end_on]', with: '1/01/2017'
+  find(:label, 'HOW OFTEN *').click
+  find('li', :text => 'Bi Weekly').click
 end
 
 Then(/^the save button should be enabled$/) do
