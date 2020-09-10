@@ -6,6 +6,10 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :max_aptc }
   it { should validate_presence_of :csr_percent_as_integer }
 
+  it { is_expected.to have_attributes(aptc_csr_annual_household_income: 0.0) }
+  it { is_expected.to have_attributes(aptc_annual_income_limit: 0.0) }
+  it { is_expected.to have_attributes(csr_annual_income_limit: 0.0) }
+
   let(:family)                        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:household)                     { family.households.first }
   let(:tax_household)                 { FactoryBot.create(:tax_household, household: household) }
