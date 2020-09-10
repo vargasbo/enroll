@@ -1,4 +1,6 @@
-require"rails_helper"
+# frozen_string_literal: true
+
+require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "census_employees_overlapping_benefit_group_assignments_report")
 
 
@@ -25,8 +27,8 @@ describe "Census Employees overlapping Benefit Group Assignments report", dbclea
       let(:benefit_sponsorship) { benefit_sponsor.active_benefit_sponsorship }
       let(:employer_profile) {  benefit_sponsorship.profile }
       let!(:benefit_package) { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
-      let(:employee_role)   { FactoryBot.create(:employee_role, employer_profile: employer_profile )}
-      let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role ) }
+      let(:employee_role)   { FactoryBot.create(:employee_role, employer_profile: employer_profile)}
+      let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role) }
       let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id, first_name: "Steve", last_name: "Rogers") }
       let(:census_employee_2) { FactoryBot.create(:census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id,  first_name: "Tony", last_name: "Stark") }
       let(:start_on) { benefit_package.start_on }
@@ -60,14 +62,14 @@ describe "Census Employees overlapping Benefit Group Assignments report", dbclea
         census_employee_2.benefit_group_assignments.destroy_all
         subject.migrate
       end
-      let(:file_name) { "#{Rails.root}/census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv" }
+      let(:file_name) { "#{Rails.root}/census_employees_overlapping_bgas_report_#{TimeKeeper.datetime_of_record.strftime('%m_%d_%Y_%H_%M_%S')}.csv" }
       let(:csv) { CSV.new(file_name).read }
       # There are only 3 bgas, so not expecting all of the ones to be present
       let(:filled_fields) do
-        %w(first_name last_name employer_fein aasm_state bga_1_id bga_1_start bga_1_end bga_2_id bga_2_start bga_2_end bga_3_id bga_3_start bga_3_end)
+        %w[first_name last_name employer_fein aasm_state bga_1_id bga_1_start bga_1_end bga_2_id bga_2_start bga_2_end bga_3_id bga_3_start bga_3_end]
       end
       let(:blank_fields) do
-        %w(bga_4_id bga_4_start bga_4_end bga_5_id bga_5_start bga_5_end)
+        %w[bga_4_id bga_4_start bga_4_end bga_5_id bga_5_start bga_5_end]
       end
 
       it "should not add census employees without benefit group assignments to the CSV" do
