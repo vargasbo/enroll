@@ -106,6 +106,7 @@ module FinancialAssistance
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
+      render layout: 'financial_assistance'
     end
 
     def render_message
