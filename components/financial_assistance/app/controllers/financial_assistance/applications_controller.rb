@@ -211,9 +211,7 @@ module FinancialAssistance
 
     def aqhp_flow
       @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
-      if @application.blank?
-        @application = create_application_with_applicants
-      end
+      @application = create_application_with_applicants if @application.blank?
 
       redirect_to application_checklist_application_path(@application)
     end
