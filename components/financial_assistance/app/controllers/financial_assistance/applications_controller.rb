@@ -216,7 +216,6 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
       if @application.blank?
         @application = FinancialAssistance::Application.create!(family_id: get_current_person.financial_assistance_identifier)
-        binding.pry
         @application.import_applicants
         @application.save!
       end
