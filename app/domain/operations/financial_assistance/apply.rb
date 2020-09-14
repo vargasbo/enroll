@@ -4,8 +4,8 @@ require 'dry/monads'
 require 'dry/monads/do'
 
 module Operations
-  module Families
-    class ApplyForFinancialAssistance
+  module FinancialAssistance
+    class Apply
       include Dry::Monads[:result, :do]
 
       def call(family_id:)
@@ -23,7 +23,9 @@ module Operations
       end
 
       def execute(family:)
-        Success(family.family_members.collect {|family_member| family_member_attributes(family_member)})
+        FinancialAssistance::Operations::Application::Create.new.call()
+
+        Success(family.active_family_members.collect {|family_member| family_member_attributes(family_member)})
       end
 
       def family_member_attributes(family_member)

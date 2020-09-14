@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module FinancialAssistance
-  module Validators
+module Validators
+  module Families
     class ApplicantContract < Dry::Validation::Contract
 
       params do
@@ -55,7 +55,7 @@ module FinancialAssistance
         optional(:emails).maybe(:array)
       end
 
-      rule(:addresses).each do |key, value|
+      rule(:addresses).each do
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::AddressContract.new.call(value)
@@ -75,7 +75,7 @@ module FinancialAssistance
         end
       end
 
-      rule(:phones).each do |key, value|
+      rule(:phones).each do
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::PhoneContract.new.call(value)
@@ -86,7 +86,7 @@ module FinancialAssistance
         end
       end
 
-      rule(:emails).each do |key, value|
+      rule(:emails).each do
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::EmailContract.new.call(value)

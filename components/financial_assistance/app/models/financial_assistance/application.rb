@@ -9,7 +9,7 @@ module FinancialAssistance
     include Acapi::Notifiers
     require 'securerandom'
 
-    belongs_to :family, class_name: "Family"
+    # belongs_to :family, class_name: "Family"
 
     before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers
     validates :application_submission_validity, presence: true, on: :submission
@@ -191,6 +191,7 @@ module FinancialAssistance
       matrix
     end
 
+    #update method as validate payload
     def update_application_and_applicant_attributes(payload)
       verified_family = Parsers::Xml::Cv::HavenVerifiedFamilyParser.new
       verified_family.parse(payload)
@@ -659,7 +660,8 @@ module FinancialAssistance
         result_object = ::FinancialAssistance::Operations::Applicant::Build.new.call(params: member_attributes)
         next unless result_object.success?
         applicant_params = result_object.success.to_h
-        applicant = applicants.where(person_hbx_id: applicant_params[:person_hbx_id]).first
+        applicant_result = ::FinancialAssistance::Operations::Applicant::Match.new.call(params: applicant_params, application: self)
+        applicant = applicant_result.success? ? applicant_result.success : applicant_result.failure
         applicant ? applicant.assign_attributes(applicant_params) : applicants.build(applicant_params)
       end
     end
@@ -1019,10 +1021,11 @@ module FinancialAssistance
 
     def create_verification_documents
       active_applicants.each do |applicant|
-        %w[Income MEC].each do |type|
-          applicant.verification_types << ::VerificationType.new(type_name: type, validation_status: 'pending')
-          applicant.move_to_pending!
-        end
+        applicant.verification_types =
+          %w[Income MEC].collect do |type|
+            VerificationType.new(type_name: type, validation_status: 'pending')
+          end
+        applicant.move_to_pending!        
       end
     end
 

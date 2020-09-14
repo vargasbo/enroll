@@ -6,7 +6,6 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :set_primary_family
 
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
@@ -92,8 +91,17 @@ module FinancialAssistance
       # rubocop:enable Metrics/BlockNesting
     end
 
+
+    #checklist
+    # - data to enroll
+    ##  -
+
+    # - data to faa
+    ## - if app in draft , update applicants
+    ## - if application not in draft , create new draft application from existing app and create/update respective applicants
+
     def copy
-      service = FinancialAssistance::Services::ApplicationService.new(@family, {application_id: params[:id]})
+      service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
       @application = service.copy!
       redirect_to edit_application_path(@application)
     end
@@ -103,17 +111,6 @@ module FinancialAssistance
 
     def render_message
       @message = params["message"]
-    end
-
-    def get_help_paying_coverage_response # rubocop:disable Naming/AccessorMethodName
-      if params["is_applying_for_assistance"].blank?
-        flash[:error] = "Please choose an option before you proceed."
-        redirect_to help_paying_coverage_applications_path
-      elsif params["is_applying_for_assistance"] == "true"
-        @assistance_status ? aqhp_flow : redirect_to_msg
-      else
-        uqhp_flow
-      end
     end
 
     def uqhp_flow
@@ -126,7 +123,7 @@ module FinancialAssistance
     end
 
     def application_checklist
-      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
+      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
@@ -206,17 +203,6 @@ module FinancialAssistance
       end
     end
 
-    def set_primary_family
-      @family = @person.primary_family
-    end
-
-    def aqhp_flow
-      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
-      @application = create_application_with_applicants if @application.blank?
-
-      redirect_to application_checklist_application_path(@application)
-    end
-
     # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED
@@ -274,14 +260,6 @@ module FinancialAssistance
       current_person = get_current_person
       return if current_person.consumer_role.blank?
       current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
-    end
-
-    def get_current_person # rubocop:disable Naming/AccessorMethodName
-      if current_user.try(:person).try(:agent?) && session[:person_id].present?
-        Person.find(session[:person_id])
-      else
-        current_user.person
-      end
     end
 
     def create_application_with_applicants
