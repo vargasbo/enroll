@@ -209,7 +209,7 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
       @application = create_application_with_applicants if @application.blank?
 
-      redirect_to application_checklist_application_path(@application)
+      redirect_to application_checklist_applications_path(@application)
     end
 
     # TODO: Remove dummy data before prod
