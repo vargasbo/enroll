@@ -138,7 +138,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     Examples:
       | user_visibility  |
       | Customer & Admin |
-      | Admin Only       |
+  # | Admin Only       |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility>
     Given Admin can navigate to the Manage SEPs screen
