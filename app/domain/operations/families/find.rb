@@ -9,10 +9,20 @@ module Operations
       send(:include, Dry::Monads[:result, :do])
 
       def call(id:)
-        #validate
-        family = find_family(id)
+        family_id = yield validate(id)
+        family    = yield find_family(family_id)
 
         Success(family)
+      end
+
+      private
+
+      def validate(id)
+        if id&.is_a?(BSON::ObjectId)
+          Success(id)
+        else
+          Failure('family_id is expected in BSON format')
+        end
       end
 
       def find_family(family_id)
