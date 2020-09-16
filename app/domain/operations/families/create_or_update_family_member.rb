@@ -45,8 +45,6 @@ module Operations
               family_member_id: applicant_params[:family_member_id],
               person_hbx_id: applicant_params[:person_hbx_id]
           }
-
-          #update family member
         else
 
           person_result = create_or_update_person(applicant_params)
