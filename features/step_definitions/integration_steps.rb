@@ -914,10 +914,10 @@ When(/^.+ clicks? to add the first employee$/) do
   find('.interaction-click-control-add-new-employee', :wait => 10).click
 end
 
-When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
-  click_link 'HBX Portal' if page.has_link?('HBX Portal')
-  find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
-end
+# When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
+#   click_link 'HBX Portal' if page.has_link?('HBX Portal')
+#   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
+# end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|
   target_dropdown = page.all('a').detect { |a| a.text == tab_name }
