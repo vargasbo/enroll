@@ -11,8 +11,15 @@ module FinancialAssistance
       attributes = traits.extract_options!
       attributes.merge!(family_id: consumer.primary_family.id)
       @application ||= FactoryBot.create(:financial_assistance_application, *traits, attributes).tap do |application|
-        application.import_applicants
-        application.save
+        consumer.primary_family.family_members.each do |member|
+          applicant = application.applicants.create first_name: member.first_name,
+                                        last_name: member.last_name,
+                                        gender: member.gender,
+                                        dob: member.dob,
+                                        is_primary_applicant: member.is_primary_applicant?
+          next if member.is_primary_applicant?
+          application.ensure_relationship_with_primary(applicant, member.relationship)
+        end
       end
     end
 
@@ -40,37 +47,29 @@ module FinancialAssistance
 
     def create_dummy_ineligibility(application)
       coverage_year = TimeKeeper.date_of_record.year
-      application.tax_households.each do |txh|
-        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
-        txh.eligibility_determinations.create!(max_aptc: 0.00,
-                                               csr_percent_as_integer: 0,
-                                               csr_eligibility_kind: "csr_0",
-                                               determined_on: TimeKeeper.datetime_of_record - 30.days,
-                                               determined_at: TimeKeeper.datetime_of_record - 30.days,
-                                               premium_credit_strategy_kind: "allocated_lump_sum_credit",
-                                               e_pdc_id: "3110344",
-                                               source: "Haven").save!
-        txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true)
+      application.eligibility_determinations.each do |ed|
+        ed.create!(max_aptc: 0.00,
+                   csr_percent_as_integer: 0,
+                   is_eligibility_determined: true,
+                   effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+                   determined_at: TimeKeeper.datetime_of_record - 30.days,
+                   source: "Faa").save!
       end
-      application.applicants.each { |applicant| applicant.update_attributes!(is_without_assistance: true) }
+      application.applicants.each { |applicant| applicant.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) }
       application.update_attributes!(aasm_state: 'determined')
     end
 
     def create_dummy_eligibility(application)
       coverage_year = TimeKeeper.date_of_record.year
-      application.tax_households.each do |txh|
-        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
-        txh.eligibility_determinations.create!(max_aptc: 200.00,
-                                               csr_percent_as_integer: 73,
-                                               csr_eligibility_kind: "csr_73",
-                                               determined_on: TimeKeeper.datetime_of_record - 30.days,
-                                               determined_at: TimeKeeper.datetime_of_record - 30.days,
-                                               premium_credit_strategy_kind: "allocated_lump_sum_credit",
-                                               e_pdc_id: "3110344",
-                                               source: "Haven").save!
-        txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false)
+      application.eligibility_determinations.each do |ed|
+        ed.create!(max_aptc: 200.00,
+                   csr_percent_as_integer: 73,
+                   is_eligibility_determined: true,
+                   effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+                   determined_at: TimeKeeper.datetime_of_record - 30.days,
+                   source: "Faa").save!
       end
-      application.applicants.each { |applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.applicants.each { |applicant| applicant.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) }
       application.update_attributes!(aasm_state: 'determined')
     end
   end

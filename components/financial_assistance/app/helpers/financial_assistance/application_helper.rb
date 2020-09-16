@@ -2,40 +2,25 @@
 
 module FinancialAssistance
   module ApplicationHelper
+
     def to_est(datetime)
       datetime.in_time_zone("Eastern Time (US & Canada)") if datetime.present?
     end
 
-    def total_aptc_sum(application_id)
-      application = FinancialAssistance::Application.find(application_id)
-      sum = 0.0
-      application.tax_households.each do |thh|
-        sum += thh.preferred_eligibility_determination.max_aptc
-      end
-      sum
+    def total_aptc_across_eligibility_determinations(application_id)
+      eds = FinancialAssistance::Application.find(application_id).eligibility_determinations
+      eds.map(&:max_aptc).flat_map(&:to_f).inject(:+)
     end
-
-    def total_aptc_across_tax_households(application_id)
-      application = FinancialAssistance::Application.find(application_id)
-      total_aptc = 0.0
-      application.tax_households.each do |thh|
-        total_aptc += thh.preferred_eligibility_determination.max_aptc
-      end
-      total_aptc
-    end
-
     def eligible_applicants(application_id, eligibility_flag)
       application = FinancialAssistance::Application.find(application_id)
       application.active_applicants.where(eligibility_flag => true).map(&:full_name).map(&:titleize)
     end
-
     def any_csr_ineligible_applicants?(application_id)
-      csr_eligible = []
       application = FinancialAssistance::Application.find(application_id)
-      application.tax_households.each do |thh|
-        csr_eligible << thh.preferred_eligibility_determination.csr_percent_as_integer
-      end
-      csr_eligible.include?(0) ? true : false
+      application.eligibility_determinations.inject([]) do |csr_eligible, ed_obj|
+        csr_eligible << ed_obj.csr_percent_as_integer
+        csr_eligible
+      end.include?(0)
     end
 
     def applicant_age(applicant)
@@ -177,7 +162,7 @@ module FinancialAssistance
     def support_text_placeholders(raw_support_text)
       # set <application-applicable-year> placeholdersr
       return [] if @application.nil?
-      assistance_year = HbxProfile.faa_application_applicable_year.to_s
+      assistance_year = calculated_application_year.to_s
 
       raw_support_text.update(raw_support_text).each do |_key, value|
         value.gsub! '<application-applicable-year>', assistance_year if value.include? '<application-applicable-year>'
@@ -249,6 +234,10 @@ module FinancialAssistance
 
     def humanize_relationships
       FinancialAssistance::Relationship::RELATIONSHIPS_UI.map {|r| [r.to_s.humanize, r.to_s] }
+    end
+
+    def calculated_application_year
+      FinancialAssistanceRegistry[:application_year].item.call.value!
     end
 
     def human_boolean(boolean)

@@ -13,7 +13,9 @@ module FinancialAssistance
       attribute :ssn, Types::String.optional
       attribute :gender, Types::String.optional
       attribute :dob, Types::Date.optional
-
+      attribute :is_primary_applicant, Types::Bool.default(false)
+      attribute :family_member_id, Types::Bson.optional.meta(omittable: true)
+      attribute :person_hbx_id, Types::String.optional.meta(omittable: true)
       attribute :is_incarcerated, Types::Strict::Bool
       attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
       attribute :ethnicity, Types::Strict::Array.meta(omittable: true)
@@ -47,7 +49,7 @@ module FinancialAssistance
       attribute :country_of_citizenship, Types::String.optional.meta(omittable: true)
       attribute :expiration_date, Types::Date.optional.meta(omittable: true)
       attribute :issuing_country, Types::String.optional.meta(omittable: true)
-      attribute :status, Types::String.optional.meta(omittable: true)
+      attribute :relationship, Types::String.optional.meta(omittable: true)
 
       attribute :addresses, Types::Array.of(FinancialAssistance::Entities::Address)
       attribute :emails, Types::Array.of(FinancialAssistance::Entities::Email)

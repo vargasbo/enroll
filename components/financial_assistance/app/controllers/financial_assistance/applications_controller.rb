@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
+require_dependency 'financial_assistance/application_controller'
+
 module FinancialAssistance
-  class ApplicationsController < ApplicationController
+  class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :set_primary_family
 
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
@@ -21,14 +22,6 @@ module FinancialAssistance
 
     def new
       @application = FinancialAssistance::Application.new
-    end
-
-    def create
-      @application = ::FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
-      @application.import_applicants
-      @application.save!
-
-      redirect_to edit_application_path(@application)
     end
 
     def edit
@@ -57,15 +50,14 @@ module FinancialAssistance
           if params[:commit] == "Submit Application"
             dummy_data_5_year_bar(@application)
             @application.submit! if @application.complete?
-            payload = generate_payload(@application)
-            if @application.publish(payload)
+            publish_result = FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: @application.id)
+            if publish_result.success?
               #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
               redirect_to application_publish_error_application_path(@application)
             end
-
           else
             render 'workflow/step'
           end
@@ -81,41 +73,26 @@ module FinancialAssistance
       # rubocop:enable Metrics/BlockNesting
     end
 
-    def generate_payload(_application)
-      ::FinancialAssistance::ApplicationController.new.render_to_string(
-        "financial_assistance/events/financial_assistance_application",
-        :formats => ["xml"],
-        :locals => { :financial_assistance_application => @application }
-      )
-    end
+
+    #checklist
+    # - data to enroll
+    ##  -
+
+    # - data to faa
+    ## - if app in draft , update applicants
+    ## - if application not in draft , create new draft application from existing app and create/update respective applicants
 
     def copy
-      service = FinancialAssistance::Services::ApplicationService.new(@family, {application_id: params[:id]})
+      service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
       @application = service.copy!
       redirect_to edit_application_path(@application)
     end
 
     def help_paying_coverage
-      @applications = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier)
-      load_support_texts
-      save_faa_bookmark(request.original_url)
-      set_admin_bookmark_url
-      @transaction_id = params[:id]
     end
 
     def render_message
       @message = params["message"]
-    end
-
-    def get_help_paying_coverage_response # rubocop:disable Naming/AccessorMethodName
-      if params["is_applying_for_assistance"].blank?
-        flash[:error] = "Please choose an option before you proceed."
-        redirect_to help_paying_coverage_applications_path
-      elsif params["is_applying_for_assistance"] == "true"
-        @assistance_status ? aqhp_flow : redirect_to_msg
-      else
-        uqhp_flow
-      end
     end
 
     def uqhp_flow
@@ -128,7 +105,7 @@ module FinancialAssistance
     end
 
     def application_checklist
-      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
+      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
@@ -153,6 +130,8 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+
+      render layout: 'financial_assistance'
     end
 
     def eligibility_results
@@ -208,40 +187,22 @@ module FinancialAssistance
       end
     end
 
-    def set_primary_family
-      @family = @person.primary_family
-    end
-
-    def aqhp_flow
-      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
-      if @application.blank?
-        @application = FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
-        @application.import_applicants
-        @application.save!
-      end
-
-      redirect_to application_checklist_application_path(@application)
-    end
-
     # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED
-      coverage_year = HbxProfile.faa_application_applicable_year
+      coverage_year = FinancialAssistanceRegistry[:application_year].item.call.value!
       @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
 
-      @model.tax_households.each do |txh|
-        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
-        txh.eligibility_determinations.build(max_aptc: 200.00,
-                                             csr_percent_as_integer: 73,
-                                             csr_eligibility_kind: "csr_73",
-                                             determined_on: TimeKeeper.datetime_of_record - 30.days,
-                                             determined_at: TimeKeeper.datetime_of_record - 30.days,
-                                             premium_credit_strategy_kind: "allocated_lump_sum_credit",
-                                             e_pdc_id: "3110344",
-                                             source: "Haven").save!
-        txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) if txh.applicants.count > 0
-        txh.applicants.second.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) if txh.applicants.count > 1
-        txh.applicants.third.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false, is_without_assistance: false) if txh.applicants.count > 2
+      @model.eligibility_determinations.each do |ed|
+        ed.update_attributes(max_aptc: 200.00,
+                             csr_percent_as_integer: 73,
+                             is_eligibility_determined: true,
+                             effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+                             determined_at: TimeKeeper.datetime_of_record - 30.days,
+                             source: "Faa")
+        ed.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) if ed.applicants.count > 0
+        ed.applicants.second.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) if ed.applicants.count > 1
+        ed.applicants.third.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false, is_without_assistance: false) if ed.applicants.count > 2
 
         #Update the Income and MEC verifications to Outstanding
         @model.applicants.each do |applicant|
@@ -253,7 +214,7 @@ module FinancialAssistance
 
     # TODO: Remove dummy stuff before prod
     def dummy_data_5_year_bar(application)
-      return unless application.primary_applicant.present? && ["bar5"].include?(application.family.primary_applicant.person.last_name.downcase)
+      return unless application.primary_applicant.present? && ["bar5"].include?(application.primary_applicant&.last_name&.downcase)
       application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
     end
 
@@ -283,14 +244,6 @@ module FinancialAssistance
       current_person = get_current_person
       return if current_person.consumer_role.blank?
       current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
-    end
-
-    def get_current_person # rubocop:disable Naming/AccessorMethodName
-      if current_user.try(:person).try(:agent?) && session[:person_id].present?
-        Person.find(session[:person_id])
-      else
-        current_user.person
-      end
     end
   end
 end

@@ -95,6 +95,7 @@ class Person
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
+  field :is_applying_for_assistance, type: Boolean
 
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
@@ -307,6 +308,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
+  after_update :person_create_or_update_handler
 
   def self.api_staff_roles
     Person.where(
@@ -420,21 +422,10 @@ class Person
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
-  def is_aqhp?
-    family = self.primary_family if self.primary_family
-    if family
-      check_households(family) && check_tax_households(family)
-    else
-      false
-    end
-  end
-
-  def check_households family
-    family.households.present? ? true : false
-  end
-
-  def check_tax_households family
-    family.households.first.tax_households.present? ? true : false
+  def person_create_or_update_handler
+    ::Operations::FinancialAssistance::PersonCreateOrUpdateHandler.new.call({person: self, event: :person_updated})
+  rescue StandardError => e
+    Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::PersonCreateOrUpdateHandler for person with object_id: #{self.id} due to #{e.message}"}
   end
 
   def completed_identity_verification?

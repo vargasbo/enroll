@@ -5,7 +5,8 @@ module FinancialAssistance
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
-    include ::Ssn
+    include Ssn
+    include UnsetableSparseFields
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -86,18 +87,6 @@ module FinancialAssistance
 
     NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"].freeze
 
-    CITIZEN_KINDS = {
-      us_citizen: "US citizen",
-      naturalized_citizen: "Naturalized citizen",
-      alien_lawfully_present: "Alien lawfully present",
-      lawful_permanent_resident: "Lawful permanent resident",
-      undocumented_immigrant: "Undocumented immigrant",
-      not_lawfully_present_in_us: "Not lawfully present in US",
-      non_native_not_lawfully_present_in_us: "Non-native not lawfully present in US",
-      ssn_pass_citizenship_fails_with_SSA: "SSN pass citizenship fails with SSA",
-      non_native_citizen: "Non-native citizen"
-    }.freeze
-
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -121,12 +110,14 @@ module FinancialAssistance
     field :is_homeless, type: Boolean, default: false
     field :is_temporarily_out_of_state, type: Boolean, default: false
 
-    field :no_ssn, type: String
+    field :no_ssn, type: String, default: '0'
     field :citizen_status, type: String
     field :is_consumer_role, type: Boolean
     field :is_resident_role, type: Boolean
     field :same_with_primary, type: Boolean, default: false
     field :is_applying_coverage, type: Boolean
+    field :is_consent_applicant, type: Boolean, default: false
+    field :is_tobacco_user, type: String, default: 'unknown'
     field :vlp_document_id, type: String
 
     field :vlp_subject, type: String
@@ -145,10 +136,10 @@ module FinancialAssistance
     field :expiration_date, type: DateTime
     # country which issued the document. e.g. passport issuing country
     field :issuing_country, type: String
-    # document verification status ::VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
-    field :status, type: String, default: "not submitted"
     # verification type this document can support: Social Security Number, Citizenship, Immigration status, Native American status
     # field :verification_type
+    field :is_consent_applicant, type: Boolean, default: false
+    field :is_tobacco_user, type: String, default: "unknown"
 
     field :assisted_income_validation, type: String, default: "pending"
     validates_inclusion_of :assisted_income_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
@@ -161,7 +152,7 @@ module FinancialAssistance
 
     field :person_hbx_id, type: String
     field :family_member_id, type: BSON::ObjectId
-    field :tax_household_id, type: BSON::ObjectId
+    field :eligibility_determination_id, type: BSON::ObjectId
 
     field :is_active, type: Boolean, default: true
 
@@ -253,14 +244,14 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
-    embeds_many :incomes,     class_name: "FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
+    embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
+    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
+    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
+    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :addresses, cascade_callbacks: true, validate: true, class_name: "::FinancialAssistance::Locations::Address"
-    embeds_many :phones, class_name: "FinancialAssistance::Locations::Phone", cascade_callbacks: true, validate: true
-    embeds_many :emails, class_name: "FinancialAssistance::Locations::Email", cascade_callbacks: true, validate: true
+    embeds_many :phones, class_name: "::FinancialAssistance::Locations::Phone", cascade_callbacks: true, validate: true
+    embeds_many :emails, class_name: "::FinancialAssistance::Locations::Email", cascade_callbacks: true, validate: true
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
     
@@ -289,8 +280,18 @@ module FinancialAssistance
 
     before_save :generate_hbx_id
 
+    # Responsible for updating family member  when applicant is created/updated
+    after_save :propagate_applicant
+
+    #save the instance without invoking call backs
+    def persist!
+      FinancialAssistance::Applicant.skip_callback(:save, :after, :propagate_applicant)
+      self.save
+      FinancialAssistance::Applicant.set_callback(:save, :after, :propagate_applicant)
+    end
+
     def generate_hbx_id
-      write_attribute(:person_hbx_id, HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+      write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
     end
 
     def us_citizen=(val)
@@ -300,11 +301,6 @@ module FinancialAssistance
 
     def naturalized_citizen=(val)
       @naturalized_citizen = (val.to_s == "true")
-    end
-
-    def indian_tribe_member=(val)
-      self.tribal_id = nil if val.to_s == false
-      @indian_tribe_member = (val.to_s == "true")
     end
 
     def eligible_immigration_status=(val)
@@ -323,12 +319,6 @@ module FinancialAssistance
       @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == citizen_status)
     end
 
-    def indian_tribe_member
-      return @indian_tribe_member unless @indian_tribe_member.nil?
-      return nil if citizen_status.blank?
-      @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
-    end
-
     def eligible_immigration_status
       return @eligible_immigration_status unless @eligible_immigration_status.nil?
       return nil if us_citizen.nil?
@@ -343,6 +333,19 @@ module FinancialAssistance
 
     def relatives
       relationships.map(&:relative)
+    end
+
+    def relationship=(value)
+      return if is_primary_applicant?
+      application.ensure_relationship_with_primary(self, value)
+    end
+
+    def self.encrypt_ssn(val)
+      if val.blank?
+        return nil
+      end
+      ssn_val = val.to_s.gsub(/\D/, '')
+      SymmetricEncryption.encrypt(ssn_val)
     end
 
     def relation_with_primary
@@ -391,7 +394,7 @@ module FinancialAssistance
     end
 
     def is_not_in_a_tax_household?
-      tax_household.blank?
+      eligibility_determination.blank?
     end
 
     aasm do
@@ -477,11 +480,9 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
-    def tax_household_of_spouse
+    def eligibility_determination_of_spouse
       return nil unless has_spouse
-      spouse = Person.find(spouse_relationship.successor_id)
-      spouse_applicant = application.active_applicants.detect {|applicant| spouse == applicant.person }
-      spouse_applicant.tax_household
+      spouse_relationship.relative.eligibility_determination
     end
 
     #### Use Person.consumer_role values for following
@@ -528,6 +529,67 @@ module FinancialAssistance
       is_without_assistance
     end
 
+    def has_i327?
+      vlp_subject == "I-327 (Reentry Permit)" && alien_number.present?
+    end
+
+    def has_i571?
+      vlp_subject == 'I-571 (Refugee Travel Document)' && alien_number.present?
+    end
+
+    def has_cert_of_citizenship?
+      vlp_subject == "Certificate of Citizenship" && citizenship_number.present?
+    end
+
+    def has_cert_of_naturalization?
+      vlp_subject == "Naturalization Certificate" && naturalization_number.present?
+    end
+
+    def has_temp_i551?
+      vlp_subject == "Temporary I-551 Stamp (on passport or I-94)" && alien_number.present?
+    end
+
+    def has_i94?
+      i94_number.present? && (vlp_subject == "I-94 (Arrival/Departure Record)" || (vlp_subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && passport_number.present? && expiration_date.present?))
+    end
+
+    def has_i20?
+      vlp_subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" && sevis_id.present?
+    end
+
+    def has_ds2019?
+      vlp_subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" && sevis_id.present?
+    end
+
+    def i551
+      vlp_subject == 'I-551 (Permanent Resident Card)' && alien_number.present? && card_number.present?
+    end
+
+    def i766
+      # vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
+      vlp_subject == 'I-766 (Employment Authorization Card)' && receipt_number.present? && expiration_.present?
+    end
+
+    def mac_read_i551
+      vlp_subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && passport_number.present? && alien_number.present?
+    end
+
+    def foreign_passport_i94
+      vlp_subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && i94_number.present? && passport_number.present? && expiration_date.present?
+    end
+
+    def foreign_passport
+      vlp_subject == "Unexpired Foreign Passport" && passport_number.present? && expiration_date.present?
+    end
+
+    def case1
+      vlp_subject == "Other (With Alien Number)" && alien_number.present? && description.present?
+    end
+
+    def case2
+      vlp_subject == "Other (With I-94 Number)" && i94_number.present? && description.present?
+    end
+
     def full_name
       @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
     end
@@ -541,13 +603,14 @@ module FinancialAssistance
       person.is_tobacco_user || "unknown"
     end
 
-    def tax_household=(thh)
-      self.tax_household_id = thh.id
+
+    def eligibility_determination=(eg)
+      self.eligibility_determination_id = eg.id
     end
 
-    def tax_household
-      return nil unless tax_household_id
-      application.tax_households.find(tax_household_id) if application.tax_households.present?
+    def eligibility_determination
+      return nil unless eligibility_determination_id
+      application.eligibility_determinations&.find(eligibility_determination_id)
     end
 
     def age_on_effective_date
@@ -566,14 +629,13 @@ module FinancialAssistance
       @age_on_effective_date = age
     end
 
-    def eligibility_determinations
-      return nil unless tax_household
-      tax_household.eligibility_determinations
+    def contact_addresses
+      return addresses if addresses.any? { |address| address.kind == "home" }
+      []
     end
 
     def preferred_eligibility_determination
-      return nil unless tax_household
-      tax_household.preferred_eligibility_determination
+      eligibility_determination
     end
 
     def applicant_validation_complete?
@@ -788,7 +850,7 @@ module FinancialAssistance
     end
 
     def attributes_for_export
-      applicant_params = attributes.slice(:_id,:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
+      applicant_params = attributes.slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
                                           :gender,:dob,:is_incarcerated,:is_disabled,:ethnicity,:race,:indian_tribe_member,:tribal_id,
                                           :language_code,:no_dc_address,:is_homeless,:is_temporarily_out_of_state,:no_ssn,:citizen_status,
                                           :is_consumer_role,:vlp_document_id,:same_with_primary,:is_applying_coverage,:vlp_subject,
@@ -952,6 +1014,14 @@ module FinancialAssistance
     #Income/MEC Verifications
     def notify_of_eligibility_change
       # CoverageHousehold.update_eligibility_for_family(family)
+    end
+
+    def propagate_applicant
+      # return if incomes_changed? || benefits_changed? || deductions_changed?
+      Operations::Families::CreateOrUpdateMember.new.call(params: self.attributes_for_export) if is_active
+      Operations::Families::DropMember.new.call(params: {family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
+    rescue StandardError => e
+      e.message
     end
   end
 end

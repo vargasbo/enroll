@@ -149,6 +149,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
+  
     begin
       @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
@@ -270,6 +271,42 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def help_paying_coverage
+    if EnrollRegistry.feature_enabled?(:financial_assistance)
+      set_current_person
+      load_support_texts
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+      @transaction_id = params[:id]
+    else
+      render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
+    end
+  end
+
+  def help_paying_coverage_response
+    set_current_person
+    if params["is_applying_for_assistance"].blank?
+      flash[:error] = "Please choose an option before you proceed."
+      redirect_to help_paying_coverage_insured_consumer_role_index_path
+    elsif params["is_applying_for_assistance"] == "true"
+      begin
+        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
+        if result.success?
+          redirect_to financial_assistance.application_checklist_application_path(id: result.success)
+        else
+          flash[:error] = result.errors
+          redirect_back fallback_location: '/'
+        end
+      rescue StandardError => e
+        flash[:error] = "Failed to proceed, " + e.message
+        redirect_back fallback_location: '/'
+      end
+    else
+      @person.update_attributes is_applying_for_assistance: false
+      redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+    end
+  end
+
   private
 
   def decrypt_params
@@ -378,5 +415,11 @@ class Insured::ConsumerRolesController < ApplicationController
 
     @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
+  end
+
+  def load_support_texts
+    file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+    raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
+    @support_texts = helpers.support_text_placeholders raw_support_text
   end
 end

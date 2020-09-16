@@ -7,6 +7,10 @@ class FamilyMember
 
   embedded_in :family
 
+  # Responsible for updating eligibility when family member is created/updated
+  # after_create :family_member_created
+  after_update :family_member_updated, if: :is_active_changed?
+
   # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
 
@@ -155,6 +159,29 @@ class FamilyMember
   end
 
   private
+
+  def family_member_created
+    deactivate_tax_households
+  end
+
+  def family_member_updated
+    deactivate_tax_households
+    delete_financial_assistance_applicant
+  end
+
+  def delete_financial_assistance_applicant
+    ::Operations::FinancialAssistance::DropApplicant.new.call({family_member: self})
+  rescue StandardError => e
+    Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::DropApplicant for family_member with object_id: #{self.id} due to #{e.message}"}
+  end
+
+  def deactivate_tax_households
+    return unless family.persisted? && family.active_household.tax_households.present?
+
+    Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: family.id, date: TimeKeeper.date_of_record})
+  rescue StandardError => e
+    Rails.logger.error {"Unable to do action Operations::Households::DeactivateFinancialAssistanceEligibility for family_member with object_id: #{self.id} due to #{e.message}"}
+  end
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory

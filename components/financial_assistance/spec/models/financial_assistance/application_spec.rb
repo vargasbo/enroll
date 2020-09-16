@@ -5,44 +5,19 @@ require 'aasm/rspec'
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
 
-  before :each do
-    primary_member.person_relationships.create(relative_id: person2.id, kind: 'child')
-    primary_member.person_relationships.create(relative_id: person4.id, kind: 'child')
-    primary_member.person_relationships.create(relative_id: person3.id, kind: 'spouse')
-    primary_member.save
-    family.save
-    # primary_member.add_relationship(person3, "spouse", family.id)
-    # primary_member.add_relationship(person4, "child", family.id)
-    # primary_member.add_relationship(person2, "child", family.id)
-  end
-
-  let!(:primary_member) { FactoryBot.create(:person, :with_consumer_role, first_name: "hello") }
-  let(:user) { FactoryBot.create(:user, person: primary_member) }
-  let!(:family)  { FactoryBot.create(:family, :with_primary_family_member, person: primary_member) }
-  let!(:person2) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:person3) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:person4) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:family_member1) { FactoryBot.create(:family_member, family: family, person: person2) }
-  let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person3) }
-  let!(:family_member3) { FactoryBot.create(:family_member, family: family, person: person4) }
+  let(:family_id) { BSON::ObjectId.new }
   let!(:year) { TimeKeeper.date_of_record.year }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family: family) }
-  let!(:household) { family.households.first }
-  let!(:tax_household) { FactoryBot.create(:tax_household, household: household) }
-  let!(:tax_household1) { FactoryBot.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
-  let!(:tax_household2) { FactoryBot.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
-  let!(:tax_household3) { FactoryBot.create(:tax_household, application_id: application.id, household: household) }
-  let!(:eligibility_determination1) { FactoryBot.create(:eligibility_determination, tax_household: tax_household1) }
-  let!(:eligibility_determination2) { FactoryBot.create(:eligibility_determination, tax_household: tax_household2) }
-  let!(:eligibility_determination3) { FactoryBot.create(:eligibility_determination, tax_household: tax_household3) }
-  let!(:application2) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'denied') }
-  let!(:application3) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determination_response_error') }
-  let!(:application4) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
-  let!(:application5) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
-  let!(:applicant1) { FactoryBot.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family.primary_applicant.id) }
-  let!(:applicant2) { FactoryBot.create(:applicant, tax_household_id: tax_household2.id, application: application, family_member_id: family_member2.id) }
-  let!(:applicant3) { FactoryBot.create(:applicant, tax_household_id: tax_household3.id, application: application, family_member_id: family_member3.id) }
-  let!(:plan) { FactoryBot.create(:plan, active_year: 2017, hios_id: '86052DC0400001-01') }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
+  let!(:eligibility_determination1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let!(:eligibility_determination2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let!(:eligibility_determination3) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let!(:application2) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'denied') }
+  let!(:application3) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determination_response_error') }
+  let!(:application4) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
+  let!(:application5) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
+  let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: BSON::ObjectId.new) }
+  let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination2.id, application: application, family_member_id: BSON::ObjectId.new) }
+  let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination3.id, application: application, family_member_id: BSON::ObjectId.new) }
 
   describe '.modelFeilds' do
     it { is_expected.to have_field(:hbx_id).of_type(String) }
@@ -108,11 +83,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       assc = described_class.reflect_on_association(:workflow_state_transitions)
       expect(assc.class).to eq Mongoid::Association::Embedded::EmbedsMany
     end
-
-    it 'belongs to family' do
-      assc = described_class.reflect_on_association(:family)
-      expect(assc.class).to eq Mongoid::Association::Referenced::BelongsTo
-    end
   end
 
   describe '.Constants' do
@@ -151,10 +121,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'should have submitted status constant' do
       expect(class_constants.include?(:SUBMITTED_STATUS)).to be_truthy
       expect(described_class::SUBMITTED_STATUS).to eq(%w[submitted verifying_income])
-    end
-
-    it 'should have faa schema file path constant' do
-      expect(class_constants.include?(:FAA_SCHEMA_FILE_PATH)).to be_truthy
     end
   end
 
@@ -214,39 +180,20 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.primary_applicant' do
     it 'returns primary_applicant' do
-      primary_applicant = application.active_applicants.detect { |applicant| applicant.is_primary_applicant? }
+      primary_applicant = application.active_applicants.detect(&:is_primary_applicant?)
       expect(application.primary_applicant).to eq(primary_applicant)
     end
   end
 
-  describe '.populate_applicants_for?' do
-    it 'returns populated applicants for family member' do
-      application.applicants.all.destroy
-      expect(application.tap(&:import_applicants).applicants).to eq(application.applicants)
-    end
-  end
-
-  describe '.current_csr_eligibility_kind' do
-    it 'should return current csr eligibility kind' do
-      application.eligibility_determination_for_tax_household(tax_household1.id)
-      expect(application.current_csr_eligibility_kind(tax_household1.id)).to eq(tax_household1.eligibility_determinations.first.csr_eligibility_kind)
+  describe '.current_csr_percent_as_integer' do
+    it 'should return current csr percent' do
+      application.eligibility_determination_for(eligibility_determination1.id)
+      expect(application.current_csr_percent_as_integer(eligibility_determination1.id)).to eq(eligibility_determination1.csr_percent_as_integer)
     end
 
-    it 'should return right eligibility_determination based on the tax_household_id' do
+    it 'should return right eligibility_determination' do
       ed = application.eligibility_determinations[0]
       expect(ed).to eq eligibility_determination1
-    end
-  end
-
-  describe '.tax_household_for_family_member' do
-    it 'returns tax household for family member' do
-      family_member_id = family_member2.id
-      expect(application.tax_household_for_family_member(family_member_id)).to eq tax_household2
-    end
-
-    it 'returns nil if no tax household for family member' do
-      family_member_id = family_member1.id
-      expect(application.tax_household_for_family_member(family_member_id)).to eq nil
     end
   end
 
@@ -285,7 +232,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:valid_application) do
       FactoryBot.create(
         :financial_assistance_application,
-        family: family,
+        family_id: BSON::ObjectId.new,
         hbx_id: '345332',
         applicant_kind: 'user and/or family',
         request_kind: 'request-kind',
@@ -304,14 +251,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       )
     end
     let!(:applicant_primary) do
-      FactoryBot.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id)
+      FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member_id)
     end
-    let!(:tax_household1) { family.latest_household.latest_active_tax_household }
-    let(:family_member) { family.primary_family_member }
+    let(:family_member_id) { BSON::ObjectId.new }
 
     it 'should returns true if application is ready_for_attestation' do
       allow(applicant_primary).to receive(:applicant_validation_complete?).and_return(true)
-      allow(family).to receive(:relationships_complete?).and_return(true)
+      allow(valid_application).to receive(:relationships_complete?).and_return(true)
       expect(valid_application.ready_for_attestation?).to be_truthy
     end
 
@@ -391,37 +337,22 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.set_assistance_year' do
     let(:assistance_year) { TimeKeeper.date_of_record + 1.year}
-    let!(:family)  { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:application) { FactoryBot.create(:financial_assistance_application, family: family) }
+    let(:family_id)       { BSON::ObjectId.new }      
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
       application.send(:set_assistance_year)
       expect(application.assistance_year).to eq(assistance_year.year - 1)
     end
   end
 
-  describe '.active_determined_tax_households' do
-    it 'returns active determined tax_households' do
-      expect(application.active_determined_tax_households).to eq family.active_household.tax_households.where(application_id: application.id.to_s, is_eligibility_determined: true)
-    end
-
-    it 'verfies active determined tax_households count' do
-      expect(application.active_determined_tax_households.count).to eq family.active_household.tax_households.where(application_id: application.id.to_s, is_eligibility_determined: true).count
-    end
-  end
-
-  describe '.tax_households' do
-    it 'returns tax households of a given applicant' do
-      expect(application.tax_households).to eq family.active_household.tax_households.where(application_id: application.id.to_s)
-    end
-
-    it 'verfies tax households count of a given applicant' do
-      expect(application.tax_households.count).to eq family.active_household.tax_households.where(application_id: application.id.to_s).count
+  describe '.eligibility_determinations' do
+    it 'verifies eligibility_determinations count of a given applicant' do
+      expect(application.eligibility_determinations.count).to eq 3
     end
   end
 
   describe 'trigger eligibility notice' do
-    let(:family_member) { FactoryBot.create(:family_member, :primary, family: family) }
-    let!(:applicant) { FactoryBot.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
+    let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: BSON::ObjectId.new) }
     before do
       application.update_attributes(:aasm_state => 'submitted')
     end
@@ -433,8 +364,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'trigger ineligibilility notice' do
-    let(:family_member) { FactoryBot.create(:family_member, :primary, family: family) }
-    let!(:applicant) { FactoryBot.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
+    let(:family_member_id) { BSON::ObjectId.new }
+    let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member_id) }
     before do
       application.active_applicants.each do |applicant|
         applicant.is_totally_ineligible = true
@@ -450,8 +381,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'generates hbx_id for application' do
-    let(:new_family) { FactoryBot.build(:family, :with_primary_family_member) }
-    let(:new_application) { FactoryBot.build(:financial_assistance_application, family: new_family) }
+    let(:new_family_id) { BSON::ObjectId.new }
+    let(:new_application) { FactoryBot.build(:financial_assistance_application, family_id: new_family_id) }
 
     it 'creates an hbx id if do not exists' do
       expect(new_application.hbx_id).to eq nil
@@ -460,9 +391,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe 'for create_tax_households' do
+  describe 'for create_eligibility_determinations' do
     before :each do
-      application.update_attributes(family: family, hbx_id: '345334', applicant_kind: 'user and/or family', request_kind: 'request-kind',
+      application.update_attributes(family_id: family_id, hbx_id: '345334', applicant_kind: 'user and/or family', request_kind: 'request-kind',
                                     motivation_kind: 'motivation-kind', us_state: 'DC', is_ridp_verified: true, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'draft',
                                     medicaid_terms: true, attestation_terms: true, submission_terms: true, medicaid_insurance_collection_terms: true,
                                     report_change_terms: true, parent_living_out_of_home_terms: true)
@@ -519,29 +450,29 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    it 'should return all the tax households of the application' do
-      expect(application.tax_households.count).to eq 3
-      expect(application.tax_households).to eq [tax_household1, tax_household2, tax_household3]
+    it 'should return all the eligibility determinations of the application' do
+      expect(application.eligibility_determinations.count).to eq 3
+      expect(application.eligibility_determinations).to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
-    it 'should not return wrong number of tax households of the application' do
-      expect(application.tax_households.count).not_to eq 4
-      expect(application.tax_households).not_to eq [tax_household1, tax_household2]
+    it 'should not return wrong number of eligibility determinations of the application' do
+      expect(application.eligibility_determinations.count).not_to eq 4
+      expect(application.eligibility_determinations).not_to eq [eligibility_determination1, eligibility_determination2]
     end
 
-    it 'should return the latest tax households' do
-      tax_household1.update_attributes('effective_ending_on' => nil)
-      tax_household2.update_attributes('effective_ending_on' => nil)
-      expect(application.latest_active_tax_households_with_year(year).count).to eq 2
-      expect(application.latest_active_tax_households_with_year(year)).to eq [tax_household1, tax_household2]
+    it 'should return the latest eligibility determinations' do
+      eligibility_determination1.update_attributes('effective_starting_on' => Date.new(year,1,1), is_eligibility_determined: true)
+      eligibility_determination2.update_attributes('effective_starting_on' => Date.new(year,1,1), is_eligibility_determined: true)
+      expect(application.latest_active_eligibility_determinations_with_year(year).count).to eq 2
+      expect(application.latest_active_eligibility_determinations_with_year(year)).to eq [eligibility_determination1, eligibility_determination2]
     end
 
-    it 'should only return latest tax households of application' do
-      expect(application.latest_active_tax_households_with_year(year).count).not_to eq 3
-      expect(application.latest_active_tax_households_with_year(year)).not_to eq [tax_household1, tax_household2, tax_household3]
+    it 'should only return latest eligibility_determinations of application' do
+      expect(application.latest_active_eligibility_determinations_with_year(year).count).not_to eq 3
+      expect(application.latest_active_eligibility_determinations_with_year(year)).not_to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
-    it 'should match correct eligibility for tax household' do
+    it 'should match correct eligibility' do
       expect(application.eligibility_determinations[0]).to eq eligibility_determination1
       expect(application.eligibility_determinations[1]).to eq eligibility_determination2
       expect(application.eligibility_determinations[2]).to eq eligibility_determination3
@@ -554,18 +485,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(ed1).not_to eq eligibility_determination3
     end
 
-    it 'should return unique tax households with active_approved_application applicants' do
-      expect(application.tax_households.count).to eq 3
-      expect(application.tax_households).to eq [tax_household1, tax_household2, tax_household3]
+    it 'should return unique eligibility determinations with active_approved_application applicants' do
+      expect(application.eligibility_determinations.count).to eq 3
+      expect(application.eligibility_determinations).to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
-    it 'should only return all unique tax_households' do
-      expect(application.tax_households.count).not_to eq 2
-      expect(application.tax_households).not_to eq [tax_household1, tax_household1, tax_household2]
-    end
-
-    it 'should not return all tax_households' do
-      expect(application.tax_households).not_to eq applicant1.tax_household.to_a
+    it 'should not return all eligibility_determinations' do
+      expect(application.eligibility_determinations).not_to eq applicant1.eligibility_determination.to_a
     end
   end
 
@@ -600,12 +526,12 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe 'check the validity of an application' do
 
-    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family: family, applicants: [applicant_primary]) }
-    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family: family, aasm_state: 'draft', applicants: [applicant_primary2]) }
-    let!(:applicant_primary) { FactoryBot.create(:applicant, tax_household_id: thh1.id, application: application, family_member_id: family_member1.id) }
-    let!(:applicant_primary2) { FactoryBot.create(:applicant, tax_household_id: thh2.id, application: application, family_member_id: family_member1.id) }
-    let!(:thh1) { FactoryBot.create(:tax_household, household: household) }
-    let!(:thh2) { FactoryBot.create(:tax_household, household: household) }
+    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family_id) }
+    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
+    let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, application: valid_app) }
+    let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, application: invalid_app) }
+    let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
+    let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: invalid_app) }
 
     it 'should allow a sucessful state transition for valid application' do
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
@@ -678,6 +604,45 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.active_applicants.each do |applicant|
         expect(applicant.verification_types.count). to eq 0
       end
+    end
+  end
+
+  context 'add_eligibility_determination' do
+    let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family.xml')) }
+    let(:message) do
+      {determination_http_status_code: 200, has_eligibility_response: true,
+       haven_app_id: '1234', haven_ic_id: '124', eligibility_response_payload: xml}
+    end
+    let!(:person10) do
+      FactoryBot.create(:person, :with_consumer_role, hbx_id: '20944967', last_name: 'Test', first_name: 'Domtest34', ssn: '243108282', dob: Date.new(1984, 3, 8))
+    end
+
+    let(:family10_id) { BSON::ObjectId.new }
+    let(:family_member10_id) { BSON::ObjectId.new }
+    let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family10_id, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
+    let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application10, csr_percent_as_integer: nil, max_aptc: 0.0) }
+    let!(:applicant10) do
+      FactoryBot.create(:applicant, application: application10,
+                                    family_member_id: family_member10_id,
+                                    person_hbx_id: person10.hbx_id,
+                                    ssn: '243108282',
+                                    dob: Date.new(1984, 3, 8),
+                                    first_name: 'Domtest34',
+                                    last_name: 'Test',
+                                    eligibility_determination_id: ed.id)
+    end
+
+    before do
+      ed.update_attributes!(hbx_assigned_id: '205828')
+      application10.add_eligibility_determination(message)
+    end
+
+    it 'should update eligibility_determination object' do
+      expect(ed.max_aptc.to_f).to eq(47.78)
+    end
+
+    it 'should update applicant object' do
+      expect(applicant10.is_ia_eligible).to be_truthy
     end
   end
 end

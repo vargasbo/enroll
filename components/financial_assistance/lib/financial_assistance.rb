@@ -6,9 +6,12 @@ require 'aasm'
 require 'config'
 require 'dry-types'
 require 'dry-validation'
+# require 'dry-struct'
+require 'dry-monads'
 require 'font-awesome-rails'
 require 'haml-rails'
 require 'money-rails'
+require FinancialAssistance::Engine.root.join('app/domain/financial_assistance/types')
 
 module FinancialAssistance
   # Isolate the namespace portion of the passed class

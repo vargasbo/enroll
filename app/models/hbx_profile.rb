@@ -99,17 +99,6 @@ class HbxProfile
       end
     end
 
-    def faa_application_applicable_year
-      calender_year = TimeKeeper.date_of_record.year
-      enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
-
-      if current_hbx&.under_open_enrollment? && calender_year == enrollment_start_on_year.year
-        calender_year + 1
-      else
-        calender_year
-      end
-    end
-
     def transmit_group_xml(employer_profile_ids)
       hbx_ids = []
       employer_profile_ids.each do |empr_id|
@@ -131,6 +120,18 @@ class HbxProfile
         broker_agency_profiles = BrokerAgencyProfile.all
       end
       broker_agency_profiles
+    end
+
+    def bcp_by_oe_dates(date = TimeKeeper.date_of_record)
+      current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+        bcp.open_enrollment_contains?(date)
+      end
+    end
+
+    def bcp_by_effective_period(date = TimeKeeper.date_of_record)
+      current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+        bcp.contains?(date)
+      end
     end
   end
 

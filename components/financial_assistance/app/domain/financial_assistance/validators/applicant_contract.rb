@@ -14,6 +14,10 @@ module FinancialAssistance
         required(:gender).maybe(:string)
         required(:dob).filled(:date)
 
+        optional(:is_primary_applicant).maybe(:bool)
+        optional(:person_hbx_id).maybe(:string)
+        optional(:family_member_id).maybe(Types::Bson)
+
         required(:is_incarcerated).filled(:bool)
         optional(:is_disabled).filled(:bool)
         optional(:ethnicity).maybe(:array)
@@ -39,7 +43,7 @@ module FinancialAssistance
         optional(:country_of_citizenship).maybe(:string)
         optional(:expiration_date).maybe(:date)
         optional(:issuing_country).maybe(:string)
-        optional(:status).maybe(:string)
+        optional(:relationship).maybe(:string)
 
         optional(:no_ssn).maybe(:string)
         required(:citizen_status).maybe(:string)
@@ -52,7 +56,7 @@ module FinancialAssistance
         optional(:emails).maybe(:array)
       end
 
-      rule(:addresses).each do
+      rule(:addresses).each do |key, value|
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::AddressContract.new.call(value)
@@ -63,7 +67,22 @@ module FinancialAssistance
         end
       end
 
-      rule(:phones).each do
+      rule(:ssn, :no_ssn) do
+        if values[:ssn].blank? && values[:no_ssn] == '0'
+          key.failure(ssn: "ssn is missing")
+        end
+      end
+
+      rule(:is_primary_applicant) do
+        if key? && value
+          if value
+            key.failure(text: "family_member_id should be present") if values[:family_member_id].blank?
+            key.failure(text: "person hbx id should be present") if values[:person_hbx_id].blank?
+          end
+        end
+      end
+
+      rule(:phones).each do |key, value|
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::PhoneContract.new.call(value)
@@ -74,7 +93,7 @@ module FinancialAssistance
         end
       end
 
-      rule(:emails).each do
+      rule(:emails).each do |key, value|
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::EmailContract.new.call(value)

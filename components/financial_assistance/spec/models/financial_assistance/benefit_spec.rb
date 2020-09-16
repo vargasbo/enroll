@@ -3,16 +3,19 @@
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each do
-  let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-  let(:application) {FactoryBot.create(:application, family: family)}
-  let(:household) {family.households.first}
-  let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_ending_on: nil)}
-  let(:family_member) {family.primary_applicant}
-  let(:applicant) {FactoryBot.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member.id)}
-  let(:benefit) {FinancialAssistance::Benefit.new(applicant: applicant)}
+  let(:family_id) { BSON::ObjectId.new }
+  let(:application) { FactoryBot.create(:application, family_id: family_id) }
+  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+  let(:family_member_id) { BSON::ObjectId.new }
+  let(:applicant) {FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination.id, application: application, family_member_id: family_member_id)}
+  let(:benefit) do
+    benefit = FinancialAssistance::Benefit.new(valid_params)
+    applicant.benefits << benefit
+    benefit
+  end
+
   let(:valid_params) do
     {
-      applicant: applicant,
       title: 'Financial Benefit',
       kind: 'is_eligible',
       insurance_kind: 'medicare_part_b',
@@ -20,21 +23,15 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
     }
   end
 
-  # before :each do
-  #   allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
-  # end
-
   context 'valid benefit' do
     it 'should save benefit step_1 and submit' do
-      expect(FinancialAssistance::Benefit.create(valid_params).valid?(:step_1)).to be_truthy
-      expect(FinancialAssistance::Benefit.create(valid_params).valid?(:submit)).to be_truthy
+      expect(benefit.valid?(:step_1)).to be_truthy
+      expect(benefit.valid?(:submit)).to be_truthy
     end
   end
 
   describe 'find' do
-    before :each do
-      benefit.save!
-    end
+    let(:valid_params) {{}}
 
     context 'when proper applicant id is sent' do
       it 'should return the applicant instance' do
