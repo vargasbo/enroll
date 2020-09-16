@@ -8,7 +8,7 @@ Feature: Broker unable to see the Ageoff Exclusion checkbox
     And ABC Widgets has census employee, person record, and active coverage for employee Patrick Doe
 
   Scenario: Broker should not see the Ageoff Exclusion checkbox
-    Given that a broker exists
+    Given that a broker with HBX staff role exists
     And the broker is signed in
     When the broker is on the Family Index of the Admin Dashboard
     # And the user clicks on Families tab

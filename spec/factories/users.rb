@@ -42,8 +42,8 @@ FactoryBot.define do
 
     after :create do |user, evaluator|
       if user.person.present?
-      user.person.hbx_staff_role = FactoryBot.build :hbx_staff_role
-      user.save
+        user.person.hbx_staff_role = FactoryBot.build :hbx_staff_role
+        user.save!
       end
     end
   end
@@ -70,6 +70,26 @@ FactoryBot.define do
 
   trait "employee" do
     roles { ["employee"] }
+  end
+
+  trait :broker_with_person_and_hbx_staff_role do
+    roles { ["broker", "hbx_staff"] }
+
+    transient do
+      organization {}
+    end
+
+    after :create do |user, evaluator|
+      if user.person.present?
+        user.person.broker_agency_staff_roles.push FactoryBot.build(:broker_agency_staff_role, broker_agency_profile_id: evaluator.organization.broker_agency_profile.id)
+        evaluator.organization.broker_agency_profile.primary_broker_role = FactoryBot.create :broker_role, person: user.person, broker_agency_profile: evaluator.organization.broker_agency_profile
+        evaluator.organization.save!
+        user.save!
+        permission = Permission.find_by(name: "hbx_staff")
+        user.person.hbx_staff_role = FactoryBot.build(:hbx_staff_role, permission_id: permission.id, person: user.person)
+        user.save!
+      end
+    end
   end
 
   trait :broker_with_person do
