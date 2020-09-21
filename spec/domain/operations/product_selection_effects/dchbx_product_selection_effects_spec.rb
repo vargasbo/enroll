@@ -227,7 +227,7 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
         expect(enrollment.aasm_state).to eq('coverage_canceled')
       end
     end
-    
+
     context 'new enrollment in prior plan year for dependent add' do
       include_context 'family with two members and one enrollment and one predecessor enrollment'
 
