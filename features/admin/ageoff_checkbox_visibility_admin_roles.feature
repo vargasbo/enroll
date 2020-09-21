@@ -1,4 +1,4 @@
-Feature: As a Super Admin I will be the only user that is able to see the Ageoff Exclusion checkbox
+Feature: HBX staff subroles able to see the Ageoff Exclusion checkbox
 
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market

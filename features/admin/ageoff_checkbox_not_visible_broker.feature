@@ -11,7 +11,11 @@ Feature: Broker unable to see the Ageoff Exclusion checkbox
     Given that a broker with HBX staff role exists
     And the broker is signed in
     When the broker is on the Family Index of the Admin Dashboard
-    # And the user clicks on Families tab
-    # And the user clicks on the name of person Patrick Doe from family index_page
-    # And the user clicks on the Manage Family button
-    # And the user clicks on the Personal tab
+    And the broker clicks on Families tab
+    And the broker clicks on the name of person Patrick Doe from family index_page
+    And the broker clicks on the Manage Family button
+    And the broker clicks on the Personal tab
+    Then the broker should not see the Ageoff Exclusion checkbox
+    When the broker clicks on the Family tab
+    And the broker clicks on Add Member
+    Then the broker should not see the Ageoff Exclusion checkbox
