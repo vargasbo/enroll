@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Notifier
   module Builders
     class ConsumerRole
@@ -39,14 +40,13 @@ module Notifier
         primary_nil? ? payload['notice_params']['dependents'][0] : payload['notice_params']['primary_member']
       end
 
-
       def first_name
         merge_model.first_name =
           if uqhp_notice? && consumer_role.present?
             consumer_role.person.first_name
           else
             payload['notice_params']['primary_member']['first_name'].titleize
-         end
+          end
       end
 
       def last_name
