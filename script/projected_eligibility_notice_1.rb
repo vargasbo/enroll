@@ -35,8 +35,9 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
     subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
     dependents = members.select{|m| m["dependent"].casecmp('YES').zero? }
     primary_person = HbxEnrollment.by_hbx_id(members.first["applid"]).first.family.primary_person
+
     next if primary_person.nil?
-    next if subscriber.present? && subscriber["resident"] && subscriber["resident"].casecmp('NO')&.zero?
+    next subscriber["resident"] && subscriber["resident"].casecmp('NO')&.zero?
     next if members.select{ |m| m["incarcerated"] && m["incarcerated"].casecmp('YES')&.zero? }.present?
     next if members.any?{ |m| m["citizen_status"].blank? || (m["citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["citizen_status"] == "not_lawfully_present_in_us")}
 
@@ -49,7 +50,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           event_object: consumer_role,
           notice_event: 'projected_eligibility_notice',
           notice_params: {
-            primary_member: subscriber.to_hash,
+            primary_member: subscriber&.to_hash,
             dependents: dependents.map(&:to_hash),
             uqhp_event: 'uqhp_projected_eligibility_notice_1'
           }
