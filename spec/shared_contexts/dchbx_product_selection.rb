@@ -343,5 +343,3 @@ RSpec.shared_context 'family with two members and one enrollment and one predece
                       applicant_id: family_member1.id)
   end
 end
-
-
