@@ -167,6 +167,107 @@ RSpec.shared_context 'family with two members and one enrollment and one predece
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
                       :ivl_product,
                       :silver,
+                      issuer_name: 'Kaiser',
+                      renewal_product_id: new_product.id,
+                      application_period: previous_year..previous_year.end_of_year)
+  end
+
+  let!(:predecessor_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: new_predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: predecessor_bcp.start_on)
+  end
+
+  let!(:predecessor_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: predecessor_enrollment,
+                      applicant_id: family_member.id)
+  end
+end
+
+RSpec.shared_context 'family with two members and one enrollment and one predecessor enrollment with plan switch', :shared_context => :metadata do
+  include_context 'family with one member and one enrollment'
+
+  let!(:new_renewal_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
+                      application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
+  end
+
+  let!(:new_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
+                      renewal_product_id: new_renewal_product.id,
+                      application_period: start_of_year..end_of_year)
+  end
+
+  let!(:new_predecessor_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
+                      renewal_product_id: new_product.id,
+                      application_period: previous_year..previous_year.end_of_year)
+  end
+
+  let!(:predecessor_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: new_predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: predecessor_bcp.start_on)
+  end
+
+  let!(:predecessor_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: predecessor_enrollment,
+                      applicant_id: family_member.id)
+  end
+end
+
+RSpec.shared_context 'family with one members and one enrollment and one predecessor enrollment with carrier switch and existing coverage', :shared_context => :metadata do
+  include_context 'family with one member and one enrollment'
+
+  let!(:expired_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      aasm_state: :coverage_expired,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: previous_year)
+  end
+
+  let!(:expired_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: expired_enrollment,
+                      applicant_id: family_member.id)
+  end
+
+  let!(:new_renewal_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
+                      application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
+  end
+
+  let!(:new_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
+                      renewal_product_id: new_renewal_product.id,
+                      application_period: start_of_year..end_of_year)
+  end
+
+  let!(:new_predecessor_product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                      :ivl_product,
+                      :silver,
                       issuer_name: 'BlueChoice',
                       renewal_product_id: new_product.id,
                       application_period: previous_year..previous_year.end_of_year)
@@ -186,12 +287,6 @@ RSpec.shared_context 'family with two members and one enrollment and one predece
                       hbx_enrollment: predecessor_enrollment,
                       applicant_id: family_member.id)
   end
-
-  # let!(:predecessor_enrollment_member1) do
-  #   FactoryBot.create(:hbx_enrollment_member,
-  #                     hbx_enrollment: predecessor_enrollment,
-  #                     applicant_id: family_member1.id)
-  # end
 end
 
 RSpec.shared_context 'family with two members and one enrollment and one predecessor enrollment with one member with previous year active coverage', :shared_context => :metadata do
@@ -237,6 +332,41 @@ RSpec.shared_context 'family with two members and one enrollment and one predece
   let!(:predecessor_enrollment_member) do
     FactoryBot.create(:hbx_enrollment_member,
                       hbx_enrollment: predecessor_enrollment,
+                      applicant_id: family_member.id)
+  end
+end
+
+RSpec.shared_context 'family with previous enrollment for termination and passive renewal', :shared_context => :metadata do
+  include_context 'family with one member and one enrollment'
+
+  let!(:expired_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      aasm_state: :coverage_expired,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: start_of_year)
+  end
+
+  let!(:expired_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: expired_enrollment,
+                      applicant_id: family_member.id)
+  end
+
+  let!(:renewal_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: product.id,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: start_of_year.next_year)
+  end
+
+  let!(:enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: renewal_enrollment,
                       applicant_id: family_member.id)
   end
 end
