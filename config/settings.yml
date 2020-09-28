@@ -407,3 +407,7 @@ external_applications:
   admin:
     url: <%= ENV['ANGULAR_ADMIN_APPLICATION_URL'] %>
     pundit_policy: AngularAdminApplicationPolicy
+
+hbxit:
+  rabbit:
+    uri: 'amqp://mafia:password@qa-dchbx-it.priv.dchbx.org:5672/hbxit'

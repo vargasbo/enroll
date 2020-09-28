@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   mount TransportGateway::Engine,     at: "/transport_gateway"
   mount TransportProfiles::Engine,    at: "/transport_profiles"
   mount Notifier::Engine,             at: "/notifier"
+  mount ActionCable.server => "/cable"
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
@@ -762,6 +763,15 @@ Rails.application.routes.draw do
       resources :users, only: [] do
         collection do
           get :current
+        end
+      end
+    end
+
+    namespace :hbxinternal do
+      namespace :v1 do
+        scope module: :rake_trigger do
+          get :say_hello
+          get :perform_task
         end
       end
     end
