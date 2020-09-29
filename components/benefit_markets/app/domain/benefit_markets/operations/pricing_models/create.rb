@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module BenefitMarkets
   module Operations
-    module ContributionModels
+    module PricingModels
 
       class Create
         # include Dry::Monads::Do.for(:call)
@@ -14,27 +14,27 @@ module BenefitMarkets
         # @param [ Hash ] params Benefit Sponsor Catalog attributes
         # @param [ Array<BenefitMarkets::Entities::ProductPackage> ] product_packages ProductPackage
         # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
-        def call(contribution_params:)
-          contribution_values = yield validate(contribution_params)
-          contribution_model  = yield create(contribution_values)
+        def call(params:)
+          values = yield validate(params)
+          pricing_model = yield create(values)
   
-          Success(contribution_model)
+          Success(pricing_model)
         end
 
         private
 
         def validate(params)
-          result = ::BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(params)
+          result = ::BenefitMarkets::Validators::PricingModels::PricingModelContract.new.call(params)
 
           if result.success?
             Success(result.to_h)
           else
-            Failure("Unable to validate contribution model #{result.errors.to_h}")
+            Failure("Unable to validate pricing model #{result.errors.to_h}")
           end
         end
 
         def create(values)
-          contribution_model = ::BenefitMarkets::Entities::ContributionModel.new(values)
+          contribution_model = ::BenefitMarkets::Entities::PricingModel.new(values)
 
           Success(contribution_model)
         end
