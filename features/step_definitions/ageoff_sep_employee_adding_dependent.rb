@@ -1,12 +1,6 @@
-# When(/^.+ clicks the Manage Family button$/) do
-#     find(:xpath, '//a[text()="Manage Family"]').click
-# end
-
 When(/^.+ sees the new dependent form$/) do
     expect(page).to have_content('CONFIRM MEMBER')
   end
-
-When(/^.+ enters new current date$/) do
 
 When(/^.+ enters? the info of his dependent wife$/) do
     fill_in 'dependent[first_name]', with: 'Cynthia'
