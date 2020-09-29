@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  require 'sidekiq/web'
   require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
+  mount Sidekiq::Web, at: '/sidekiq'
+
   mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
   mount BenefitMarkets::Engine,       at: "/benefit_markets"
   mount SponsoredBenefits::Engine,    at: "/sponsored_benefits"
@@ -64,6 +67,10 @@ Rails.application.routes.draw do
   get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
+
+    resources :bulk_uploads do
+      get :enqueue, on: :collection
+    end
 
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
