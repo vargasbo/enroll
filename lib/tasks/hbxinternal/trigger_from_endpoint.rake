@@ -16,7 +16,7 @@ namespace :hbxinternal do
     queue = chan.queue('dev')
     chan.confirm_select
     chan.default_exchange.publish("Initiating rake task: trigger_from_endpoint by Andrej Rasevic at #{Time.now}",routing_key: queue.name)
-    sleep 4
+    sleep 10
     puts "ending hbxinternal rake task"
     chan.default_exchange.publish("Ending rake task: trigger_from_endpoint successfully by Andrej Rasevic at #{Time.now}",routing_key: queue.name)
     chan.wait_for_confirms
