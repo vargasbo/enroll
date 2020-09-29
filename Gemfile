@@ -125,6 +125,10 @@ group :development do
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
   gem 'rubocop-git'
+  gem 'byebug'
+  gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'pry-stack_explorer'
 
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
