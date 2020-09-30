@@ -53,5 +53,5 @@ end
 
 Then(/(.*) should see his active enrollment including his wife$/) do |_person|
   sleep 1
-  expect(enrollmentfind('.family-members')).to have_content 'Cynthia'
+  expect(page).to have_content 'Cynthia'
 end
