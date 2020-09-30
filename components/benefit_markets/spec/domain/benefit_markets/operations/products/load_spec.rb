@@ -17,7 +17,7 @@ RSpec.describe BenefitMarkets::Operations::Products::Load, dbclean: :after_each 
   }
 
   let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-  let!(:issuer_profile) { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+  let!(:issuer_profile) { double(id: BSON::ObjectId.new) }
 
   let!(:health_products) { create_list(:benefit_markets_products_health_products_health_product,
           5,

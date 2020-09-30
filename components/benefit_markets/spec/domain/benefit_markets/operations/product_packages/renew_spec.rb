@@ -21,7 +21,7 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Renew, dbclean: :aft
     }
 
     let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:issuer_profile) { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+    let(:issuer_profile) { double(id: BSON::ObjectId.new) }
     let(:product_kinds) { [:health] }
     let(:benefit_market) { site.benefit_markets.first }
 
