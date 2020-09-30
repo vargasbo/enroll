@@ -137,12 +137,11 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Renew, dbclean: :
       ]
     }
   end
-  
 
   context 'when contribution model present' do
     let(:params) { {contribution_model: contribution_params} }
 
-    it 'should renew contribution model' do 
+    it 'should renew contribution model' do
       result = subject.call(params)
 
       expect(result.success?).to be_truthy
@@ -155,13 +154,13 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Renew, dbclean: :
   context 'when contribution models present' do
     let(:params) { {contribution_models: [contribution_params]} }
 
-    it 'should renew contribution models' do 
+    it 'should renew contribution models' do
       result = subject.call(params)
 
       expect(result.success?).to be_truthy
       values = result.success
       expect(values[:contribution_model]).to be_blank
-      expect(values[:contribution_models][0]).to be_a BenefitMarkets::Entities::ContributionModel      
+      expect(values[:contribution_models][0]).to be_a BenefitMarkets::Entities::ContributionModel
     end
   end
 end

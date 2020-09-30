@@ -14,7 +14,7 @@ module BenefitMarkets
 
         # @param [ Date ] effective_date Effective Date of the Current Benefit Market Catalog
         # @param [ Symbol ] market_kind BenefitMarket market kind
-        def call(params) #overwrite
+        def call(params)
           # paramss[:options][:overwrite] ||= false
           existing_catalog = yield find_benefit_market_catalog(params)
           new_catalog_params = yield construct_attributes(existing_catalog)
@@ -28,7 +28,7 @@ module BenefitMarkets
 
         def construct_attributes(existing_catalog)
           renewal_start_date = existing_catalog.application_period.max + 1.day
-  
+
           attributes = {
             title: existing_catalog.title,
             description: existing_catalog.description,
@@ -44,14 +44,11 @@ module BenefitMarkets
           renewed_packages = existing_catalog.product_packages.collect do |existing_product_package|
             product_package_attributes = existing_product_package.attributes.slice(:benefit_kind, :product_kind, :title, :description, :package_kind, :contribution_models, :contribution_model, :pricing_model, :products)
             product_package_attributes.merge!(application_period: application_period)
-            
+
             result = ::BenefitMarkets::Operations::ProductPackages::Renew.new.call(product_package_attributes.deep_symbolize_keys)
 
-            if result.success?
-              result.success.to_h
-            else
-              raise StandardError, result.failure.errors
-            end
+            raise StandardError, result.failure.errors if result.failure?
+            result.success.to_h
           end
 
           Success(renewed_packages)

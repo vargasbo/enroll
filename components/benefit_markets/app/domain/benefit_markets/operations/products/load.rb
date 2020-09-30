@@ -14,7 +14,7 @@ module BenefitMarkets
         def call(params)
           params = yield fetch(params)
           values = yield renew(params)
-          
+
           Success(values)
         end
 
@@ -23,19 +23,15 @@ module BenefitMarkets
         def fetch(params)
           p_candidate = OpenStruct.new(params.slice(:benefit_kind, :product_kind, :package_kind, :application_period))
           products_params = ::BenefitMarkets::Products::Product.by_product_package(p_candidate).collect{|product| product.create_copy_for_embedding.serializable_hash }
-          
+
           Success(products_params)
         end
 
         def renew(products_params)
           products = products_params.collect do |product_params|
             product = ::BenefitMarkets::Operations::Products::Create.new.call(product_params: product_params.symbolize_keys)
-            
-            if product.success?
-              product.value!
-            else
-              raise StandardError, product.failure.errors
-            end
+            raise StandardError, product.failure.errors if product.failure?
+            product.value!
           end
 
           Success(products)

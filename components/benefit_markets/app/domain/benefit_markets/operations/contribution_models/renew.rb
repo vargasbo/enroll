@@ -6,7 +6,6 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module ContributionModels
-
       class Renew
         # include Dry::Monads::Do.for(:call)
         include Dry::Monads[:result, :do]
@@ -16,15 +15,14 @@ module BenefitMarkets
         def call(params)
           params = yield extract(params)
           values = yield renew(params)
-  
+
           Success(values)
         end
 
         private
 
-        # TODO:
-        # Update key and title to Simple List Bill Contribution Model
-        # PercentWithCapContributionModel
+        # TODO: Update key and title to Simple List Bill Contribution Model
+        #       PercentWithCapContributionModel
         def extract(params)
           contribution_params = {
             contribution_models: params[:contribution_models],
@@ -47,12 +45,8 @@ module BenefitMarkets
 
         def build_entity(params)
           contribution_model = ::BenefitMarkets::Operations::ContributionModels::Create.new.call(contribution_params: params)
-          
-          if contribution_model.success?
-            contribution_model.value!
-          else
-            raise StandardError, contribution_model.failure.errors
-          end
+          raise StandardError, contribution_model.failure.errors if contribution_model.failure?
+          contribution_model.value!
         end
       end
     end

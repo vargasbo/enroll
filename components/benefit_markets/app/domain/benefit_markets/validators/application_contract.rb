@@ -76,13 +76,12 @@ module BenefitMarkets
 
       rule(:pricing_model) do
         if key? && value
-          if !value.is_a?(::BenefitMarkets::Entities::PricingModel)
-            if value.is_a?(Hash)
-              result = ::BenefitMarkets::Validators::PricingModels::PricingModelContract.new.call(value)
-              key.failure(text: "invalid pricing model", error: result.errors.to_h) if result&.failure?
-            else
-              key.failure(text: "invalid pricing model. expected a hash or pricing_model entity")
-            end
+          next if value.is_a?(::BenefitMarkets::Entities::PricingModel)
+          if value.is_a?(Hash)
+            result = ::BenefitMarkets::Validators::PricingModels::PricingModelContract.new.call(value)
+            key.failure(text: "invalid pricing model", error: result.errors.to_h) if result&.failure?
+          else
+            key.failure(text: "invalid pricing model. expected a hash or pricing_model entity")
           end
         end
       end

@@ -15,15 +15,13 @@ module BenefitMarkets
         end
 
         rule(:product_packages).each do
-          if key? && value
-            if !value.is_a?(::BenefitMarkets::Entities::ProductPackage)
-              if value.is_a?(Hash)
-                result = BenefitMarkets::Validators::Products::LegacyProductPackageContract.new.call(value)
-                key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
-              else
-                key.failure(text: "invalid product packages. expected a hash or product_package entity")
-              end
-            end
+          next unless key?
+          next if value.blank? || value.is_a?(::BenefitMarkets::Entities::ProductPackage)
+          if value.is_a?(Hash)
+            result = BenefitMarkets::Validators::Products::LegacyProductPackageContract.new.call(value)
+            key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?
+          else
+            key.failure(text: "invalid product packages. expected a hash or product_package entity")
           end
         end
       end

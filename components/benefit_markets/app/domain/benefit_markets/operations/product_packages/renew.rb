@@ -6,7 +6,6 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module ProductPackages
-
       class Renew
         include Dry::Monads[:result, :do]
 
@@ -40,7 +39,7 @@ module BenefitMarkets
           params = params.slice(:benefit_kind, :product_kind, :description, :title, :package_kind, :application_period)
           params.merge!(contributions)
           params.merge!(pricing_model: pricing_model, products: products)
-          
+
           ::BenefitMarkets::Operations::ProductPackages::Create.new.call(product_package_params: params, enrollment_eligibility: nil)
         end
       end
