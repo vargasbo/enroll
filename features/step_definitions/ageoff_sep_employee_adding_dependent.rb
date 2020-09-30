@@ -24,7 +24,7 @@ When(/(.*) clicks "(.*?)" link in the qle carousel$/) do |_name, qle_event|
   click_link qle_event.to_s
 end
 
-When(/employee selects a current qle date$/) do |_person|
+When(/employee selects a current qle date$/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
