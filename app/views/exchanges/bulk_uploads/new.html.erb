@@ -1,3 +1,15 @@
-<%= form_for(@bulk_notice) do |f| %>
-    <%= f.select :audience_type, ['Broker', 'Employer', 'General Agency', 'Employee'] %>
+<%= form_for(@bulk_notice, url: exchanges_bulk_uploads_path) do |f| %>
+    <div>
+        <%= f.label :audience_type, 'Audience' %>
+        <%= f.select :audience_type, ['Broker', 'Employer', 'General Agency', 'Employee'] %>
+    </div>
+    <div>
+        <%= f.label :audience_identifiers, 'Identifiers' %>
+        <%= f.text_area :audience_identifiers, rows: 10, cols: 200 %>
+    </div>
+    <div>
+        <%= f.label :subject, 'Subject' %>
+        <%= f.text_field :subject %>
+    </div>
 <% end %>
+
