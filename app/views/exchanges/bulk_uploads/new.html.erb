@@ -11,5 +11,12 @@
         <%= f.label :subject, 'Subject' %>
         <%= f.text_field :subject %>
     </div>
+        <div>
+        <%= f.label :body, 'Message' %>
+        <%= f.text_area :body, rows: 10, cols: 200 %>
+    </div>
+    <div>
+        <%= f.submit %>
+    </div>
 <% end %>
 
