@@ -4,7 +4,7 @@ module ConsumerRolesHelper
       ["White", "Black or African American", "Asian Indian", "Chinese" ],
       ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
       ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
-      ["Other Pacific Islander", "American Indian or Alaskan Native", "Other"]
+      ["Other Pacific Islander", "American Indian/Alaska Native", "Other"]
 
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
@@ -13,8 +13,8 @@ module ConsumerRolesHelper
 
   def latino_collection
     [
-      ["Mexican, Mexican American, Chicano/a"],
-      ["Puerto Rican"],
+      ["Mexican", "Mexican American"],
+      ["Chicano/a", "Puerto Rican"],
       ["Cuban", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
