@@ -111,7 +111,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
 
       it "should give qle_eligible_end for qle with end on date." do
         shop_self_attested.update_attributes(coverage_start_on: date.beginning_of_month, coverage_end_on: date.end_of_year)
-        expect(shop_self_attested.qle_eligible_end).to eq (shop_self_attested.coverage_end_on - TimeKeeper.date_of_record).numerator
+        expect(shop_self_attested.qle_eligible_end).to eq(shop_self_attested.coverage_end_on - TimeKeeper.date_of_record).numerator
       end
 
       it "should give qle_eligible_start for qle when no start on date." do
