@@ -46,8 +46,7 @@ module BenefitMarkets
             product_package_attributes.merge!(application_period: application_period)
 
             result = ::BenefitMarkets::Operations::ProductPackages::Renew.new.call(product_package_attributes.deep_symbolize_keys)
-
-            raise StandardError, result.failure.errors if result.failure?
+            raise StandardError, result.errors.to_h if result.failure?
             result.success.to_h
           end
 

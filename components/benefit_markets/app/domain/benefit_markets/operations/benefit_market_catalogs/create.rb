@@ -28,7 +28,7 @@ module BenefitMarkets
           if result.success?
             Success(result.to_h)
           else
-            Failure(result.errors)
+            Failure(result.errors.to_h)
           end
         end
 
