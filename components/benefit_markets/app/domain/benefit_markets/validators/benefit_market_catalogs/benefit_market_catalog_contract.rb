@@ -10,7 +10,7 @@ module BenefitMarkets
           required(:application_period).filled(type?: Range)
           required(:probation_period_kinds).value(:array)
           required(:title).filled(:string)
-          optional(:description).filled(:string)
+          optional(:description).maybe(:string)
           required(:product_packages).value(:array)
         end
 

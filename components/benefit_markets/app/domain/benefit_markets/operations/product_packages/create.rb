@@ -26,7 +26,8 @@ module BenefitMarkets
 
         def validate(product_package_params, enrollment_eligibility = nil)
           result =
-            if enrollment_eligibility.blank? || enrollment_eligibility.market_kind == :fehb || product_package_params[:product_kind] != :health
+            if product_package_params[:benefit_kind] == :fehb || product_package_params[:product_kind] != :health
+              product_package_params[:contribution_models] ||= []
               ::BenefitMarkets::Validators::Products::LegacyProductPackageContract.new.call(product_package_params)
             else
               ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(product_package_params)
