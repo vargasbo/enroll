@@ -204,7 +204,6 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     include_context 'family with one member and one enrollment and one predecessor enrollment'
 
     context 'new enrollment in prior plan year' do
-
       before do
         predecessor_enrollment.expire_coverage!
         product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
@@ -226,6 +225,119 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
       it 'should cancel existing renewel enrollment' do
         enrollment.reload
         expect(enrollment.aasm_state).to eq('coverage_canceled')
+      end
+    end
+
+    context 'new enrollment in prior plan year for dependent add' do
+      include_context 'family with two members and one enrollment and one predecessor enrollment'
+
+      before do
+        predecessor_enrollment.expire_coverage!
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members' do
+        expect(predecessor_enrollment.hbx_enrollment_members.size).to eq 2
+        expect(family.hbx_enrollments.count).to eq(3)
+        expect(family.hbx_enrollments.last.hbx_enrollment_members.size).to eq 2
+      end
+    end
+
+    context 'new enrollment in prior plan year for dependent drop with previous year active coverage' do
+      include_context 'family with two members and one enrollment and one predecessor enrollment with one member with previous year active coverage'
+
+      before do
+        expired_enrollment.generate_hbx_signature
+        predecessor_enrollment.update_attributes(enrollment_signature: expired_enrollment.enrollment_signature)
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+        expired_enrollment.reload
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members' do
+        expect(expired_enrollment.hbx_enrollment_members.size).to eq 2
+        expect(expired_enrollment.aasm_state).to eq "coverage_terminated"
+        expect(predecessor_enrollment.hbx_enrollment_members.size).to eq 1
+        expect(family.hbx_enrollments.count).to eq(4)
+        expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 1
+      end
+    end
+
+
+    context 'new enrollment in prior plan year for dependent add with previous year active coverage' do
+      include_context 'family with two members and one enrollment and one predecessor enrollment with two members with previous year active coverage'
+
+      before do
+        family.family_members[1].person.update_attributes(dob: predecessor_enrollment.effective_on - 10.years)
+        expired_enrollment.generate_hbx_signature
+        predecessor_enrollment.update_attributes(enrollment_signature: expired_enrollment.enrollment_signature)
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+        expired_enrollment.reload
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members' do
+        expect(expired_enrollment.hbx_enrollment_members.size).to eq 1
+        expect(expired_enrollment.aasm_state).to eq "coverage_terminated"
+        expect(predecessor_enrollment.hbx_enrollment_members.size).to eq 2
+        expect(family.hbx_enrollments.count).to eq(4)
+        expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 2
+      end
+    end
+
+    context 'new enrollment in prior plan year for dependent add with previous year active coverage' do
+      include_context 'family with two members and one enrollment and one predecessor enrollment with carrier switch'
+
+      before do
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members' do
+        expect(family.hbx_enrollments.count).to eq(3)
+        expect(family.hbx_enrollments.second.product.renewal_product.id).to eq(family.hbx_enrollments.last.product.id)
+        expect(family.hbx_enrollments.first.product.renewal_product.id).not_to eq(family.hbx_enrollments.last.product.id)
+      end
+    end
+
+    context 'new enrollment in prior plan year for dependent add for age off with previous year active coverage' do
+      include_context 'family with two members and one enrollment and one predecessor enrollment with two members with previous year active coverage'
+
+      before do
+        expired_enrollment.generate_hbx_signature
+        predecessor_enrollment.update_attributes(enrollment_signature: expired_enrollment.enrollment_signature)
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+        expired_enrollment.reload
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members excluding aged of dependent.' do
+        expect(expired_enrollment.hbx_enrollment_members.size).to eq 1
+        expect(expired_enrollment.aasm_state).to eq "coverage_terminated"
+        expect(predecessor_enrollment.hbx_enrollment_members.size).to eq 2
+        expect(family.hbx_enrollments.count).to eq(4)
+        expect(family.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq 1
+      end
+    end
+
+    context 'new enrollment in prior plan year for dependent drop' do
+      let!(:enr_member1) do
+        FactoryBot.create(:hbx_enrollment_member,
+                          hbx_enrollment: family.hbx_enrollments.first,
+                          applicant_id: family.family_members[1].id)
+      end
+      before do
+        predecessor_enrollment.expire_coverage!
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members for dependent drop' do
+        expect(family.hbx_enrollments.first.hbx_enrollment_members.count).to eq(2)
+        expect(predecessor_enrollment.hbx_enrollment_members.size).to eq 1
+        expect(family.hbx_enrollments.count).to eq(3)
+        expect(family.hbx_enrollments.last.hbx_enrollment_members.size).to eq 1
       end
     end
 
