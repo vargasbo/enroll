@@ -279,13 +279,63 @@ RSpec.shared_context 'family with one members and one enrollment and one predece
                       kind: 'individual',
                       family: family,
                       consumer_role_id: family.primary_person.consumer_role.id,
-                      effective_on: predecessor_bcp.start_on)
+                      effective_on: predecessor_bcp.start_on.next_month)
   end
 
   let!(:predecessor_enrollment_member) do
     FactoryBot.create(:hbx_enrollment_member,
                       hbx_enrollment: predecessor_enrollment,
                       applicant_id: family_member.id)
+  end
+end
+
+
+RSpec.shared_context 'family with two members and one enrollment and one predecessor enrollment with two members with previous year active coverage', :shared_context => :metadata do
+  include_context 'family with one member and one enrollment'
+
+  let!(:expired_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      aasm_state: :coverage_expired,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: previous_year)
+  end
+
+  let!(:expired_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: expired_enrollment,
+                      applicant_id: family_member.id)
+  end
+
+  let!(:enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      hbx_enrollment: enrollment,
+                      applicant_id: family_member.id)
+  end
+
+  let!(:predecessor_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      product_id: predecessor_product.id,
+                      kind: 'individual',
+                      family: family,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      effective_on: predecessor_bcp.start_on.next_month)
+  end
+
+  let!(:predecessor_enrollment_member) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      coverage_start_on: predecessor_enrollment.effective_on,
+                      hbx_enrollment: predecessor_enrollment,
+                      applicant_id: family_member.id)
+  end
+
+  let!(:predecessor_enrollment_member1) do
+    FactoryBot.create(:hbx_enrollment_member,
+                      coverage_start_on: predecessor_enrollment.effective_on,
+                      hbx_enrollment: predecessor_enrollment,
+                      applicant_id: family_member1.id)
   end
 end
 
