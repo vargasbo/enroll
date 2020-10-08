@@ -27,7 +27,14 @@ module BenefitMarkets
           ::BenefitMarkets::Operations::ContributionModels::Renew.new.call(params)
         end
 
+        def build_pricing_units_entities(params)
+          params[:pricing_model][:pricing_units].collect do |pricing_unit_params|
+            ::BenefitMarkets::Operations::PricingUnits::Create.new.call(pricing_unit_params: pricing_unit_params, package_kind: params[:package_kind]).value!
+          end
+        end
+
         def renew_pricing_model(params)
+          params[:pricing_model][:pricing_units] = build_pricing_units_entities(params)
           ::BenefitMarkets::Operations::PricingModels::Create.new.call(params: params[:pricing_model])
         end
 

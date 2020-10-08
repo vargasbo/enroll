@@ -57,9 +57,8 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Renew, dbclean: :aft
     end
 
     let(:params) do
-      product_package_attributes = existing_product_package.attributes.slice('benefit_kind', 'product_kind', 'title', 'description', 'package_kind', 'contribution_models', 'contribution_model', 'pricing_model', 'products')
+      product_package_attributes = existing_product_package.as_json.deep_symbolize_keys
       product_package_attributes.merge!(application_period: application_period)
-      product_package_attributes.deep_symbolize_keys
     end
 
     it 'should create ProductPackage' do

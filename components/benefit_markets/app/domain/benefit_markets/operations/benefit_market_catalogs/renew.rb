@@ -42,12 +42,12 @@ module BenefitMarkets
 
         def renew_product_packages(existing_catalog, application_period)
           renewed_packages = existing_catalog.product_packages.collect do |existing_product_package|
-            product_package_attributes = existing_product_package.attributes.slice(:benefit_kind, :product_kind, :title, :description, :package_kind, :contribution_models, :contribution_model, :pricing_model, :products)
+            product_package_attributes = existing_product_package.as_json.deep_symbolize_keys
             product_package_attributes.merge!(application_period: application_period)
 
-            result = ::BenefitMarkets::Operations::ProductPackages::Renew.new.call(product_package_attributes.deep_symbolize_keys)
+            result = ::BenefitMarkets::Operations::ProductPackages::Renew.new.call(product_package_attributes)
             raise StandardError, result.errors.to_h if result.failure?
-            result.success.to_h
+            result.success
           end
 
           Success(renewed_packages)
