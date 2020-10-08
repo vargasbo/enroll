@@ -699,7 +699,6 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'dependent[ssn]', with: '123445678'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
   find(:xpath, "//label[@for='radio_female']").click
-  # find('#dependents_info_wrapper').click
   sleep 1
   find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
   find(:xpath, "//li[@data-index='1'][contains(., 'Spouse')]").click
@@ -928,11 +927,6 @@ end
 When(/^.+ clicks? to add the first employee$/) do
   find('.interaction-click-control-add-new-employee', :wait => 10).click
 end
-
-# When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
-#   click_link 'HBX Portal' if page.has_link?('HBX Portal')
-#   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
-# end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|
   target_dropdown = page.all('a').detect { |a| a.text == tab_name }

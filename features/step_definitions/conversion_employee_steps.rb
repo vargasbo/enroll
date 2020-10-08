@@ -270,10 +270,6 @@ Then(/(.*) should see the receipt page with renewing plan year start date as eff
   end
 end
 
-# When(/(.*) click the "(.*?)" in qle carousel/) do |_name, qle_event|
-#   click_link "#{qle_event}"
-# end
-
 When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
