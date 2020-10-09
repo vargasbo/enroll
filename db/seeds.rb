@@ -140,12 +140,8 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   # system "bundle exec rake load:benefit_market_catalog[2018]"
   system "bundle exec rake load:dc_benefit_market_catalog[2019]"
   system "bundle exec rake load:dc_benefit_market_catalog[2020]"
-  system "bundle exec rake load:dc_benefit_market_catalog[2021]"
   puts "::: complete :::"
   puts "*"*80
-
-
-  system "bundle exec rake migrations:add_contribution_models_to_product_package"
 
   puts "*"*80
   puts "Loading QLE kinds."
@@ -214,7 +210,6 @@ puts "Loading IVL benefit packages."
 # Need to fix this rake to handle based on year for IVL
 system "bundle exec rake import:create_2019_ivl_packages"
 system "bundle exec rake import:create_2020_ivl_packages"
-system "bundle exec rake import:create_2021_ivl_packages"
 puts "::: complete :::"
 puts "*"*80
 
