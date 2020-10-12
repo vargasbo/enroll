@@ -1,22 +1,37 @@
-<%= form_for(@bulk_notice, url: exchanges_bulk_uploads_path) do |f| %>
-    <div>
-        <%= f.label :audience_type, 'Audience' %>
-        <%= f.select :audience_type, ['Broker', 'Employer', 'General Agency', 'Employee'] %>
+-<div class="container" data-controller="bulk-notice"
+                        data-bulk-notice-org-ids="<%= BenefitSponsors::Organizations::Organization.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name } }.to_json %>">
+  <%= form_for(@bulk_notice, url: exchanges_bulk_uploads_path) do |f| %>
+    <div class="form-group row">
+      <%= f.label :audience_type, 'Audience', class: 'col-1 col-form-label' %>
+      <%= f.select :audience_type, ['Broker', 'Employer', 'General Agency', 'Employee'], { }, class: 'form-control col-11' %>
     </div>
-    <div>
-        <%= f.label :audience_identifiers, 'Identifiers' %>
-        <%= f.text_area :audience_identifiers, rows: 10, cols: 200 %>
-    </div>
-    <div>
-        <%= f.label :subject, 'Subject' %>
-        <%= f.text_field :subject %>
-    </div>
-        <div>
-        <%= f.label :body, 'Message' %>
-        <%= f.text_area :body, rows: 10, cols: 200 %>
-    </div>
-    <div>
-        <%= f.submit %>
-    </div>
-<% end %>
 
+    <div class="row">
+      <div data-target="bulk-notice.recipientList" class="col-11 offset-1 pl-0">
+        <button type="button" data-target="bulk-notice.recipientBadge" class="btn btn-info d-none">
+          <span class="badge badge-light"><i class="fas fa-spinner fa-spin""></i></span>
+          <span class="sr-only">unread messages</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <%= f.label :audience_identifiers, 'Identifiers', class: 'col-1 col-form-label' %>
+      <%= f.text_area :audience_identifiers, rows: 1, data: { action: 'blur->bulk-notice#new_identifier' }, class: 'form-control col-11' %>
+    </div>
+
+    <div class="form-group row">
+      <%= f.label :subject, 'Subject', class: 'col-1 col-form-label' %>
+      <%= f.text_field :subject, class: 'form-control col-11' %>
+    </div>
+
+    <div class="form-group row">
+      <%= f.label :body, 'Message', class: 'col-1 col-form-label' %>
+      <%= f.text_area :body, rows: 10, class: 'form-control col-11' %>
+    </div>
+
+    <div class="form-group">
+      <%= f.submit "Send", class: 'btn btn-blue' %>
+    </div>
+  <% end %>
+</div>
