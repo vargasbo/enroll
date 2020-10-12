@@ -8,6 +8,7 @@ module Exchanges
 
     def new
       @bulk_notice = Admin::BulkNotice.new
+      render layout: 'bootstrap_4'
     end
 
     def create
