@@ -28,7 +28,12 @@ module Forms
     attr_reader :dob
 
     def dob=(val)
-      @dob = val.class == Date ? val : Date.strptime(val, "%m/%d/%Y") rescue nil
+      @dob = begin
+               Date.strptime(val, "%m/%d/%Y")
+             rescue StandardError => e
+               puts e.message
+               nil
+             end
     end
 
     # TODO fix and use as the only way to match census employees for the employee flow or blow this away

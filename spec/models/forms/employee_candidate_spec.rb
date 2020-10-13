@@ -31,16 +31,16 @@ describe Forms::EmployeeCandidate, "asked to match a census employee" do
   let(:fake_employer) { instance_double("EmployerProfile", :census_employees => [census_employee], :plan_years => [fake_plan_year]) }
   let(:fake_org) { instance_double("Organization", :employer_profile => fake_employer) }
 
-  subject {
+  subject do
     Forms::EmployeeCandidate.new({
-                                     :dob => "10/12/2012",
-                                     :ssn => "123-45-6789",
-                                     :first_name => "Tom",
-                                     :last_name => "Baker",
-                                     :gender => "male",
-                                     :is_applying_coverage => false
+                                   :dob => "10/12/2012",
+                                   :ssn => "123-45-6789",
+                                   :first_name => "Tom",
+                                   :last_name => "Baker",
+                                   :gender => "male",
+                                   :is_applying_coverage => false
                                  })
-  }
+  end
 
   let(:search_params) { {
       :dob => Date.new(2012, 10, 12),
@@ -84,17 +84,17 @@ end
 
 describe Forms::EmployeeCandidate, "asked to match a person" do
 
-  subject {
+  subject do
     Forms::EmployeeCandidate.new({
-                                     :dob => "10/12/2012",
-                                     :ssn => "123-45-6789",
-                                     :first_name => "yo",
-                                     :last_name => "guy",
-                                     :gender => "male",
-                                     :user_id => 20,
-                                     :is_applying_coverage => false
+                                   :dob => "10/12/2012",
+                                   :ssn => "123-45-6789",
+                                   :first_name => "yo",
+                                   :last_name => "guy",
+                                   :gender => "male",
+                                   :user_id => 20,
+                                   :is_applying_coverage => false
                                  })
-  }
+  end
 
   let(:search_params) { {
       :dob => Date.new(2012, 10, 12),
@@ -162,7 +162,7 @@ describe "match a person in db" do
                                  })
   }
 
-  let(:search_params) { double(dob: db_person.dob.strftime("%m/%d/%Y"), ssn: db_person.ssn, )}
+  let(:search_params) { double(dob: db_person.dob.strftime("%m/%d/%Y"), ssn: db_person.ssn)}
   let(:search_param_name) { double( first_name: db_person.first_name, last_name: db_person.last_name)}
 
   after(:each) do
