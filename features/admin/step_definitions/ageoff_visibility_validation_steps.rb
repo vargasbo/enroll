@@ -12,11 +12,11 @@ And(/^.+ clicks on the Manage Family button$/) do
   find('a.interaction-click-control-manage-family', :wait => 10).click
 end
 
-And(/^.+ clicks on the Personal tab$/) do
+And(/^.+ clicks on the Personal portal/) do
   find('a.interaction-click-control-personal', :wait => 10).click
 end
 
-And(/^.+ clicks on the Family tab$/) do
+And(/^.+ clicks on the Family portal$/) do
   find('a.interaction-click-control-family', :wait => 10).click
 end
 
@@ -25,7 +25,7 @@ Then(/^.+ will see the Ageoff Exclusion checkbox$/) do
 end
 
 And(/^.+ clicks on Add Member$/) do
-  find(:xpath, '//a[text()=" Add Member"]', :wait => 10).click
+  find(:xpath, '//*[@id="add-member-btn"]/a', :wait => 10).click
 end
 
 When(/^the broker is on the Family Index of the Admin Dashboard$/) do

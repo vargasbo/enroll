@@ -13,9 +13,9 @@ Feature: HBX staff subroles able to see the Ageoff Exclusion checkbox
     And the user clicks on Families tab
     And the user clicks on the name of person Patrick Doe from family index_page
     And the user clicks on the Manage Family button
-    And the user clicks on the Personal tab
+    And the user clicks on the Personal portal
     Then the user will <action> the Ageoff Exclusion checkbox
-    When the user clicks on the Family tab
+    When the user clicks on the Family portal
     And the user clicks on Add Member
     Then the user will <action> the Ageoff Exclusion checkbox
 
