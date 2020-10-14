@@ -16,8 +16,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:hbx_profile) do
     FactoryBot.create(:hbx_profile,
                       :normal_ivl_open_enrollment,
-                      coverage_year: coverage_year
-    )
+                      coverage_year: coverage_year)
   end
   let(:benefit_package) { benefit_coverage_period.benefit_packages.first }
   let(:benefit_coverage_period) do
@@ -34,8 +33,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
                       :individual_unassisted,
                       household: family.active_household,
                       effective_on: Date.new(coverage_year, 11, 1),
-                      family: family
-    )
+                      family: family)
   end
 
   let(:product_selection) do
@@ -69,8 +67,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:hbx_profile) do
     FactoryBot.create(:hbx_profile,
                       :normal_ivl_open_enrollment,
-                      coverage_year: coverage_year
-    )
+                      coverage_year: coverage_year)
   end
   let(:benefit_package) { benefit_coverage_period.benefit_packages.first }
   let(:benefit_coverage_period) do
@@ -81,8 +78,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:family) do
     FactoryBot.create(:family,
                       :with_primary_family_member,
-                      person: consumer_role.person
-    )
+                      person: consumer_role.person)
   end
   let(:product) do
     BenefitMarkets::Products::Product.find(benefit_package.benefit_ids.first)
@@ -105,8 +101,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
                       household: family.active_household,
                       effective_on: Date.new(coverage_year, 11, 1),
                       family: family,
-                      product: product
-    )
+                      product: product)
   end
 
   let(:product_selection) do
