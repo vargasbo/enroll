@@ -1,36 +1,39 @@
 -<div class="container" data-controller="bulk-notice"
                         data-bulk-notice-org-ids="<%= BenefitSponsors::Organizations::Organization.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id } }.to_json %>">
+
+  <h4>New Message</h4>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
   <%= form_for(@bulk_notice, url: exchanges_bulk_uploads_path) do |f| %>
-    <div class="form-group row">
-      <%= f.label :audience_type, 'Audience', class: 'col-1 col-form-label' %>
-      <%= f.select :audience_type, ['Broker', 'Employer', 'General Agency', 'Employee'], { }, class: 'form-control col-11' %>
-    </div>
-
-    <div class="row">
-      <div data-target="bulk-notice.recipientList" class="col-11 offset-1 pl-0">
-        <button type="button" data-target="bulk-notice.recipientBadge" class="btn btn-info mb-3 mr-3 d-none">
-          <span class="badge badge-light d-none"></span>
-          <span class="badge badge-danger d-none"></span>
-          <a data-action='bulk-notice#deleteIdentifier'><i class="far fa-times-circle"></i></a>
-          <input type='hidden' name='bulk_notice[audience_ids][]'>
-        </button>
-      </div>
-    </div>
-
-    <div class="form-group row">
-      <%= f.label :audience_identifiers, 'Identifiers', class: 'col-1 col-form-label' %>
-      <%= f.text_area :audience_identifiers, rows: 1, data: { action: 'blur->bulk-notice#newIdentifier' }, class: 'form-control col-11' %>
-    </div>
-
-    <div class="form-group row">
-      <%= f.label :subject, 'Subject', class: 'col-1 col-form-label' %>
-      <%= f.text_field :subject, class: 'form-control col-11' %>
-    </div>
-
-    <div class="form-group row">
-      <%= f.label :body, 'Message', class: 'col-1 col-form-label' %>
-      <%= f.text_area :body, rows: 10, class: 'form-control col-11' %>
-    </div>
+    <%= f.select :audience_type, ['Broker', 'Employer', 'General Agency', 'Employee'], { }, class: 'form-control col-2 bg-primary text-white' %>
+    <table class='table table-message-wrapper'>
+      <tbody>
+        <tr>
+          <th style="text-transform: capitalize;">Recipients:</th>
+          <td data-target="bulk-notice.recipientList">
+            <span class="badge badge-secondary d-none" data-target="bulk-notice.recipientBadge">
+              <%= f.hidden_field :audience_identifiers, multiple: true %>
+              <a data-action='bulk-notice#deleteIdentifier'>
+                <i class="far fa-times-circle"></i>
+              </a>
+            </span>
+            <%= f.text_area :audience_identifiers, rows: 1, data: { action: 'blur->bulk-notice#newIdentifier' }, placeholder: 'FEINs or HBX IDs, comma separated' %>
+          </td>
+        </tr>
+        <tr>
+          <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
+          <td><%= f.text_field :subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
+          <td><%= f.text_area :body, rows: 5, placeholder: 'Write here...', required: true  %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
+          <td><%= file_field_tag "file", type: :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file"%></td>
+        </tr>
+      </tbody>
+    </table>
 
     <div class="form-group">
       <%= f.submit "Send", class: 'btn btn-primary' %>
