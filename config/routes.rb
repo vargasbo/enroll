@@ -72,7 +72,7 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
 
-    resources :bulk_uploads do
+    resources :bulk_notices do
       get :enqueue, on: :collection
       get :preview, on: :member
     end

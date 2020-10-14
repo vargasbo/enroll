@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Exchanges
-  class BulkUploadsController < ApplicationController
+  class BulkNoticesController < ApplicationController
 
     def index
     end
