@@ -34,19 +34,19 @@ export default class extends Controller {
 
   newSuccessBadge(match) {
     let newBadge = this.recipientBadgeTarget.cloneNode(true)
-    newBadge.prepend(match.legal_name)
+    newBadge.prepend(match.legal_name + ' ')
     newBadge.querySelector('input').setAttribute('value', match.id)
-    this.recipientListTarget.appendChild(newBadge)
+    this.recipientListTarget.querySelector('textarea').insertAdjacentElement('beforebegin', newBadge)
     newBadge.classList.remove('d-none')
   }
 
   newErrorBadge(invalidId) {
     let newBadge = this.recipientBadgeTarget.cloneNode(true)
-    newBadge.prepend(invalidId)
-    newBadge.classList.remove('btn-info')
-    newBadge.classList.add('btn-danger')
-    this.recipientListTarget.appendChild(newBadge)
+    newBadge.prepend(invalidId + ' ')
+    newBadge.classList.remove('badge-secondary')
+    newBadge.classList.add('badge-danger')
     newBadge.querySelector('input:not([value])').remove()
+    this.recipientListTarget.querySelector('textarea').insertAdjacentElement('beforebegin', newBadge)
     newBadge.classList.remove('d-none')
   }
 
@@ -58,7 +58,7 @@ export default class extends Controller {
   }
 
   deleteIdentifier(event) {
-    let identifierEl = event.currentTarget.closest('button')
+    let identifierEl = event.currentTarget.closest('span.badge')
     identifierEl.remove()
   }
 }
