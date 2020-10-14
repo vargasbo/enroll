@@ -1,12 +1,12 @@
 And(/^admin has navigated into the NEW CONSUMER APPLICATION$/) do
-	visit exchanges_hbx_profiles_root_path
+  visit exchanges_hbx_profiles_root_path
   find('.interaction-click-control-families', wait: 10).click
-	page.find('.interaction-click-control-new-consumer-application', wait: 10).click
-	visit begin_consumer_enrollment_exchanges_agents_path
+  page.find('.interaction-click-control-new-consumer-application', wait: 10).click
+  visit begin_consumer_enrollment_exchanges_agents_path
 end
 
 And(/^the Admin is on the Personal Info page for the family$/) do
-	fill_in "person_first_name", with: "John"
+  fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
   fill_in "person[dob]", with: "11/11/1991"
   fill_in "person_ssn", with: '212-31-3131'

@@ -24,7 +24,12 @@ module Forms
     attr_reader :dob
 
     def dob=(val)
-      @dob = Date.strptime(val, "%m/%d/%Y") rescue nil
+      @dob = begin
+               Date.strptime(val, "%m/%d/%Y")
+             rescue StandardError => e
+               puts e.message
+               nil
+             end
     end
 
     def match_person
