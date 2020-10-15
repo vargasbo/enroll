@@ -50,6 +50,10 @@ export default class extends Controller {
     newBadge.classList.remove('d-none')
   }
 
+  notAlreadyPresent(match) {
+    this.receipientListTarget.queryAll
+  }
+
   findMatchingOrg(identifier) {
     return this.orgIds.find(org => {
       return org.fein == identifier ||

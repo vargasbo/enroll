@@ -8,6 +8,8 @@ module Admin
     field :audience_identifiers, type: Array
     field :subject, type: String
     field :body, type: String
+    field :aasm_state, type: String, default: 'draft'
+    field :document_metadata, type: Hash
 
     embeds_many :results, class_name: "Admin::BulkNoticeResult"
   end
