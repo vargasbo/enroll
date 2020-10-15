@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - uses: nelonoel/branch-name@v1
       - uses: ruby/setup-ruby@v1
       - name: Restore project gems
         uses: actions/cache@v2
@@ -29,4 +30,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
           SOURCE_DIR: doc
-          DEST_DIR: ${{ github.ref }}
+          DEST_DIR: ${{ env.BRANCH_NAME }}
