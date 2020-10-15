@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe Insured::FamilyMembersController do
@@ -66,7 +68,11 @@ RSpec.describe Insured::FamilyMembersController do
 
     describe "when the value for 'is_applying_coverage' is NOT provided" do
       let(:dependent_update_properties) do
+<<<<<<< HEAD
         { "first_name" => "Dependent First Name" , "same_with_primary" => "true", }
+=======
+        { "first_name" => "Dependent First Name", "same_with_primary" => "true" }
+>>>>>>> origin/master
       end
 
       it "does not change the 'is_applying_coverage' value for the dependent" do
