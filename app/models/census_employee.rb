@@ -777,7 +777,7 @@ class CensusEmployee < CensusMember
                                                           last_name: last_name,
                                                           ssn: ssn,
                                                           gender: gender,
-                                                          dob: dob.strftime("%m/%d/%Y")})
+                                                          dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
 
     return false if person.blank? || (person.present? &&
