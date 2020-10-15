@@ -201,12 +201,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
   describe "POST create" do
     let(:address) { double }
-<<<<<<< HEAD
-    let(:valid_addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
-                                        "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211" } } }
-    let(:invalid_addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"222"},
-                                          "1"=>{"kind"=>"mailing", "address_1"=>"test", "address_2"=>"", "city"=>"test", "state"=>"DC", "zip"=>"223"} } }
-=======
     let(:valid_addresses_attributes) do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
        "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -215,7 +209,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "222"},
        "1" => {"kind" => "mailing", "address_1" => "test", "address_2" => "", "city" => "test", "state" => "DC", "zip" => "223"} }
     end
->>>>>>> origin/master
     let(:dependent) { double(addresses: [valid_addresses_attributes], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { ActionController::Parameters.new({addresses: valid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
     let(:save_result) { false }
@@ -298,11 +291,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         allow(controller).to receive(:update_vlp_documents).and_return false
       end
 
-<<<<<<< HEAD
-      let(:address_errors) {[{:zip=>["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip=>["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
-=======
       let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
->>>>>>> origin/master
 
       let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
       let(:dependent_properties) { ActionController::Parameters.new({addresses: invalid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
@@ -401,12 +390,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     let(:address) { double }
     let(:family_member) { double }
     let(:dependent_id) { "234dlfjadsklfj" }
-<<<<<<< HEAD
-    let(:valid_addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211"},
-                                        "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211" } } }
-    let(:invalid_addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"222"},
-                                          "1"=>{"kind"=>"mailing", "address_1"=>"test", "address_2"=>"", "city"=>"test", "state"=>"DC", "zip"=>"223"} } }
-=======
     let(:valid_addresses_attributes) do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
        "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -415,7 +398,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "222"},
        "1" => {"kind" => "mailing", "address_1" => "test", "address_2" => "", "city" => "test", "state" => "DC", "zip" => "223"} }
     end
->>>>>>> origin/master
     let(:dependent) { double(addresses: [valid_addresses_attributes], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { ActionController::Parameters.new({ "first_name" => "lkjdfkajdf", addresses: valid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
     let(:update_result) { false }
@@ -466,11 +448,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         allow(controller).to receive(:update_vlp_documents).and_return false
       end
 
-<<<<<<< HEAD
-      let(:address_errors) {[{:zip=>["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip=>["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
-=======
       let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
->>>>>>> origin/master
 
       let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
       let(:dependent_properties) { ActionController::Parameters.new({addresses: invalid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
