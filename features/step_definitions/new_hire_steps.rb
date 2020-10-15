@@ -182,6 +182,7 @@ Then(/(.*) should see active enrollment with their spouse/) do |named_person|
   enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
 
   expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+  sleep 5
 end
 
 Then(/(.*) should see active enrollment with his daughter/) do |named_person|
@@ -251,7 +252,7 @@ end
 
 When(/^.+ submits termination reason in modal$/) do
   waiver_modal = find('.terminate_confirm')
-  find('.selectric').click
+  find('.selectric', text: 'Please select terminate reason').click
   find('li', :text => 'I have coverage through Medicare').click
   waiver_modal.find('.terminate_reason_submit').click
 end
@@ -283,7 +284,7 @@ end
 
 Then(/Employee should see \"may not enroll until eligible\" error message/) do
   screenshot("new_hire_not_eligible_exception")
-  find('.alert', text: "You may not enroll until you're eligible under an enrollment period.")
+  find('.alert', text: "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period.")
   visit '/families/home'
 end
 
