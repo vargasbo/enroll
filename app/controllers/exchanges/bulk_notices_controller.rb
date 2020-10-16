@@ -4,6 +4,8 @@ module Exchanges
   class BulkNoticesController < ApplicationController
     layout 'bootstrap_4'
 
+    before_action :unread_messages
+
     def index
       @bulk_notices = Admin::BulkNotice.all
     end
@@ -45,6 +47,11 @@ module Exchanges
     def bulk_notice_params
       params[:admin_bulk_notice][:audience_identifiers] = params[:admin_bulk_notice][:audience_identifiers].split(" ")
       params.require(:admin_bulk_notice).permit!
+    end
+
+    def unread_messages
+      profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
+      @unread_messages = profile.inbox.unread_messages.try(:count) || 0
     end
   end
 end
