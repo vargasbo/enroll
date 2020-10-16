@@ -41,6 +41,7 @@ Feature: User Account page
     When I click Employee and Unlocked button
     Then I should only see user with employee role
 
+  @flaky
   Scenario: Search for User by OIM ID string
     Given user visits the Hbx Portal
     And Hbx Admin click on User Accounts
