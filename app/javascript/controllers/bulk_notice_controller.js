@@ -1,7 +1,7 @@
 import { Controller } from "stimulus";
 
 export default class extends Controller {
-  static targets = ['recipientList', 'recipientBadge']
+  static targets = ['recipientList', 'recipientBadge', 'audienceSelect']
 
   initialize() {
     this.orgIds = JSON.parse(this.data.get('orgIds'))
@@ -16,7 +16,10 @@ export default class extends Controller {
       identifierEl.value.split(/\s*,?\s/).forEach((id) => {
         let match = this.findMatchingOrg(id)
         if (match) {
-          this.newSuccessBadge(match)
+          if (this.typesMatchCheck(match))
+            this.newSuccessBadge(match)
+          else
+            this.newErrorBadge(match.legal_name)
         } else {
           this.newErrorBadge(id)
         }
@@ -55,14 +58,24 @@ export default class extends Controller {
   }
 
   findMatchingOrg(identifier) {
+    console.log("Find Matching" + this.audienceSelectTarget.value);
     return this.orgIds.find(org => {
-      return org.fein == identifier ||
-      org.hbx_id == identifier
+      return org.fein == identifier || org.hbx_id == identifier
     })
+  }
+
+  typesMatchCheck(match) {
+    if (match.type == "employer") {
+      return this.audienceSelectTarget.value == "employer" || this.audienceSelectTarget.value == "employee"
+    } else {
+      return this.audienceSelectTarget.value == match.entity_type
+    }
   }
 
   deleteIdentifier(event) {
     let identifierEl = event.currentTarget.closest('span.badge')
     identifierEl.remove()
+    event.stopPropagation()
+    return false
   }
 }
