@@ -5,6 +5,7 @@ export default class extends Controller {
 
   initialize() {
     this.orgIds = JSON.parse(this.data.get('orgIds'))
+    console.log(this.orgIds)
   }
 
   newIdentifier(event) {
@@ -15,24 +16,24 @@ export default class extends Controller {
       let results = { found: [], not_found: [], invalid: [] }
       identifierEl.value.split(/\s*,?\s/).forEach((id) => {
         let match = this.findMatchingOrg(id)
-        if (match) {
-          if (this.typesMatchCheck(match))
-            this.newSuccessBadge(match)
-          else
-            this.newErrorBadge(match.legal_name)
-        } else {
-          this.newErrorBadge(id)
-        }
+        this.matchHandler(match)
       })
     } else {
       let match = this.findMatchingOrg(identifierEl.value)
-      if (match) {
-        this.newSuccessBadge(match)
-      } else {
-        this.newErrorBadge(identifierEl.value)
-      }
+      this.matchHandler(match)
     }
     identifierEl.value = ''
+  }
+
+  matchHandler(match) {
+    if (match) {
+      if (this.typesMatchCheck(match))
+        this.newSuccessBadge(match)
+      else
+        this.newErrorBadge(match.legal_name)
+    } else {
+      this.newErrorBadge(id)
+    }
   }
 
   newSuccessBadge(match) {
@@ -58,15 +59,14 @@ export default class extends Controller {
   }
 
   findMatchingOrg(identifier) {
-    console.log("Find Matching" + this.audienceSelectTarget.value);
     return this.orgIds.find(org => {
       return org.fein == identifier || org.hbx_id == identifier
     })
   }
 
   typesMatchCheck(match) {
-    if (match.entity_type == "employer") {
-      return this.audienceSelectTarget.value == "employer" || this.audienceSelectTarget.value == "employee"
+    if (this.audienceSelectTarget.value == "employer") {
+      return match.entity_type == "employer" || match.entity_type == "employee"
     } else {
       return this.audienceSelectTarget.value == match.entity_type
     }
@@ -75,7 +75,11 @@ export default class extends Controller {
   deleteIdentifier(event) {
     let identifierEl = event.currentTarget.closest('span.badge')
     identifierEl.remove()
-    event.stopPropagation()
+    event.preventDefault()
     return false
+  }
+
+  resetIdentifiers(event) {
+    this.recipientListTarget.querySelectorAll('span.badge:not(:first-child)').forEach((element) => element.remove())
   }
 }
