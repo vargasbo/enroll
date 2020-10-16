@@ -21,6 +21,7 @@ module Exchanges
     end
 
     def new
+      @entities = Organization.all_profiles.to_json
       @bulk_notice = Admin::BulkNotice.new
     end
 
