@@ -193,8 +193,6 @@ class Organization
 
   scope :employer_profiles_with_attestation_document, -> { exists(:"employer_profile.employer_attestation.employer_attestation_documents" => true) }
 
-
-  # scope :all_employer_profiles,               ->{ unscoped.exists(employer_profile: true) }
   scope :all_broker_agency_profiles,           ->{ unscoped.exists(broker_agency_profile: true) }
   scope :all_general_agency_profiles,          ->{ unscoped.exists(general_agency_profile: true) }
 
