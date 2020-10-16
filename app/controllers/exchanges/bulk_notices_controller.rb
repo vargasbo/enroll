@@ -2,20 +2,31 @@
 
 module Exchanges
   class BulkNoticesController < ApplicationController
+    layout 'bootstrap_4'
 
     def index
+      @bulk_notices = Admin::BulkNotice.all
+    end
+
+    def show
+      @bulk_notice = Admin::BulkNotice.find(params[:id])
+
+      if @bulk_notice.aasm_state == 'draft'
+        render 'preview'
+      else
+        render 'summary'
+      end
     end
 
     def new
       @bulk_notice = Admin::BulkNotice.new
-      render layout: 'bootstrap_4'
     end
 
     def create
       @bulk_notice = Admin::BulkNotice.new(user_id: current_user)
 
       if @bulk_notice.update_attributes(bulk_notice_params)
-        redirect_to preview_exchanges_bulk_upload_path(@bulk_notice)
+        redirect_to exchanges_bulk_notice_path(@bulk_notice)
       else 
         render "new"
       end
