@@ -65,7 +65,7 @@ export default class extends Controller {
   }
 
   typesMatchCheck(match) {
-    if (match.type == "employer") {
+    if (match.entity_type == "employer") {
       return this.audienceSelectTarget.value == "employer" || this.audienceSelectTarget.value == "employee"
     } else {
       return this.audienceSelectTarget.value == match.entity_type
