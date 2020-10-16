@@ -15,17 +15,17 @@ export default class extends Controller {
     if (identifierEl.value.match(/[ ,]/)) { // more than one
       let results = { found: [], not_found: [], invalid: [] }
       identifierEl.value.split(/\s*,?\s/).forEach((id) => {
-        let match = this.findMatchingOrg(id)
-        this.matchHandler(match)
+        this.matchHandler(id)
       })
     } else {
-      let match = this.findMatchingOrg(identifierEl.value)
-      this.matchHandler(match)
+      this.matchHandler(identifierEl.value)
     }
     identifierEl.value = ''
   }
 
-  matchHandler(match) {
+  matchHandler(matcher) {
+    let match = this.findMatchingOrg(matcher)
+
     if (match) {
       if (this.typesMatchCheck(match))
         this.newSuccessBadge(match)
