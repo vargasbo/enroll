@@ -14,6 +14,7 @@ Feature: Employee hired during renewal period
     And this employer offering 0.75 contribution to Employee
     And this employer ABC Widgets has first_of_month rule
 
+  @broken
   Scenario: New hire should be able to purchase Insurance under current plan year & should be able to
     purchase coverage by clicking on make_changes button on passive renewal
 

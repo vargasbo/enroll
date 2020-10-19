@@ -41,6 +41,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
     Then Employee clicks back to my account button
     Then Patrick Doe should see active enrollment with their spouse
 
+  @broken
   Scenario: Passively Renewed Employee terminates his coverage
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
