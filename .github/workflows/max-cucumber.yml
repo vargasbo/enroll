@@ -4,7 +4,8 @@ on:
     branches:
       - cucumber-upgrade
 
-CUCUMBER_SPLIT_CONFIGURATION_PATH: 'ci/max-cucumber-split-config.json'
+env:
+  CUCUMBER_SPLIT_CONFIGURATION_PATH: 'ci/max-cucumber-split-config.json'
 
 jobs:
   cucumber:
