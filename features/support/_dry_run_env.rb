@@ -4,7 +4,6 @@ require "email_spec"
 require 'email_spec/cucumber'
 require 'rspec/expectations'
 require 'capybara/cucumber'
-require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')

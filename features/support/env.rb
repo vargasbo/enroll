@@ -4,19 +4,9 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV["RAILS_ENV"] ||= 'test'
-$LOADING_CUCUMBER_ENV = true
-require 'webdrivers'
 require 'cucumber/rails'
-require 'email_spec/cucumber'
-require 'rspec/expectations'
-require 'capybara-screenshot/cucumber'
-require 'cucumber/rspec/doubles'
 
-Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
-require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
-require "rspec/rails"
-require_relative '../../spec/ivl_helper'
+# frozen_string_literal: true
 
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
@@ -53,13 +43,13 @@ end
 # See the DatabaseCleaner documentation for details. Example:
 #
 #   Before('@no-txn,@selenium,@culerity,@celerity,@javascript') do
-#     # { :except => [:widgets] } may not do what you expect here
+#     # { except: [:widgets] } may not do what you expect here
 #     # as Cucumber::Rails::Database.javascript_strategy overrides
 #     # this setting.
 #     DatabaseCleaner.strategy = :truncation
 #   end
 #
-#   Before('~@no-txn', '~@selenium', '~@culerity', '~@celerity', '~@javascript') do
+#   Before('not @no-txn', 'not @selenium', 'not @culerity', 'not @celerity', 'not @javascript') do
 #     DatabaseCleaner.strategy = :transaction
 #   end
 #
@@ -69,8 +59,6 @@ end
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
-Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
-Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -78,7 +66,7 @@ Webdrivers.cache_time = 86_400
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.add_argument("headless")
-  options.add_argument("--window-size=1024,768")
+  options.add_argument("--window-size=1920,1080")
 
   if RUBY_PLATFORM =~ /darwin/
     options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
