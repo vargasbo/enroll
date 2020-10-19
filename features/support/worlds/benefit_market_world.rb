@@ -58,6 +58,7 @@ module BenefitMarketWorld
   end
 
   def issuer_profile(carrier=:default)
+    # issuer_profiles(carrier) Nisanth's solution
     @issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
 

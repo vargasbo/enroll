@@ -60,6 +60,7 @@ Feature: Employees can purchase coverage from both active and renewing plan year
   # # TODO # Fix scenario after bug fixed
   #   Then Employee should see "You are attempting to purchase coverage through qle proir to your eligibility date" error message
 
+  @broken
   Scenario: Employee Receives Secure Enrollment Message after purchasing plan
     Given there exists Patrick Doe employee for employer ABC Widgets
     And renewal employer ABC Widgets has expired and renewal active benefit applications
