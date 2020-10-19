@@ -147,6 +147,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
   # When Employee clicks continue on the group selection page
   # Then Soren White should see "open enrollment not yet started" error message
 
+  @broken
   Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year using QLE
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_closed renewal employer with health benefits
