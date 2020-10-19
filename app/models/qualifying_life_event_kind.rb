@@ -6,7 +6,7 @@ class QualifyingLifeEventKind
 
   # Model Changes to support IVL needs
   ## effective_on_kinds -- type changed to Array to support multiple choices (view to provide choice when size > 1)
-  ### added enumerations to EffectiveOnKinds with following definitions:
+  ### added enumerations to EFFECTIVEONKINDS with following definitions:
   ###   exact_date: specific date provided
   ###   date_of_event: specific date upon which the QLE occurred
   ###   first_of_month: first of month following the 15th of month rule
@@ -22,7 +22,7 @@ class QualifyingLifeEventKind
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EFFECTIVE_ON_KINDS = %w[date_of_event exact_date first_of_month first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
+  EFFECTIVE_ON_KINDS = %w[date_of_event first_of_month first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
 
   TERMINATION_ON_KINDS = %w[end_of_event_month date_before_event end_of_reporting_month end_of_last_month_of_reporting exact_date].freeze
 
@@ -120,7 +120,7 @@ class QualifyingLifeEventKind
   #           presence: true,
   #           allow_blank: false,
   #           allow_nil:   false,
-  #           inclusion: {in: EffectiveOnKinds}
+  #           inclusion: {in: EFFECTIVEONKINDS}
 
   validates :market_kind,
             presence: true,
