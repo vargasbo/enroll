@@ -409,7 +409,7 @@ GEM
     curl (0.0.9)
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
-    database_cleaner (1.8.3)
+    database_cleaner (1.8.5)
     debug_inspector (0.0.3)
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
@@ -976,7 +976,7 @@ DEPENDENCIES
   config (~> 2.0)
   cucumber-rails (~> 2.0.0)
   curl (~> 0.0.9)
-  database_cleaner (~> 1.7)
+  database_cleaner
   devise (~> 4.5)
   devise-jwt (~> 0.5.9)
   effective_datatables!

@@ -23,8 +23,6 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 ## Fix this dependency -- bring into project
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
-## Verify Rails 5 eliminates need for this gem with MongoDB
-gem 'database_cleaner',       '~> 1.7'
 
 #######################################################
 
@@ -163,6 +161,7 @@ end
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
   gem 'cucumber-rails',               '~> 2.0.0', require: false
+  gem 'database_cleaner'
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
