@@ -410,6 +410,13 @@ GEM
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
     database_cleaner (1.8.5)
+    database_cleaner-mongo (1.8.1)
+      database_cleaner (~> 1.8.0)
+      mongo
+    database_cleaner-mongoid (1.8.1)
+      database_cleaner (~> 1.8.0)
+      database_cleaner-mongo (~> 1.8.0)
+      mongoid
     debug_inspector (0.0.3)
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
@@ -976,7 +983,7 @@ DEPENDENCIES
   config (~> 2.0)
   cucumber-rails (~> 2.0.0)
   curl (~> 0.0.9)
-  database_cleaner
+  database_cleaner-mongoid
   devise (~> 4.5)
   devise-jwt (~> 0.5.9)
   effective_datatables!
