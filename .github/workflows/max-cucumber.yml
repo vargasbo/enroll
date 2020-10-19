@@ -9,7 +9,6 @@ env:
 
 jobs:
   cucumber:
-    needs: [rubocop]
     runs-on: ubuntu-latest
     strategy:
       matrix:
