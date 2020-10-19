@@ -1,5 +1,5 @@
 name: cucumber report
-on: workflow_dispatch
+on: push
 
 jobs:
   cucumber-report:
