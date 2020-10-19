@@ -162,8 +162,6 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
-  gem 'capybara',                     '~> 3.12'
-  gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber-rails',               :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
@@ -175,7 +173,7 @@ group :test do
   gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers', '~> 3.0'
+  gem 'webdrivers',                   :require => false
   gem 'webmock',                      '~> 3.0.1'
 end
 
@@ -184,4 +182,3 @@ group :production do
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
 end
-
