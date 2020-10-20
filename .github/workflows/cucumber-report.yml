@@ -1,5 +1,5 @@
 name: cucumber report
-on: workflow_dispatch
+on: push
 
 jobs:
   cucumber-report:
@@ -39,7 +39,7 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: bundle exec cucumber --format json --out ci/cucumber/gh-cucumber-report.json
+        run: bundle exec cucumber -p gh-report
       - name: Commit file
         run: |
           git config user.name github-actions
