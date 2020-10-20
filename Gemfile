@@ -128,7 +128,6 @@ group :development do
   gem 'rubocop-rspec'
   gem 'rubocop-git'
 
-
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
   gem 'listen',                 '>= 3.0.5', '< 3.2'
@@ -173,7 +172,7 @@ group :test do
   gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers'
+  gem 'webdrivers',                   require: false
   gem 'webmock',                      '~> 3.0.1'
 end
 

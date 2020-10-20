@@ -5,6 +5,8 @@
 # files.
 
 require 'cucumber/rails'
+require 'webdrivers'
+require 'capybara/rails'
 
 # frozen_string_literal: true
 
@@ -67,10 +69,7 @@ Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.add_argument("headless")
   options.add_argument("--window-size=1920,1080")
-
-  if RUBY_PLATFORM =~ /darwin/
-    options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
-  end
+  options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
 
   client = Selenium::WebDriver::Remote::Http::Default.new
   client.open_timeout = 120 # instead of the default 60

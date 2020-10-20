@@ -57,9 +57,8 @@ module BenefitMarketWorld
     @issuer_profiles[legal_name] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: legal_name, assigned_site: site)
   end
 
-  def issuer_profile(carrier=:default)
-    # issuer_profiles(carrier) Nisanth's solution
-    @issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
+  def issuer_profile
+    @issuer_profile ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site)
   end
 
   def dental_issuer_profile(carrier=:default)

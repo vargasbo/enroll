@@ -29,8 +29,6 @@ Feature: Broker Agency Registration
 
   Scenario: When the broker is hired as a census employee and registration is complete through employee role
     Given a CCA site exists with a benefit market
-    # These steps will set up:
-    # Given Primary Broker Ricky Martin exists
     When Primary Broker visits the HBX Broker Registration form
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
@@ -49,7 +47,6 @@ Feature: Broker Agency Registration
     Then Hbx Admin should see the broker successfully approved message
     And Hbx Admin logs out
 
-    # Set up employer
     And benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer Acme Inc.
     And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
