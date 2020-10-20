@@ -1,5 +1,5 @@
-name: cucumber report
-on: workflow_dispatch
+name: flaky cukes
+on: push
 
 jobs:
   cucumber-report:
