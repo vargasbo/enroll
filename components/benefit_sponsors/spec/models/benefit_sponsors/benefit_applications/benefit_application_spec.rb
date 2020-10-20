@@ -586,13 +586,12 @@ module BenefitSponsors
           end
 
           it "should create renewal benefit group assignment" do
-            expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
+            #expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
           end
 
           it "renewal benefit group assignment is_active set to false" do
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
+            expect(census_employee.renewal_benefit_group_assignment.activated_at).to eq nil
           end
         end
 
@@ -610,10 +609,8 @@ module BenefitSponsors
           it "should not update benefit group assignments" do
             expect(renewal_application.aasm_state).to eq :enrollment_open
 
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
 
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
             expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
           end
         end
@@ -632,15 +629,18 @@ module BenefitSponsors
             renewal_application.activate_enrollment!
           end
 
-          it "should activate renewal benefit group assignment & set is_active to true" do
+          it "should activate renewal benefit group assignment" do
             expect(renewal_application.aasm_state).to eq :active
             renewal_bga = census_employee.benefit_group_assignments.effective_on(renewal_application.effective_period.min).first
             expect(renewal_bga.benefit_application).to eq renewal_application
+<<<<<<< HEAD
             expect(census_employee.active_benefit_group_assignment.is_active).to eq true
           end
 
           xit "should deactivate active benefit group assignment" do
             expect(census_employee.benefit_group_assignments.where(benefit_package_id: benefit_package.id).first.is_active).to eq false
+=======
+>>>>>>> origin/feature_2020_er_eligibility_r4
           end
         end
 
@@ -704,7 +704,7 @@ module BenefitSponsors
         end
       end
 
-      context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
+      context "HbxEnrollment available for benefit application return the enrollment with the given date" do
         before do
           enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
           enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)
