@@ -211,9 +211,9 @@ module BenefitSponsors
       def self.all_profiles
         Rails.cache.fetch("all_profiles", expires_in: 4.hour) do
           profiles = []
-          profiles.push *self.employer_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'employer' } }
-          profiles.push *self.broker_agency_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'broker_agency' } }
-          profiles.push *self.general_agency_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'general_agency' } }
+          profiles.push(*self.employer_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'employer' } })
+          profiles.push(*self.broker_agency_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'broker_agency' } })
+          profiles.push(*self.general_agency_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'general_agency' } })
         end
       end
 

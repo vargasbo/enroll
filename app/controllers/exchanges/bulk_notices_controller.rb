@@ -24,20 +24,20 @@ module Exchanges
       @entities = BenefitSponsors::Organizations::Organization.all_profiles.to_json
       @bulk_notice = Admin::BulkNotice.new
     end
-    
+
     def create
       @bulk_notice = Admin::BulkNotice.new(user_id: current_user)
 
       if @bulk_notice.update_attributes(bulk_notice_params)
         redirect_to exchanges_bulk_notice_path(@bulk_notice)
-      else 
+      else
         render "new"
       end
     end
 
     def enqueue
       # Fake Enqueue
-      Organization.all.collect{|e| e.hbx_id}.each do |hbx_id|
+      Organization.all.collect(&:hbx_id).each do |hbx_id|
         BulkNoticeWorker.perform_async(hbx_id)
       end
       render action: "index"
