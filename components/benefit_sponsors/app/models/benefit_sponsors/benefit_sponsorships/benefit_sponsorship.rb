@@ -518,7 +518,7 @@ module BenefitSponsors
       #   end.include?(benefit_applications.last.aasm_state)
       #   benefit_applications.last
       # end
-      recent_bas = benefit_applications.order_by(:created_at.desc).to_a.last(3)
+      recent_bas = benefit_applications.order_by(:created_at.asc).to_a.last(3)
       termed_or_ineligible_app = recent_bas.detect(&:is_termed_or_ineligible?)
       return nil unless termed_or_ineligible_app
 
@@ -547,7 +547,7 @@ module BenefitSponsors
     end
 
     def is_potential_off_cycle_employer?
-      benefit_applications.order_by(:created_at.desc).to_a.last(2).any?(&:is_termed_or_ineligible?)
+      benefit_applications.order_by(:created_at.asc).to_a.last(2).any?(&:is_termed_or_ineligible?)
     end
 
     def most_recent_benefit_application
