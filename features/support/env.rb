@@ -77,7 +77,7 @@ Capybara.default_max_wait_time = 5
 
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("headless")
+  options.add_argument("headless") unless ENV['HEADLESS'] == "false"
   options.add_argument("--window-size=1920,1080")
   options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
   options.add_argument("--no-sandbox")

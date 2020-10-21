@@ -9,6 +9,7 @@ module Queries
 
     def initialize(attributes)
       @custom_attributes = attributes
+      puts @custom_attributes.inspect
       @employer_profile = BenefitSponsors::Organizations::Organization.employer_profiles.where(
         :"profiles._id" => BSON::ObjectId.from_string(@custom_attributes[:id])
       ).first.try(:employer_profile) || EmployerProfile.find(@custom_attributes[:id]) # Remove try when you deprecate old ER profile
