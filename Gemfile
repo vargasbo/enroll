@@ -160,7 +160,7 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
-  gem 'cucumber-rails',               '~> 2.0.0', require: false
+  gem 'cucumber-rails',               '~> 2.1.0', require: false
   gem 'database_cleaner-mongoid'
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'

@@ -44,7 +44,7 @@ ActionController::Base.allow_rescue = false
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
   load Rails.root + "db/seedfiles/english_translations_seed.rb"
-  DatabaseCleaner.strategy = :truncation, {:except => %w[translations]}
+  DatabaseCleaner[:mongoid].strategy = :truncation, { except: ["translations"] }
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end
@@ -80,6 +80,9 @@ Capybara.register_driver :selenium_chrome do |app|
   options.add_argument("headless")
   options.add_argument("--window-size=1920,1080")
   options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
+  options.add_argument("--no-sandbox")
+  options.add_argument("--disable-gpu")
+  options.add_argument("--disable-extensions")
 
   client = Selenium::WebDriver::Remote::Http::Default.new
   client.open_timeout = 120 # instead of the default 60
