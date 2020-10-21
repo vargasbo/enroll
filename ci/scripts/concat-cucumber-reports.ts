@@ -19,15 +19,15 @@ async function getJson() {
     'utf-8'
   );
   const financialAssistance = await fs.readFile(
-    './ci/cucumber/financial-assistance-report.json',
+    './ci/cucumber/financial_assistance-report.json',
     'utf-8'
   );
   const generalAgencies = await fs.readFile(
-    './ci/cucumber/general-agencies-report.json',
+    './ci/cucumber/general_agencies-report.json',
     'utf-8'
   );
   const groupSelection = await fs.readFile(
-    './ci/cucumber/group-selection-report.json',
+    './ci/cucumber/group_selection-report.json',
     'utf-8'
   );
   const hbx = await fs.readFile('./ci/cucumber/hbx-report.json', 'utf-8');
@@ -48,7 +48,7 @@ async function getJson() {
     'utf-8'
   );
   const planShopping = await fs.readFile(
-    './ci/cucumber/plan-shopping-report.json',
+    './ci/cucumber/plan_shopping-report.json',
     'utf-8'
   );
 
@@ -77,7 +77,7 @@ async function getJson() {
 
   const jsonList = JSON.stringify(allReports);
 
-  await fs.writeFile('./ci/cucumber/local-cucumber-report.json', jsonList);
+  await fs.writeFile('./ci/cucumber/gh-cucumber-report.json', jsonList);
 }
 
 getJson();

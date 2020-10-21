@@ -2,12 +2,31 @@ name: cucumber report
 on: push
 
 jobs:
-  cucumber-report:
+  feature-folder-reports:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        feature-folder:
+          [
+            'admin',
+            'brokers',
+            'cover_all',
+            'employee',
+            'employers',
+            'financial_assistance',
+            'general_agencies',
+            'group_selection',
+            'hbx',
+            'hbx_admin',
+            'insured',
+            'integration',
+            'permissions',
+            'plan_shopping',
+          ]
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: '10'
       - uses: wbari/start-mongoDB@v0.2
@@ -39,12 +58,41 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: bundle exec cucumber -p gh-report
+        run: bundle exec cucumber features/${{ matrix.feature_folder }} --format json --out ci/cucumber/${{ matrix.feature_folder }}-report.json --fail-fast --strict --tags 'not @wip and not @broken and not @ma_only' -r features
       - name: Commit file
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git add ci/cucumber/${{ matrix.feature_folder }}-report.json
+          git commit -m "update ${{ matrix.feature_folder}} report"
+          git pull --rebase
+          git push
+  concat-reports:
+    runs-on: ubuntu-latest
+    needs: [feature-folder-reports]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: concat reports
+        run: npx ts-node ci/scripts/concat-cucumber-report
+      - name: commit files
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git add ci/cucumber/gh-cucumber-report.json
-          git commit -m "update cucumber report"
+          git commit -m 'update cucumber split config'
           git pull --rebase
           git push
