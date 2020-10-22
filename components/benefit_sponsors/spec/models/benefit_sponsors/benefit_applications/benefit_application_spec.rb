@@ -520,14 +520,14 @@ module BenefitSponsors
           reference_product.save!
           bp
         end
-        let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_group_id:nil, benefit_package_id: benefit_package.id, is_active:true)}
+        let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_group_id:nil, benefit_package_id: benefit_package.id)}
         let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
         let(:renewal_application) do
           application = initial_application.renew
           application.save
           application
         end
-        let(:renewal_bga) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
+        let(:renewal_bga) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee)}
         let(:renewal_product_package)    { benefit_market_catalog_next_year.product_packages.detect { |package| package.package_kind == package_kind } }
         let(:product) { renewal_product_package.products[0] }
 
@@ -580,13 +580,12 @@ module BenefitSponsors
           end
 
           it "should create renewal benefit group assignment" do
-            expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
+            #expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
           end
 
           it "renewal benefit group assignment is_active set to false" do
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
+            expect(census_employee.renewal_benefit_group_assignment.activated_at).to eq nil
           end
         end
 
@@ -604,10 +603,8 @@ module BenefitSponsors
           it "should not update benefit group assignments" do
             expect(renewal_application.aasm_state).to eq :enrollment_open
 
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
 
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
             expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
           end
         end
@@ -626,15 +623,10 @@ module BenefitSponsors
             renewal_application.activate_enrollment!
           end
 
-          it "should activate renewal benefit group assignment & set is_active to true" do
+          it "should activate renewal benefit group assignment" do
             expect(renewal_application.aasm_state).to eq :active
             renewal_bga = census_employee.benefit_group_assignments.effective_on(renewal_application.effective_period.min).first
             expect(renewal_bga.benefit_application).to eq renewal_application
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
-          end
-
-          xit "should deactivate active benefit group assignment" do
-            expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
           end
         end
 
@@ -698,7 +690,7 @@ module BenefitSponsors
         end
       end
 
-      context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
+      context "HbxEnrollment available for benefit application return the enrollment with the given date" do
         before do
           enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
           enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)

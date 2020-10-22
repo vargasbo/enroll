@@ -30,7 +30,7 @@ module BenefitSponsors
       delegate :benefit_sponsor_catalog, to: :benefit_application
       delegate :rate_schedule_date,      to: :benefit_application
       delegate :effective_period,        to: :benefit_application
-      delegate :recorded_sic_code, to: :benefit_application
+      delegate :recorded_sic_code,       to: :benefit_application
 
       delegate :start_on, :end_on, :open_enrollment_period, to: :benefit_application
       delegate :open_enrollment_start_on, :open_enrollment_end_on, to: :benefit_application
@@ -40,7 +40,8 @@ module BenefitSponsors
       delegate :benefit_market, to: :benefit_application
       delegate :is_conversion?, to: :benefit_application
       delegate :is_renewing?,   to: :benefit_application
-      delegate :shoppable?,   to: :benefit_application
+      delegate :shoppable?,     to: :benefit_application
+      delegate :cover?,         to: :effective_period
 
       validates_presence_of :title, :probation_period_kind, :is_default, :is_active #, :sponsored_benefits
 
@@ -73,6 +74,12 @@ module BenefitSponsors
       def open_enrollment_contains?(date)
         open_enrollment_period.include?(date)
       end
+
+      # def cover?(date)
+      #   effective_period.cover?(date)
+      # end
+
+
 
       def package_for_open_enrollment(shopping_date)
         if open_enrollment_period.include?(shopping_date)
@@ -254,7 +261,7 @@ module BenefitSponsors
         #        as I am not sure what tests rely on renewal.
         #        Correct and updates specs IMMEDIATELY.
 
-        census_employees_assigned_on(effective_period.min, false).each do |member| 
+        census_employees_assigned_on(effective_period.min).each do |member|
           if Rails.env.test?
             renew_member_benefit(member)
           else
@@ -281,7 +288,7 @@ module BenefitSponsors
 
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
-          
+
           enrollments = family.active_household.hbx_enrollments.enrolled_and_waived
           .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
 
@@ -289,7 +296,7 @@ module BenefitSponsors
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
-              renewed_enrollment = hbx_enrollment.renew_benefit(self)       
+              renewed_enrollment = hbx_enrollment.renew_benefit(self)
             end
 
             trigger_renewal_model_event(sponsored_benefit, census_employee, renewed_enrollment)
@@ -348,7 +355,7 @@ module BenefitSponsors
           end
         end
       end
- 
+
       def terminate_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
         terminate_benefit_group_assignments
         enrolled_and_terminated_families.each do |family|
@@ -468,8 +475,8 @@ module BenefitSponsors
         end
       end
 
-      def eligible_assigned_census_employees(effective_date, is_active = true)
-        CensusEmployee.by_benefit_package_and_assignment_on_or_later(self, effective_date, is_active).non_term_and_pending
+      def eligible_assigned_census_employees(effective_date)
+        CensusEmployee.by_benefit_package_and_assignment_on_or_later(self, effective_date).non_term_and_pending
       end
 
       def assign_other_benefit_package(other_benefit_package)
@@ -477,13 +484,13 @@ module BenefitSponsors
           if is_renewing?
             ce.add_renew_benefit_group_assignment([other_benefit_package])
           else
-            ce.find_or_create_benefit_group_assignment([other_benefit_package])
+            ce.create_benefit_group_assignment([other_benefit_package])
           end
         end
       end
 
       def activate_benefit_group_assignments
-        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.each do |ce|
+        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on).non_terminated.each do |ce|
           ce.benefit_group_assignments.each do |bga|
             if bga.benefit_package_id == self.id
               bga.make_active
@@ -492,11 +499,12 @@ module BenefitSponsors
         end
       end
 
+      # TODO: Figure this out and depracate
       def deactivate_benefit_group_assignments
         self.benefit_application.benefit_sponsorship.census_employees.each do |ce|
           benefit_group_assignments = ce.benefit_group_assignments.where(benefit_package_id: self.id)
           benefit_group_assignments.each do |benefit_group_assignment|
-            benefit_group_assignment.update(is_active: false) unless is_renewing?
+            benefit_group_assignment.update(end_on: benefit_group_assignment.start_on) unless is_renewing?
           end
         end
       end
@@ -528,8 +536,8 @@ module BenefitSponsors
         sponsored_benefit_for(:dental).present?
       end
 
-      def census_employees_assigned_on(effective_date, is_active = true)
-        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date, is_active).non_term_and_pending
+      def census_employees_assigned_on(effective_date)
+        CensusEmployee.by_benefit_package_and_assignment_on(self, effective_date).non_term_and_pending
       end
 
       def census_employees_eligible_for_renewal(effective_date)
