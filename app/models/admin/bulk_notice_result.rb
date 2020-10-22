@@ -7,6 +7,7 @@ module Admin
 
     field :audience_identifier, type: String
     field :result, type: String
+    field :audience_member_identifier, type: String
 
     embedded_in :bulk_notice
   end

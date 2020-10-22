@@ -35,12 +35,11 @@ module Exchanges
       end
     end
 
-    def enqueue
-      # Fake Enqueue
-      Organization.all.collect(&:hbx_id).each do |hbx_id|
-        BulkNoticeWorker.perform_async(hbx_id)
+    def update
+      @bulk_notice = Admin::BulkNotice.find(params[:id])
+      if @bulk_notice.update_attributes(bulk_notice_params)
+        @bulk_notice.process!
       end
-      render action: "index"
     end
 
     private
