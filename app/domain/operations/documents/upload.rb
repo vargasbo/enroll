@@ -48,13 +48,17 @@ module Operations
       end
 
       def construct_body(resource, file_params, subjects)
-        document_body = { subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}], "document_type": 'notice', 'creator': Settings.site.publisher,
-                              'publisher': Settings.site.publisher,
-                              'type': 'text',
-                              'format': 'application/octet-stream',
-                              'source': 'enroll_system',
-                              'language': 'en',
-                              'date_submitted': TimeKeeper.date_of_record }
+        document_body = {
+          subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}],
+          'document_type': 'notice',
+          'creator': Settings.site.publisher,
+          'publisher': Settings.site.publisher,
+          'type': 'text',
+          'format': 'application/octet-stream',
+          'source': 'enroll_system',
+          'language': 'en',
+          'date_submitted': TimeKeeper.date_of_record
+        }
         document_body[:subjects] = subjects unless subjects.nil?
         Success({ document: document_body.to_json,
                   content: fetch_file(file_params) })
