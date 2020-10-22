@@ -29,6 +29,7 @@ module Exchanges
       @bulk_notice = Admin::BulkNotice.new(user_id: current_user)
 
       if @bulk_notice.update_attributes(bulk_notice_params)
+        @bulk_notice.upload_document(params[:document])
         redirect_to exchanges_bulk_notice_path(@bulk_notice)
       else
         render "new"
