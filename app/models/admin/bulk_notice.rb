@@ -22,6 +22,7 @@ module Admin
     belongs_to :user, class_name: 'User'
 
     embeds_many :results, class_name: "Admin::BulkNoticeResult"
+    embeds_many :documents, as: :documentable
 
     def process!
       batch = Sidekiq::Batch.new
@@ -51,7 +52,7 @@ module Admin
       event :complete do
         transitions from: :processing, to: :completed
       end
-    embeds_many :documents, as: :documentable
+    end
 
     def upload_document(params)
       ::Operations::Documents::Upload.new.call(resource: self, file_params: params, user: current_user, subjects: subjects)
