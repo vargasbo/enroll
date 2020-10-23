@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # During Preview (view) we have all the identifiers (record ids) we want process
-# When Submitting Preview, we capture all 
+# When Submitting Preview, we capture all
 
 module Admin
   class BulkNotice
@@ -35,7 +35,7 @@ module Admin
       end
     end
 
-    def on_success(status, options)
+    def on_success(_status, _options)
       complete!
     end
 

@@ -5,7 +5,7 @@ class HbxEnrollment
   include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
-  include AASM 
+  include AASM
   include MongoidSupport::AssociationProxies
   include Acapi::Notifiers
   extend Acapi::Notifiers

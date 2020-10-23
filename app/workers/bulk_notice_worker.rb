@@ -4,7 +4,6 @@ class BulkNoticeWorker
   include Sidekiq::Worker
 
   def perform(audience_id, bulk_notice_id)
-
     # Call Operations here!
     bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
     @org = BenefitSponsors::Organizations::Organization.find(audience_id)
@@ -14,7 +13,8 @@ class BulkNoticeWorker
       bulk_notice.results.create(
         audience_member_identifier: audience_member.id,
         audience_id: audience_id,
-        result: "OK!")
+        result: "OK!"
+      )
     end
 
     Rails.logger.info("Processing #{id} for Bulk Notice request #{bulk_notice_id}")
