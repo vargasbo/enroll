@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/AbcSize
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigrationTask
   def all_census_employees
-    @census_employees ||= CensusEmployee.all
+    @all_census_employees ||= CensusEmployee.all
   end
 
   def ce_with_overlapping_benefit_assignments(census_employee)
@@ -57,3 +59,5 @@ class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigration
   end
   puts("Generation of overlapping benefit group assignments report complete.") unless Rails.env.test?
 end
+
+# rubocop:enable Metrics/AbcSize
