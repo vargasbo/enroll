@@ -7,7 +7,6 @@ class QualifyingLifeEventKind
   MarketKinds = %w[shop]
 
   EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month)
-
   REASON_KINDS = [
     "lost_access_to_mec",
     "adoption",
