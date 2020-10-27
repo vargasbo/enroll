@@ -130,14 +130,14 @@ module Insured
         year = hbx_created_datetime.year
         month = hbx_created_datetime.month + offset_month
         if month > 12
-          year = year + 1
-          month = month - 12
+          year += 1
+          month -= 12
         end
         day = 1
         hour = hbx_created_datetime.hour
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
-        return DateTime.new(year, month, day, hour, min, sec)
+        DateTime.new(year, month, day, hour, min, sec)
       end
 
       private
