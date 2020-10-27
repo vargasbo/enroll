@@ -3,7 +3,6 @@
 class BulkNoticeWorker
   include Sidekiq::Worker
   def perform(audience_id, bulk_notice_id)
-    # Call Operations here!
     bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
     @org = BenefitSponsors::Organizations::Organization.find(audience_id)
     result = Operations::SecureMessageAction.new.call(

@@ -1,17 +1,17 @@
 require 'rails_helper'
 
 describe BulkNoticeWorker do
-  describe "#peform" do
+  describe "#peform_async" do
 
     context "with employees as the audience type" do
         let(:profile) { FactoryBot.create :benefit_sponsors_organizations_aca_shop_dc_employer_profile }
         let(:audience) { profile.organization }
-        let(:bulk_notice) { FactoryBot.create :bulk_notice, audience_type: 'employees', audience_identifiers: [ audience.id ]}
+        let!(:user) { FactoryBot.create(:user, :with_hbx_staff_role) }
+        let(:bulk_notice) { FactoryBot.create :bulk_notice, user: user, audience_type: 'employees', audience_identifiers: [ audience.id.to_s ]}
 
-        before { subject.peform_async(audience.id, bulk_notice.id) }
+        before { BulkNoticeWorker.perform_async(audience.id.to_s, bulk_notice.id.to_s) }
 
         it 'delievered a message for each employee (audience_member)' do
-          byebug
           audience.employees.each do |audience_member|
             expect(audience_member.messages.first).to_not be_nil
         end

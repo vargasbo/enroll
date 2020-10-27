@@ -22,7 +22,7 @@ module Admin
     belongs_to :user, class_name: 'User'
 
     embeds_many :results, class_name: "Admin::BulkNoticeResult"
-    embeds_many :documents, as: :documentable
+    #embeds_many :documents, as: :documentable # WHAT IS THIS FOR?
 
     def process!
       batch = Sidekiq::Batch.new
