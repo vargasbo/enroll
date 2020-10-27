@@ -24,6 +24,7 @@ class BulkNoticeReflex < ApplicationReflex
   def new_identifier
     session[:bulk_notice] ||= { audience: {} }
     params[:admin_bulk_notice][:audience_ids] ||= []
+    audience_type = params[:admin_bulk_notice][:audience_type] == 'employee' ? 'employer' : params[:admin_bulk_notice][:audience_type]
 
     identifiers = element[:value]
     org_badges = identifiers.split(/ |, |,/).reduce('') do |badges, identifier|
@@ -36,9 +37,13 @@ class BulkNoticeReflex < ApplicationReflex
           session[:bulk_notice][:audience][organization.id.to_s] = { id: organization.id,
                                                                      legal_name: organization.legal_name,
                                                                      fein: organization.fein,
-                                                                     hbx_id: organization.hbx_id }
-                                                                     # types: organization.profile_types }
-          badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: organization.id, legal_name: organization.legal_name })
+                                                                     hbx_id: organization.hbx_id,
+                                                                     types: organization.profile_types }
+          if session[:bulk_notice][:audience][organization.id.to_s][:types].include?(audience_type)
+            badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: organization.id, legal_name: organization.legal_name })
+          else
+            badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: organization.id, error: 'Wrong audience type', legal_name: organization.legal_name })
+          end
         end
       elsif params[:admin_bulk_notice][:audience_ids].include?(identifier)
         badges
@@ -52,8 +57,29 @@ class BulkNoticeReflex < ApplicationReflex
       org_attrs = session[:bulk_notice][:audience][org_id]
       if org_attrs.key?(:error)
         badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_id, error: org_attrs[:error], legal_name: org_attrs[:legal_name] })
+      elsif org_attrs[:types].include?(audience_type)
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_id, error: 'Wrong audience type', legal_name: org_attrs[:legal_name] })
       else
         badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_id, legal_name: org_attrs[:legal_name] })
+      end
+    end
+
+    morph '#recipient-list', org_badges
+  end
+
+  def audience_select
+    session[:bulk_notice] ||= { audience: {} }
+    params[:admin_bulk_notice][:audience_ids] ||= []
+    audience_type = params[:admin_bulk_notice][:audience_type] == 'employee' ? 'employer' : params[:admin_bulk_notice][:audience_type]
+
+    org_badges = params[:admin_bulk_notice][:audience_ids].reduce('') do |badges, identifier|
+      org_attrs = session[:bulk_notice][:audience][identifier]
+      if org_attrs.key?(:error)
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: org_attrs[:error], legal_name: org_attrs[:legal_name] })
+      elsif org_attrs[:types].include?(audience_type)
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: 'Wrong audience type', legal_name: org_attrs[:legal_name] })
+      else
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: identifier, legal_name: org_attrs[:legal_name] })
       end
     end
 

@@ -12,7 +12,7 @@ module Admin
 
     field :user_id, type: String
     field :audience_type, type: String
-    field :audience_identifiers, type: Array
+    field :audience_ids, type: Array
     field :subject, type: String
     field :body, type: String
     field :aasm_state, type: String
@@ -29,7 +29,7 @@ module Admin
       batch.description = "Bulk Notice for id #{self.id}"
       batch.on(:complete, Admin::BulkNotice)
       batch.jobs do
-        audience_identifiers.map do |audience_id|
+        audience_ids.map do |audience_id|
           BulkNoticeWorker.perform_async(audience_id, self.id)
         end
       end
@@ -59,7 +59,9 @@ module Admin
     end
 
     def subjects
-      audience_identifiers.map {|identifier| {id: identifier, type: audience_type}}
+      audience_ids.map {|identifier| {id: identifier, type: audience_type}}
     end
+
+    def audience_identifiers; end
   end
 end

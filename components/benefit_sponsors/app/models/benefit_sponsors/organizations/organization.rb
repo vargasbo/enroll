@@ -280,9 +280,9 @@ module BenefitSponsors
 
       def profile_types
         result = []
-        result << :employer if is_employer_profile?
-        result << :broker_agency if is_broker_agency_profile?
-        result << :general_agency if is_general_agency_profile?
+        result << 'employer' if is_employer_profile?
+        result << 'broker_agency' if is_broker_agency_profile?
+        result << 'general_agency' if is_general_agency_profile?
         result
       end
 

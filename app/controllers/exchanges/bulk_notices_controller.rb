@@ -31,7 +31,7 @@ module Exchanges
       @bulk_notice = Admin::BulkNotice.new(user_id: current_user)
 
       if @bulk_notice.update_attributes(bulk_notice_params)
-        @bulk_notice.upload_document(params[:document], current_user)
+        @bulk_notice.upload_document(params[:document], current_user) if params[:document]
         redirect_to exchanges_bulk_notice_path(@bulk_notice)
       else
         render 'new'
@@ -51,8 +51,7 @@ module Exchanges
     private
 
     def bulk_notice_params
-      params[:admin_bulk_notice][:audience_identifiers] = params[:admin_bulk_notice][:audience_identifiers].split(" ")
-      params.require(:admin_bulk_notice).permit!
+      params.require(:admin_bulk_notice).except(:audience_identifiers).permit!
     end
 
     def unread_messages
