@@ -12,7 +12,7 @@ module Admin
 
     field :user_id, type: String
     field :audience_type, type: String
-    field :audience_identifiers, type: Array
+    field :audience_ids, type: Array
     field :subject, type: String
     field :body, type: String
     field :aasm_state, type: String
@@ -25,14 +25,15 @@ module Admin
     embeds_many :documents, as: :documentable, class_name: "Document"
 
     def process!
-      batch = Sidekiq::Batch.new
-      batch.description = "Bulk Notice for id #{self.id}"
-      batch.on(:complete, Admin::BulkNotice)
-      batch.jobs do
-        audience_identifiers.map do |audience_id|
-          BulkNoticeWorker.perform_async(audience_id, self.id)
+      #batch = Sidekiq::Batch.new
+      #batch.description = "Bulk Notice for id #{self.id}"
+      #batch.on(:complete, Admin::BulkNotice)
+      #batch.jobs do
+        audience_ids.map do |audience_id|
+          puts "Bulk Job #{audience_id}"
+          BulkNoticeWorker.perform_async(audience_id, self.id.to_s)
         end
-      end
+      #end
     end
 
     def on_success(_status, _options)
@@ -59,7 +60,7 @@ module Admin
     end
 
     def subjects
-      audience_identifiers.map {|identifier| {id: identifier, type: audience_type}}
+      audience_ids.map {|identifier| {id: identifier, type: audience_type}}
     end
   end
 end

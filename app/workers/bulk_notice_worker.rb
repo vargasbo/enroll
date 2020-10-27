@@ -5,12 +5,15 @@ class BulkNoticeWorker
   def perform(audience_id, bulk_notice_id)
     bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
     @org = BenefitSponsors::Organizations::Organization.find(audience_id)
+
     result = Operations::SecureMessageAction.new.call(
-      resource_id: audience_id,
+      params: { resource_id: @org.profiles.first.id.to_s,
       resource_name: 'BenefitSponsors::Organizations::Profile',
       subject: bulk_notice.subject,
       body: bulk_notice.body,
-      document: bulk_notice.documents.first
+      actions_id: "Bulk Notice"
+      document: bulk_notice.documents.first},
+      user: User.first
     )
     if result.success?
       bulk_notice.results.create(
