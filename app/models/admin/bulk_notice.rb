@@ -32,7 +32,7 @@ module Admin
         audience_ids.map do |audience_id|
           BulkNoticeWorker.perform_async(audience_id, self.id)
         end
-      #end
+      end
     end
 
     def on_success(_status, _options)
