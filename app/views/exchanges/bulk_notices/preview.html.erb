@@ -6,7 +6,7 @@
   <h4>Preview</h4>
   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
-  <%= form_for(@bulk_notice, url: exchanges_bulk_notices_path) do |f| %>
+  <%= form_for(@bulk_notice, url: exchanges_bulk_notice_path(@bulk_notice)) do |f| %>
     <%= f.select :audience_type, { 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2' %>
     <table class='table table-message-wrapper'>
       <tbody>
@@ -14,14 +14,14 @@
           <th style="text-transform: capitalize;">Recipients:</th>
           <td data-target="bulk-notice.recipientList">
             <span class="badge badge-secondary d-none mb-1" data-target="bulk-notice.recipientBadge">
-              <%= f.hidden_field :audience_identifiers, multiple: true %>
+              <%= f.hidden_field :audience_ids, multiple: true %>
               <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
                 <i class="far fa-times-circle"></i>
               </a>
             </span>
-            <% @bulk_notice.audience_identifiers.each do |identifier| %>
+            <% @bulk_notice.audience_ids.each do |identifier| %>
               <span class="badge badge-secondary mb-1">
-                <%= f.hidden_field :audience_identifiers, multiple: true, value: identifier %>
+                <%= f.hidden_field :audience_ids, multiple: true, value: identifier %>
                 <%= BenefitSponsors::Organizations::Organization.find(identifier).legal_name %>&nbsp;
                 <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
                   <i class="far fa-times-circle"></i>

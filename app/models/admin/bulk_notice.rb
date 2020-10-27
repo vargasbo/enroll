@@ -25,13 +25,12 @@ module Admin
     embeds_many :documents, as: :documentable, class_name: "Document"
 
     def process!
-      #batch = Sidekiq::Batch.new
-      #batch.description = "Bulk Notice for id #{self.id}"
-      #batch.on(:complete, Admin::BulkNotice)
-      #batch.jobs do
+      batch = Sidekiq::Batch.new
+      batch.description = "Bulk Notice for id #{self.id}"
+      batch.on(:complete, Admin::BulkNotice)
+      batch.jobs do
         audience_ids.map do |audience_id|
-          puts "Bulk Job #{audience_id}"
-          BulkNoticeWorker.perform_async(audience_id, self.id.to_s)
+          BulkNoticeWorker.perform_async(audience_id, self.id)
         end
       #end
     end
@@ -62,5 +61,7 @@ module Admin
     def subjects
       audience_ids.map {|identifier| {id: identifier, type: audience_type}}
     end
+
+    def audience_identifiers; end
   end
 end

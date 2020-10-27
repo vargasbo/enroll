@@ -1,26 +1,22 @@
 import { Controller } from "stimulus";
+import StimulusReflex from 'stimulus_reflex';
 
 export default class extends Controller {
   static targets = ['recipientList', 'recipientBadge', 'audienceSelect']
 
+  connect() {
+    console.log('connect')
+    StimulusReflex.register(this)
+  }
+
   initialize() {
-    this.orgIds = JSON.parse(this.data.get('orgIds'))
-    console.log(this.orgIds)
   }
 
   newIdentifier(event) {
     let identifierEl = event.currentTarget
     if (identifierEl.value == "") return
 
-    if (identifierEl.value.match(/[ ,]/)) { // more than one
-      let results = { found: [], not_found: [], invalid: [] }
-      identifierEl.value.split(/\s*,?\s/).forEach((id) => {
-        this.matchHandler(id)
-      })
-    } else {
-      this.matchHandler(identifierEl.value)
-    }
-    identifierEl.value = ''
+    this.stimulate('BulkNotice#new_identifier', identifierEl.value)
   }
 
   matchHandler(matcher) {
@@ -34,6 +30,10 @@ export default class extends Controller {
     } else {
       this.newErrorBadge(id)
     }
+  }
+
+  newIdentifierSuccess(element) {
+    element.value = '';
   }
 
   newSuccessBadge(match) {
