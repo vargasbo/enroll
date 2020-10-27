@@ -5,6 +5,7 @@ module Exchanges
     layout 'bootstrap_4'
 
     before_action :unread_messages
+    before_action :set_current_user
 
     def index
       @bulk_notices = Admin::BulkNotice.all
@@ -29,7 +30,7 @@ module Exchanges
       @bulk_notice = Admin::BulkNotice.new(user_id: current_user)
 
       if @bulk_notice.update_attributes(bulk_notice_params)
-        @bulk_notice.upload_xdocument(params[:document])
+        @bulk_notice.upload_document(params[:document], current_user)
         redirect_to exchanges_bulk_notice_path(@bulk_notice)
       else
         render 'new'

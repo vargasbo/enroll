@@ -22,7 +22,7 @@ module Admin
     belongs_to :user, class_name: 'User'
 
     embeds_many :results, class_name: "Admin::BulkNoticeResult"
-    #embeds_many :documents, as: :documentable # WHAT IS THIS FOR?
+    embeds_many :documents, as: :documentable, class_name: "Document"
 
     def process!
       batch = Sidekiq::Batch.new
@@ -54,8 +54,8 @@ module Admin
       end
     end
 
-    def upload_document(params)
-      ::Operations::Documents::Upload.new.call(resource: self, file_params: params, user: current_user, subjects: subjects)
+    def upload_document(params, user)
+      ::Operations::Documents::Upload.new.call(resource: self, file_params: params, user: user, subjects: subjects)
     end
 
     def subjects

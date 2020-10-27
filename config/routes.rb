@@ -16,9 +16,7 @@ Rails.application.routes.draw do
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
-  authenticate(:user, ->(admin) { admin.active? }) do
-    mount Sidekiq::Web => '/sidekiq'
-  end
+  mount Sidekiq::Web => '/sidekiq'
 
   namespace :uis do
     resources :bootstrap3_examples do
