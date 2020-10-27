@@ -29,19 +29,21 @@ module Exchanges
       @bulk_notice = Admin::BulkNotice.new(user_id: current_user)
 
       if @bulk_notice.update_attributes(bulk_notice_params)
-        @bulk_notice.upload_document(params[:document])
+        @bulk_notice.upload_xdocument(params[:document])
         redirect_to exchanges_bulk_notice_path(@bulk_notice)
       else
-        render "new"
+        render 'new'
       end
     end
 
-    def enqueue
-      # Fake Enqueue
-      Organization.all.collect(&:hbx_id).each do |hbx_id|
-        BulkNoticeWorker.perform_async(hbx_id)
+    def update
+      @bulk_notice = Admin::BulkNotice.find(params[:id])
+      if @bulk_notice.update_attributes(bulk_notice_params)
+        @bulk_notice.process!
+        redirect_to exchanges_bulk_notice_path(@bulk_notice)
+      else
+        render 'new'
       end
-      render action: "index"
     end
 
     private

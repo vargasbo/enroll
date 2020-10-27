@@ -16,7 +16,9 @@ Rails.application.routes.draw do
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
-  mount Sidekiq::Web => '/sidekiq'
+  authenticate(:user, ->(admin) { admin.active? }) do
+    mount Sidekiq::Web => '/sidekiq'
+  end
 
   namespace :uis do
     resources :bootstrap3_examples do
@@ -72,10 +74,7 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
 
-    resources :bulk_notices do
-      get :enqueue, on: :collection
-      get :preview, on: :member
-    end
+    resources :bulk_notices
 
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
