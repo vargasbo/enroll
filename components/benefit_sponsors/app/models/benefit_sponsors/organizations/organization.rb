@@ -278,16 +278,36 @@ module BenefitSponsors
         end
       end
 
+      def profile_types
+        result = []
+        result << :employer if is_employer_profile?
+        result << :broker_agency if is_broker_agency_profile?
+        result << :general_agency if is_general_agency_profile?
+        result
+      end
+
       def employer_profile
         self.profiles.where(_type: /.*EmployerProfile$/).first
+      end
+
+      def is_employer_profile?
+        profiles.where(_type: /.*EmployerProfile$/).present?
       end
 
       def broker_agency_profile
         self.profiles.where(_type: /.*BrokerAgencyProfile$/).first
       end
 
+      def is_broker_agency_profile?
+        profiles.where(_type: /.*BrokerAgencyProfile$/).present?
+      end
+
       def general_agency_profile
         self.profiles.where(_type: /.*GeneralAgencyProfile$/).first
+      end
+
+      def is_general_agency_profile?
+        profiles.where(_type: /.*GeneralAgencyProfile$/).present?
       end
 
       def hbx_profile
