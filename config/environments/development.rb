@@ -1,6 +1,8 @@
 Rails.application.configure do
   # Verifies that versions and hashed value of the package contents in the project's package.json
   config.webpacker.check_yarn_integrity = true
+  config.session_store :cache_store
+
 
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -50,6 +52,11 @@ Rails.application.configure do
     :host => "127.0.0.1",
     :port => 3000
   }
+
+  config.action_cable.url = "ws://localhost:3000/cable"
+
+  config.action_cable.allowed_request_origins = [/http:\/\/*/, 
+/https:\/\/*/]
 
   #Environment URL stub
   config.checkbook_services_base_url = "https://checkbook_url"

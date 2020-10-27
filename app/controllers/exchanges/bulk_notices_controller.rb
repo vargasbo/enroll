@@ -22,6 +22,7 @@ module Exchanges
     end
 
     def new
+      session[:bulk_notice] = nil
       @entities = BenefitSponsors::Organizations::Organization.all_profiles.to_json
       @bulk_notice = Admin::BulkNotice.new
     end
