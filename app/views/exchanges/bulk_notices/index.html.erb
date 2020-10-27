@@ -37,7 +37,7 @@
         <%= link_to bulk_notice.subject, exchanges_bulk_notice_path(bulk_notice) %>
       </div>
       <div class='col-2 text-right'>
-        <%= bulk_notice.audience_identifiers&.count || 0 %>
+        <%= bulk_notice.audience_ids&.count || 0 %>
       </div>
       <div class='col-2 text-right'>
         None
